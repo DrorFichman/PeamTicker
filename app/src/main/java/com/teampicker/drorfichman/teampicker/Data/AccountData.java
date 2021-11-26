@@ -2,7 +2,7 @@ package com.teampicker.drorfichman.teampicker.Data;
 
 import com.google.firebase.auth.FirebaseUser;
 
-public class AccountData {
+public class AccountData { 
 
     public String email;
     public String displayName;
