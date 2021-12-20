@@ -121,8 +121,8 @@ public class FirebaseHelper implements CloudSync {
                 ArrayList<Game> games = DbHelper.getGames(ctx);
 
                 for (Game g : games) {
-                    ArrayList<Player> team1 = DbHelper.getCurrTeam(ctx, g.gameId, TeamEnum.Team1, -1);
-                    ArrayList<Player> team2 = DbHelper.getCurrTeam(ctx, g.gameId, TeamEnum.Team2, -1);
+                    ArrayList<Player> team1 = DbHelper.getCurrTeam(ctx, g.gameId, TeamEnum.Team1, 0);
+                    ArrayList<Player> team2 = DbHelper.getCurrTeam(ctx, g.gameId, TeamEnum.Team2, 0);
                     g.setTeams(team1, team2);
                     storeGame(g);
                 }
@@ -197,7 +197,7 @@ public class FirebaseHelper implements CloudSync {
                 if (status == null) {
                     // Clear selection once done
                     AuthHelper.fetchFor(null);
-                    Toast.makeText(ctx, "Pulled from " + users.get(which).displayName, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx, "Pull completed from " + users.get(which).displayName, Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -221,7 +221,6 @@ public class FirebaseHelper implements CloudSync {
         pullPlayersFromCloud(ctx, () ->
                 pullGamesFromCloud(ctx, () ->
                         pullPlayersGamesFromCloud(ctx, () -> {
-                            Toast.makeText(ctx, "Pull completed", Toast.LENGTH_LONG).show();
                             handler.showSyncStatus(null);
                         })));
     }

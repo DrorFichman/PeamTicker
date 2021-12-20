@@ -196,7 +196,7 @@ public class PlayerGamesDbHelper {
     public static ArrayList<PlayerGameStat> getPlayerLastGames(SQLiteDatabase db, Player player, int countLastGames) {
 
         ArrayList<PlayerGameStat> results = new ArrayList<>();
-        if (countLastGames == 0) {
+        if (countLastGames <= 0) {
             return results;
         }
 
