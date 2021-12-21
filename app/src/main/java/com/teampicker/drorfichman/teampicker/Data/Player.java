@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
  */
 public class Player extends Sortable implements Serializable, Comparable {
     public String mName;
+    public String msgDisplayName;
     public int mGrade;
     public int mBirthYear;
     public int mBirthMonth;

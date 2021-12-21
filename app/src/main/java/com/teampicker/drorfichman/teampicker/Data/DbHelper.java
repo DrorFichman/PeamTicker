@@ -22,13 +22,18 @@ import androidx.annotation.NonNull;
 public class DbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
     public static final String DATABASE_NAME = "Players.db";
 
     private static SQLiteDatabase writableDatabase;
+    static HashMap<String, ArrayList<PlayerGameStat>> playersHistory = new HashMap();
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public static void onUnderlyingDataChange() {
+        playersHistory.clear();
     }
 
     public static void saveTeams(Context ctx, ArrayList<Player> firstTeam, ArrayList<Player> secondTeam) {
@@ -81,6 +86,7 @@ public class DbHelper extends SQLiteOpenHelper {
         addColumn(db, PlayerContract.PlayerEntry.TABLE_NAME, PlayerContract.PlayerEntry.ATTRIBUTES, "TEXT", "''");
         addColumn(db, PlayerContract.PlayerGameEntry.TABLE_NAME, PlayerContract.PlayerGameEntry.ATTRIBUTES, "TEXT", "''");
         modifyGameDates(db);
+        addColumn(db, PlayerContract.PlayerEntry.TABLE_NAME, PlayerContract.PlayerEntry.MSG_IDENTIFIER, "TEXT", "''");
     }
 
     private void addColumn(SQLiteDatabase db, String table, String column, String type, String def) {
@@ -208,6 +214,13 @@ public class DbHelper extends SQLiteOpenHelper {
         return players;
     }
 
+    @NonNull
+    public static ArrayList<Player> getPlayersByIdentifier(Context context, ArrayList<String> names) {
+        ArrayList<Player> players = PlayerDbHelper.getPlayersByIdentifier(getSqLiteDatabase(context), names);
+        return players;
+    }
+
+
     public static int getComingPlayersCount(Context context) {
         return PlayerDbHelper.getComingPlayersCount(getSqLiteDatabase(context));
     }
@@ -224,6 +237,14 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public static void archivePlayer(Context context, String name, boolean archiveValue) {
         PlayerDbHelper.setPlayerArchive(getSqLiteDatabase(context), name, archiveValue);
+    }
+
+    public static int setPlayerIdentifier(Context context, String name, String identifier) {
+        return PlayerDbHelper.setPlayerMsgIdentifier(getSqLiteDatabase(context), name, identifier);
+    }
+
+    public static void clearPlayerIdentifier(Context context, String name) {
+        PlayerDbHelper.clearPlayerMsgIdentifier(getSqLiteDatabase(context), name);
     }
 
     public static void clearOldGameTeams(Context context) {
@@ -250,7 +271,12 @@ public class DbHelper extends SQLiteOpenHelper {
     private static void addLastGameStats(Context context, int countLastGames, ArrayList<Player> currTeam, boolean statistics) {
 
         for (Player p : currTeam) {
-            p.results = PlayerGamesDbHelper.getPlayerLastGames(getSqLiteDatabase(context), p, countLastGames);
+            if (playersHistory.containsKey(p.mName + countLastGames)) {
+                p.results = playersHistory.get(p.mName + countLastGames);
+            } else {
+                p.results = PlayerGamesDbHelper.getPlayerLastGames(getSqLiteDatabase(context), p, countLastGames);
+                playersHistory.put(p.mName + countLastGames, p.results);
+            }
             if (statistics) {
                 p.statistics = PlayerGamesDbHelper.getPlayerStatistics(getSqLiteDatabase(context), countLastGames, p.mName);
             }
@@ -273,6 +299,7 @@ public class DbHelper extends SQLiteOpenHelper {
         GameDbHelper.insertGameResults(getSqLiteDatabase(context), game);
         PlayerGamesDbHelper.setPlayerGameResult(getSqLiteDatabase(context),
                 game.gameId, game.dateString, game.winningTeam);
+        onUnderlyingDataChange();
     }
 
     public static void updateGameDate(Context context, Game game, String gameDate) {
@@ -320,6 +347,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         GameDbHelper.deleteGame(getSqLiteDatabase(context), game);
         PlayerGamesDbHelper.deleteGame(getSqLiteDatabase(context), game);
+        onUnderlyingDataChange();
     }
 
     public static void clearComingPlayers(Context context) {

@@ -12,7 +12,7 @@
     <CheckBox
         android:id="@+id/player_coming"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="left"
         android:checked="false"
         android:focusable="false"
@@ -22,7 +22,8 @@
     <TextView
         android:id="@+id/player_grade"
         android:layout_width="40dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="9dp"
         android:textAppearance="@style/regularHeadline"
@@ -31,17 +32,18 @@
     <TextView
         android:id="@+id/player_recent_performance"
         android:layout_width="30dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="6dp"
-        android:text="99"
         android:textAppearance="@style/regularHeadline"
         android:textSize="14sp" />
 
     <TextView
         android:id="@+id/player_attributes"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:layout_weight="1"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
@@ -51,19 +53,19 @@
     <TextView
         android:id="@+id/player_age"
         android:layout_width="30dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
-        android:gravity="right"
+        android:gravity="center_vertical"
         android:textAppearance="@style/regularHeadline"
         android:textSize="14sp" />
 
     <TextView
         android:id="@+id/player_name"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:gravity="right"
+        android:gravity="right|center_vertical"
         android:paddingRight="3dp"
         android:textAppearance="@style/regularHeadline"
         android:textSize="14sp" />

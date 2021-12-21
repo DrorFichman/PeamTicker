@@ -1,14 +1,23 @@
 package com.teampicker.drorfichman.teampicker.View;
 
 import android.Manifest;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,7 +39,6 @@ import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DBSnapshotUtils;
 import com.teampicker.drorfichman.teampicker.tools.FileHelper;
-import com.teampicker.drorfichman.teampicker.tools.cloud.DataCallback;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.PermissionTools;
 import com.teampicker.drorfichman.teampicker.tools.SnapshotHelper;
@@ -38,6 +46,9 @@ import com.teampicker.drorfichman.teampicker.tools.cloud.SyncProgress;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -63,8 +74,9 @@ public class MainActivity extends AppCompatActivity
     TextView syncProgressStatus;
 
     private boolean showArchivedPlayers = false;
+    private boolean showPastedPlayers = false;
 
-    Sorting sorting = new Sorting(this::sortingChanged, sortType.grade);
+    Sorting sorting = new Sorting(this::sortingChanged, sortType.coming);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +91,8 @@ public class MainActivity extends AppCompatActivity
 
         setNavigationDrawer(toolbar);
 
-        setPlayersList();
+        ArrayList<Player> players = DbHelper.getPlayers(getApplicationContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
+        setPlayersList(players, null);
 
         syncInProgress = findViewById(R.id.sync_progress);
         syncProgressStatus = findViewById(R.id.sync_progress_status);
@@ -87,19 +100,21 @@ public class MainActivity extends AppCompatActivity
         AuthHelper.requireLogin(this, ACTIVITY_RESULT_SIGN_IN);
     }
 
-    private void setPlayersList() {
-        setHeadlines();
+    private void setPlayersList(List<Player> players, AdapterView.OnItemClickListener clickHandler) {
+        setHeadlines(true);
 
         ListView playersList = findViewById(R.id.players_list);
-
-        ArrayList<Player> players = DbHelper.getPlayers(getApplicationContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
         playersAdapter = new PlayerAdapter(this, players, this::setActivityTitle);
 
-        playersList.setOnItemClickListener((adapterView, view, i, l) -> {
-            Player p = (Player) view.getTag();
-            Intent intent = PlayerDetailsActivity.getDetailsPlayerIntent(MainActivity.this, p.mName);
-            startActivityForResult(intent, ACTIVITY_RESULT_PLAYER);
-        });
+        if (clickHandler != null) {
+            playersList.setOnItemClickListener(clickHandler);
+        } else {
+            playersList.setOnItemClickListener((adapterView, view, i, l) -> {
+                Player p = (Player) view.getTag();
+                Intent intent = PlayerDetailsActivity.getDetailsPlayerIntent(MainActivity.this, p.mName);
+                startActivityForResult(intent, ACTIVITY_RESULT_PLAYER);
+            });
+        }
 
         playersList.setOnItemLongClickListener((adapterView, view, i, l) -> {
             checkPlayerDeletion((Player) view.getTag());
@@ -147,16 +162,25 @@ public class MainActivity extends AppCompatActivity
         fab.addButton(addPlayerButton);
     }
 
-    private void setHeadlines() {
+    private void setHeadlines(boolean show) {
 
-        sorting.setHeadlineSorting(this, R.id.player_name, this.getString(R.string.name), sortType.name);
-        sorting.setHeadlineSorting(this, R.id.player_age, this.getString(R.string.age), sortType.age);
-        sorting.setHeadlineSorting(this, R.id.player_attributes, this.getString(R.string.attributes), sortType.attributes);
-        sorting.setHeadlineSorting(this, R.id.player_recent_performance, this.getString(R.string.plus_minus), sortType.suggestedGrade);
-        sorting.setHeadlineSorting(this, R.id.player_grade, this.getString(R.string.grade), sortType.grade);
-        sorting.setHeadlineSorting(this, R.id.player_coming, null, sortType.coming);
+        if (show) {
+            sorting.setHeadlineSorting(this, R.id.player_name, this.getString(R.string.name), sortType.name);
+            sorting.setHeadlineSorting(this, R.id.player_age, this.getString(R.string.age), sortType.age);
+            sorting.setHeadlineSorting(this, R.id.player_attributes, this.getString(R.string.attributes), sortType.attributes);
+            sorting.setHeadlineSorting(this, R.id.player_recent_performance, this.getString(R.string.plus_minus), sortType.suggestedGrade);
+            sorting.setHeadlineSorting(this, R.id.player_grade, this.getString(R.string.grade), sortType.grade);
+            sorting.setHeadlineSorting(this, R.id.player_coming, null, sortType.coming);
 
-        ((CheckBox) findViewById(R.id.player_coming)).setTextColor(Color.BLACK);
+            ((CheckBox) findViewById(R.id.player_coming)).setTextColor(Color.BLACK);
+        } else {
+            sorting.removeHeadlineSorting(this, R.id.player_name, this.getString(R.string.name));
+            sorting.removeHeadlineSorting(this, R.id.player_age, "");
+            sorting.removeHeadlineSorting(this, R.id.player_attributes, "");
+            sorting.removeHeadlineSorting(this, R.id.player_recent_performance, "");
+            sorting.removeHeadlineSorting(this, R.id.player_grade, "");
+            sorting.removeHeadlineSorting(this, R.id.player_coming, "");
+        }
     }
 
     @Override
@@ -196,7 +220,9 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-        refreshPlayers();
+        if (!showPastedPlayers) {
+            refreshPlayers();
+        }
     }
 
     @Override
@@ -206,6 +232,9 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else if (showArchivedPlayers) { // return from archived players
             showArchivedPlayers = false;
+            refreshPlayers();
+        } else if (showPastedPlayers) {
+            showPastedPlayers = false;
             refreshPlayers();
         } else if (fab != null && fab.isExpanded()) { // collapse floating button
             fab.collapse();
@@ -230,6 +259,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.enter_results:
                 startEnterResultActivity();
+                break;
+            case R.id.paste_coming_players:
+                pasteComingPlayers();
                 break;
             case R.id.add_player:
                 startActivityForResult(new Intent(MainActivity.this, NewPlayerActivity.class), ACTIVITY_RESULT_PLAYER);
@@ -307,12 +339,119 @@ public class MainActivity extends AppCompatActivity
     public void refreshPlayers() {
         ArrayList<Player> players = DbHelper.getPlayers(getApplicationContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
 
+        setPlayersList(players, null);
+
         sorting.sort(players);
+    }
 
-        playersAdapter.clear();
-        playersAdapter.addAll(players);
+    private void pasteComingPlayers() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+        CharSequence pasteData = item.getText();
 
-        setActivityTitle();
+        try {
+            Set<String> comingSet = new HashSet<>();
+            String[] split = ((String) pasteData).split("\n");
+            for (String coming : split) {
+                try {
+                    String numberOrName = coming.split("] ")[1].split(":")[0];
+                    comingSet.add(numberOrName);
+                } catch (Exception e) {
+                    Log.e("Coming", "Failed to process " + coming);
+                }
+            }
+
+            ArrayList<Player> players = DbHelper.getPlayers(this, 0, false);
+            String[] playerNames = new String[players.size()];
+            int i = 0;
+            for (Player p : players) {
+                playerNames[i] = p.mName;
+                i++;
+            }
+
+            if (comingSet.size() > 0) {
+                displayPastedIdentifiers(comingSet, playerNames);
+            } else {
+                Toast.makeText(this, "Paste multiple messages", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            Log.e("Coming", "Failed to process " + pasteData);
+            Toast.makeText(this, "Failed to process : " + pasteData, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void displayPastedIdentifiers(Set<String> set, String[] playerNames) {
+        Set<String> comingSet = new HashSet<>(set);
+        ArrayList<String> coming = new ArrayList<>(comingSet);
+
+        ArrayList<Player> knownPlayers = DbHelper.getPlayersByIdentifier(this, coming);
+        for (Player p : knownPlayers) {
+            comingSet.remove(p.msgDisplayName);
+        }
+
+        for (String identifier : comingSet) {
+            Player player = new Player(null, -1);
+            player.msgDisplayName = identifier;
+            knownPlayers.add(player);
+        }
+
+        showPastedPlayers = true;
+
+        AdapterView.OnItemClickListener handler = (parent, view, position, id) -> {
+            Player p = (Player) view.getTag();
+            Log.i("Identify", "Clicked on " + p.mName + " = " + p.msgDisplayName);
+            setComingPlayerIdentity(p.mName, p.msgDisplayName, set, playerNames);
+        };
+
+        // Filter the players list only to the pasted players identifiers
+        setPlayersList(knownPlayers, handler);
+        setHeadlines(false);
+    }
+
+    private void setComingPlayerIdentity(String currName, String identity, Set<String> comingSet, String[] playerNames) {
+
+        // TODO Dialog with player names for selection?
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter player name for : \n" + identity);
+
+        final AutoCompleteTextView input = new AutoCompleteTextView(this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, playerNames);
+        input.setAdapter(adapter);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.requestFocus();
+        input.setText(currName);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String text = input.getText().toString();
+            Log.i("Identifier", "Identify " + text + " as " + identity);
+            int count = DbHelper.setPlayerIdentifier(MainActivity.this, text, identity);
+            if (count == 0) {
+                if (TextUtils.isEmpty(text) && !TextUtils.isEmpty(currName)) {
+                    DbHelper.clearPlayerIdentifier(MainActivity.this, currName);
+                    Toast.makeText(MainActivity.this, "Cleared " + currName, Toast.LENGTH_LONG).show();
+                    displayPastedIdentifiers(comingSet, playerNames);
+                } else {
+                    Toast.makeText(MainActivity.this, text + " not found", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "Set " + text + " with " + identity, Toast.LENGTH_LONG).show();
+                if (currName != null) {
+                    DbHelper.clearPlayerIdentifier(MainActivity.this, currName);
+                }
+                displayPastedIdentifiers(comingSet, playerNames);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     private void startEnterResultActivity() {
@@ -335,6 +474,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             syncInProgress.setVisibility(View.GONE);
             syncProgressStatus.setText("");
+            DbHelper.onUnderlyingDataChange();
             refreshPlayers();
         }
     }

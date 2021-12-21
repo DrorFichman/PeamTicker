@@ -161,7 +161,7 @@ public class FirebaseHelper implements CloudSync {
         if (isAdmin()) {
 
             GetUsers.query(ctx, result -> {
-                showUsersDialog(ctx, result);
+                showUsersDialog(ctx, result, handler);
             });
 
         } else {
@@ -178,7 +178,7 @@ public class FirebaseHelper implements CloudSync {
         }
     }
 
-    private void showUsersDialog(Context ctx, ArrayList<AccountData> users) {
+    private void showUsersDialog(Context ctx, ArrayList<AccountData> users, SyncProgress handler) {
         Log.d("showUsersDialog", users.size() + " users ");
         String[] list = new String[users.size()];
         int curr = 0;
@@ -199,6 +199,7 @@ public class FirebaseHelper implements CloudSync {
                     AuthHelper.fetchFor(null);
                     Toast.makeText(ctx, "Pull completed from " + users.get(which).displayName, Toast.LENGTH_LONG).show();
                 }
+                handler.showSyncStatus(status);
             });
         });
         builder.show();
@@ -277,6 +278,7 @@ public class FirebaseHelper implements CloudSync {
 
     private static void pullPlayersGamesFromCloud(Context ctx, DataCallback handler) {
         ArrayList<Player> players = DbHelper.getPlayers(ctx);
+        ArrayList<Player> clone = (ArrayList<Player>) players.clone();
         for (Player p : players) {
             ValueEventListener playersGamesListener = new ValueEventListener() {
                 @Override
@@ -289,7 +291,12 @@ public class FirebaseHelper implements CloudSync {
                         gameCount++;
                     }
 
-                    Log.i("pullPlayersGamesFromCloud", "Local players games DB updated from cloud - " + p.mName + " - " + gameCount);
+                    clone.remove(p);
+                    Log.i("pullPlayersGamesFromCloud", "Local players games DB updated from cloud - " + p.mName + " - " + gameCount + " clone " + clone.size());
+
+                    if (clone.size() == 0) {
+                        handler.DataChanged();
+                    }
                 }
 
                 @Override
@@ -300,8 +307,6 @@ public class FirebaseHelper implements CloudSync {
 
             playersGames().child(p.mName).addListenerForSingleValueEvent(playersGamesListener);
         }
-
-        handler.DataChanged();
     }
     //endregion
 

@@ -33,6 +33,7 @@
 
     <!--    Menus-->
     <string name="add_player">Add player</string>
+    <string name="paste_players">Paste Players</string>
     <string name="show_archived">Players Archive</string>
     <string name="make_teams">Make teams</string>
     <string name="enter_results">Enter Results</string>

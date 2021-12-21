@@ -68,6 +68,7 @@ public class PlayerDbHelper {
         String[] projection = {
                 PlayerContract.PlayerEntry.ID,
                 PlayerContract.PlayerEntry.NAME,
+                PlayerContract.PlayerEntry.MSG_IDENTIFIER,
                 PlayerContract.PlayerEntry.GRADE,
                 PlayerContract.PlayerEntry.BIRTH_YEAR,
                 PlayerContract.PlayerEntry.BIRTH_MONTH,
@@ -105,6 +106,7 @@ public class PlayerDbHelper {
                 do {
                     Player p = createPlayerFromCursor(c,
                             PlayerContract.PlayerEntry.NAME,
+                            PlayerContract.PlayerEntry.MSG_IDENTIFIER,
                             PlayerContract.PlayerEntry.BIRTH_YEAR,
                             PlayerContract.PlayerEntry.BIRTH_MONTH,
                             PlayerContract.PlayerEntry.GRADE,
@@ -124,6 +126,7 @@ public class PlayerDbHelper {
     @NonNull
     public static Player createPlayerFromCursor(Cursor c,
                                                 String player_name,
+                                                String player_msg_identifier,
                                                 String year,
                                                 String month,
                                                 String player_grade,
@@ -136,6 +139,7 @@ public class PlayerDbHelper {
         p.archived = (archived != null) ? c.getInt(c.getColumnIndex(archived)) == 1 : false;
         p.mBirthYear = (year != null && c.getColumnIndex(year) > 0) ? c.getInt(c.getColumnIndex(year)) : 0;
         p.mBirthMonth = (month != null && c.getColumnIndex(month) > 0) ? c.getInt(c.getColumnIndex(month)) : 0;
+        p.msgDisplayName = (player_msg_identifier != null && c.getColumnIndex(player_msg_identifier) > 0) ? c.getString(c.getColumnIndex(player_msg_identifier)) : "";
 
         if (attributes != null && c.getColumnIndex(attributes) > 0) {
             String attr = c.getString(c.getColumnIndex(attributes));
@@ -175,6 +179,7 @@ public class PlayerDbHelper {
         String[] projection = {
                 PlayerContract.PlayerEntry.ID,
                 PlayerContract.PlayerEntry.NAME,
+                PlayerContract.PlayerEntry.MSG_IDENTIFIER,
                 PlayerContract.PlayerEntry.GRADE,
                 PlayerContract.PlayerEntry.BIRTH_YEAR,
                 PlayerContract.PlayerEntry.BIRTH_MONTH,
@@ -228,6 +233,61 @@ public class PlayerDbHelper {
         );
 
         return getPlayers(c);
+    }
+
+    @NonNull
+    public static ArrayList<Player> getPlayersByIdentifier(SQLiteDatabase db, ArrayList<String> names) {
+
+        String[] projection = {
+                PlayerContract.PlayerEntry.ID,
+                PlayerContract.PlayerEntry.NAME,
+                PlayerContract.PlayerEntry.MSG_IDENTIFIER,
+                PlayerContract.PlayerEntry.GRADE,
+                PlayerContract.PlayerEntry.BIRTH_YEAR,
+                PlayerContract.PlayerEntry.BIRTH_MONTH,
+                PlayerContract.PlayerEntry.IS_COMING,
+                PlayerContract.PlayerEntry.ARCHIVED,
+                PlayerContract.PlayerEntry.ATTRIBUTES
+        };
+
+        ArrayList<String> queryName = new ArrayList<>();
+        for (String coming : names) {
+            queryName.add("\"" + coming + "\"");
+        }
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder = PlayerContract.PlayerEntry.GRADE + " DESC";
+        String where = PlayerContract.PlayerEntry.ARCHIVED + " = 0 AND (" +
+//                PlayerContract.PlayerEntry.NAME + " IN (" + String.join(",", queryName) + ") OR " +
+                PlayerContract.PlayerEntry.MSG_IDENTIFIER + " IN (" + String.join(",", queryName) + "))";
+        String[] selectionArgs = null;
+
+        Cursor c = db.query(
+                PlayerContract.PlayerEntry.TABLE_NAME,    // The table to query
+                projection,                               // The columns to return
+                where,                                    // where
+                selectionArgs,                        // where values
+                null,                            // don't group the rows
+                null,                             // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        return getPlayers(c);
+    }
+
+    public static int setPlayerMsgIdentifier(SQLiteDatabase db, String name, String identifier) {
+        ContentValues values = new ContentValues();
+        values.put(PlayerContract.PlayerEntry.MSG_IDENTIFIER, identifier);
+
+        String where = PlayerContract.PlayerEntry.NAME + " = ?  AND " +
+                PlayerContract.PlayerEntry.ARCHIVED + " = ? ";
+        String[] whereArgs = new String[]{name, "0"};
+
+        return (DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerEntry.TABLE_NAME));
+    }
+
+    public static void clearPlayerMsgIdentifier(SQLiteDatabase db, String name) {
+        setPlayerMsgIdentifier(db, name, "");
     }
 
     public static boolean insertPlayer(SQLiteDatabase db, Player p) {
@@ -304,11 +364,11 @@ public class PlayerDbHelper {
         DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerGameEntry.TABLE_NAME);
     }
 
-    private static void updatePlayer(SQLiteDatabase db, String name, ContentValues values) {
+    private static int updatePlayer(SQLiteDatabase db, String name, ContentValues values) {
         String where = PlayerContract.PlayerEntry.NAME + " = ? ";
         String[] whereArgs = new String[]{name};
 
-        DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerEntry.TABLE_NAME);
+        return (DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerEntry.TABLE_NAME));
     }
 
     public static Player getPlayer(SQLiteDatabase db, String name) {
@@ -342,6 +402,7 @@ public class PlayerDbHelper {
             if (c.moveToFirst()) {
                 return createPlayerFromCursor(c,
                         PlayerContract.PlayerEntry.NAME,
+                        null,
                         PlayerContract.PlayerEntry.BIRTH_YEAR,
                         PlayerContract.PlayerEntry.BIRTH_MONTH,
                         PlayerContract.PlayerEntry.GRADE,

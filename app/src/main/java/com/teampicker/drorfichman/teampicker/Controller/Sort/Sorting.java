@@ -1,6 +1,7 @@
 package com.teampicker.drorfichman.teampicker.Controller.Sort;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -22,6 +23,12 @@ public class Sorting {
     private sortType sort;
     private boolean originalOrder = true;
     private sortingCallbacks handler;
+
+    enum HeadlineSortType {
+        Sorted,
+        Reversed,
+        None
+    }
 
     public Sorting(sortingCallbacks handle, sortType defaultSort) {
         sort = defaultSort;
@@ -97,6 +104,22 @@ public class Sorting {
         setHeadlineSorting(headlineView, headline, sorting);
     }
 
+    public void removeHeadlineSorting(Activity ctx, int textField, String title) {
+        TextView headlineView = null;
+        if (textField > 0)
+            headlineView = ctx.findViewById(textField);
+
+        if (headlineView != null) {
+            if (TextUtils.isEmpty(title)) {
+                headlineView.setVisibility(View.INVISIBLE);
+            } else if (headlineView instanceof TextView) {
+                headlineView.setVisibility(View.VISIBLE);
+                headlineView.setText(title);
+            }
+            headlineView.setOnClickListener(null);
+        }
+    }
+
     public void setHeadlineSorting(Activity ctx, int textField, String headline, final sortType sorting) {
         TextView headlineView = null;
         if (textField > 0)
@@ -125,27 +148,45 @@ public class Sorting {
                 }
                 handler.sortingChanged();
             });
+
+            headlineView.setVisibility(View.VISIBLE);
         }
     }
 
     private void setSorted(TextView sortingView) {
-        if (sortingView != null) sortingView.setTextAppearance(R.style.greenHeadline);
-        resetSorting(sortingView);
+        if (sortingView != null) {
+            setSelected(sortingView, HeadlineSortType.Sorted);
+            resetSorting(sortingView);
+        }
     }
 
     private void setReverseSorted(TextView reversedSortingView) {
-        if (reversedSortingView != null) reversedSortingView.setTextAppearance(R.style.redHeadline);
-        resetSorting(reversedSortingView);
+        if (reversedSortingView != null) {
+            setSelected(reversedSortingView, HeadlineSortType.Reversed);
+            resetSorting(reversedSortingView);
+        }
     }
 
     private void resetSorting(TextView exceptView) {
         for (View otherHeadlines : headlines.keySet()) {
             if (otherHeadlines.getId() != exceptView.getId()) {
-                if (otherHeadlines instanceof TextView)
-                    ((TextView) otherHeadlines).setTextAppearance(R.style.regularHeadline);
-                if (otherHeadlines instanceof CheckBox)
-                    ((CheckBox) otherHeadlines).setChecked(false);
+                setSelected(otherHeadlines, HeadlineSortType.None);
             }
         }
+    }
+
+    private void setSelected(View headline, HeadlineSortType type) {
+        if (headline instanceof TextView)
+            if (type == HeadlineSortType.Sorted)
+                ((TextView) headline).setTextAppearance(R.style.greenHeadline);
+            else if (type == HeadlineSortType.Reversed)
+                ((TextView) headline).setTextAppearance(R.style.redHeadline);
+            else // default
+                ((TextView) headline).setTextAppearance(R.style.regularHeadline);
+        if (headline instanceof CheckBox)
+            if (type == HeadlineSortType.Sorted || type == HeadlineSortType.Reversed)
+                ((CheckBox) headline).setChecked(true);
+            else // default
+                ((CheckBox) headline).setChecked(false);
     }
 }

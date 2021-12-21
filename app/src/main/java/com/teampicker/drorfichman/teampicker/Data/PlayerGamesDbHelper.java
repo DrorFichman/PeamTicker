@@ -112,6 +112,7 @@ public class PlayerGamesDbHelper {
                             PlayerContract.PlayerGameEntry.NAME,
                             null,
                             null,
+                            null,
                             PlayerContract.PlayerGameEntry.PLAYER_GRADE,
                             null, null, PlayerContract.PlayerGameEntry.ATTRIBUTES);
 
@@ -389,6 +390,7 @@ public class PlayerGamesDbHelper {
                 do {
                     Player p = PlayerDbHelper.createPlayerFromCursor(c,
                             "player_name",
+                            null,
                             "birth_year",
                             "birth_month",
                             "player_grade",

@@ -30,6 +30,7 @@ public final class PlayerContract {
         public static final String BIRTH_MONTH = "birth_month";
         public static final String ATTRIBUTES = "attributes";
         public static final String ARCHIVED = "archived";
+        public static final String MSG_IDENTIFIER = "message_identifier";
     }
 
     public static abstract class PlayerGameEntry {

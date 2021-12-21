@@ -2,6 +2,7 @@ package com.teampicker.drorfichman.teampicker.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,23 +40,38 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.player_item, parent, false);
         TextView name = view.findViewById(R.id.player_name);
-        TextView grade = view.findViewById(R.id.player_grade);
+        TextView nameView = view.findViewById(R.id.player_name);
+        TextView gradeView = view.findViewById(R.id.player_grade);
         final CheckBox vComing = view.findViewById(R.id.player_coming);
         TextView recentPerformance = view.findViewById(R.id.player_recent_performance);
+        TextView ageView = view.findViewById(R.id.player_age);
+        TextView attributes = view.findViewById(R.id.player_attributes);
 
         final Player player = mPlayers.get(position);
-        name.setText(player.mName);
-        grade.setText(String.valueOf(player.mGrade));
-        vComing.setChecked(player.isComing);
-
-        setAge(view, player);
-
-        setPlayerRecentPerformance(recentPerformance, player);
-
-        setAttributes(player, view.findViewById(R.id.player_attributes));
-
         view.setTag(player);
 
+        setName(nameView, player);
+        setGrade(gradeView, player);
+        setAge(ageView, player);
+        setPlayerRecentPerformance(recentPerformance, player);
+        setAttributes(attributes, player);
+        setComing(vComing, player);
+
+        return view;
+    }
+
+    private void setGrade(TextView grade, Player player) {
+        if (isMsgIdentifier(player)) {
+            grade.setVisibility(View.GONE);
+        } else {
+            grade.setText(String.valueOf(player.mGrade >= 0 ? player.mGrade : ""));
+            grade.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setComing(CheckBox vComing, Player player) {
+        vComing.setVisibility(player.mName != null ? View.VISIBLE : View.INVISIBLE);
+        vComing.setChecked(player.isComing);
         vComing.setOnClickListener(view1 -> {
             player.isComing = vComing.isChecked();
             DbHelper.updatePlayerComing(context, player.mName, vComing.isChecked());
@@ -64,19 +80,36 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
                 handler.handle();
             }
         });
-
-        return view;
     }
 
-    private void setAttributes(Player player, TextView attributes) {
-        attributes.setVisibility(player.hasAttributes() ? View.VISIBLE : View.INVISIBLE);
-        attributes.setText(player.getAttributes());
+    private void setName(TextView name, Player player) {
+        if (player.mName != null && isMsgIdentifier(player)) {
+            name.setText(player.mName + "\n" + player.msgDisplayName);
+        } else if (player.mName != null) {
+            name.setText(player.mName);
+        } else if (isMsgIdentifier(player)) {
+            name.setText(player.msgDisplayName);
+        } else {
+            name.setText("");
+        }
     }
 
-    private void setAge(View view, Player player) {
+    private void setAttributes(TextView attributes, Player player) {
+        if (isMsgIdentifier(player)) {
+            attributes.setVisibility(View.GONE);
+        } else if (player.hasAttributes()) {
+            attributes.setVisibility(View.VISIBLE);
+            attributes.setText(player.getAttributes());
+        } else {
+            attributes.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setAge(TextView ageView, Player player) {
         int age = player.getAge();
-        TextView ageView = view.findViewById(R.id.player_age);
-        if (age > 0) {
+        if (isMsgIdentifier(player))
+            ageView.setVisibility(View.GONE);
+        else if (age > 0) {
             ageView.setText(String.valueOf(age));
             ageView.setVisibility(View.VISIBLE);
         } else {
@@ -98,5 +131,9 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         } else {
             recentPerformance.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private boolean isMsgIdentifier(Player p) {
+        return !TextUtils.isEmpty(p.msgDisplayName);
     }
 }
