@@ -39,7 +39,6 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.player_item, parent, false);
-        TextView name = view.findViewById(R.id.player_name);
         TextView nameView = view.findViewById(R.id.player_name);
         TextView gradeView = view.findViewById(R.id.player_grade);
         final CheckBox vComing = view.findViewById(R.id.player_coming);
