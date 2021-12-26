@@ -31,6 +31,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerAdapter;
+import com.teampicker.drorfichman.teampicker.BuildConfig;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.sortType;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
@@ -123,9 +124,7 @@ public class MainActivity extends AppCompatActivity
 
         playersList.setAdapter(playersAdapter);
 
-        if (players.size() == 0) {
-            showTutorialDialog();
-        }
+        setActivityTitle();
     }
 
     private void setFloatingActionButton() {
@@ -320,6 +319,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_getting_started) {
             showTutorialDialog();
+        } else if (id == R.id.nav_about) {
+            showAbout();
         } else if (id == R.id.nav_data_sync) {
             FirebaseHelper.getInstance().syncToCloud(this, this::showSyncStatus);
         } else if (id == R.id.nav_data_pull) {
@@ -542,7 +543,23 @@ public class MainActivity extends AppCompatActivity
                         "And don't forget to be awesome :)")
                 .setCancelable(true)
                 .setPositiveButton("Got it", (dialog, id) -> {
-                    fab.expand();
+                    dialog.dismiss();
+                });
+
+        alertDialogBuilder.create().show();
+    }
+
+    private void showAbout() {
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder.setTitle("About");
+
+        alertDialogBuilder
+                .setMessage("VERSION_CODE " + BuildConfig.VERSION_CODE + "\n" +
+                        "VERSION_NAME " + BuildConfig.VERSION_NAME + "\n")
+                .setCancelable(true)
+                .setPositiveButton("Got it", (dialog, id) -> {
                     dialog.dismiss();
                 });
 

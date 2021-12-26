@@ -23,7 +23,8 @@ public class PlayerDbHelper {
                     PlayerContract.PlayerEntry.BIRTH_YEAR + " INTEGER, " +
                     PlayerContract.PlayerEntry.BIRTH_MONTH + " INTEGER, " +
                     PlayerContract.PlayerEntry.ARCHIVED + " INTEGER DEFAULT 0, " +
-                    PlayerContract.PlayerEntry.ATTRIBUTES + " TEXT DEFAULT '' " +
+                    PlayerContract.PlayerEntry.ATTRIBUTES + " TEXT DEFAULT '', " +
+                    PlayerContract.PlayerEntry.MSG_IDENTIFIER + " TEXT DEFAULT '' " +
                     " )";
 
     public static final String SQL_DROP_PLAYER_TABLE =

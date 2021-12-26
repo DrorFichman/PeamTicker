@@ -42,6 +42,12 @@ public class AuthHelper {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
+    public static void signOut() {
+        if (FirebaseAuth.getInstance() != null) {
+            FirebaseAuth.getInstance().signOut();
+        }
+    }
+
     @NonNull
     public static String getUserUID() {
         if (fetchUser != null && fetchUser.uid != null) {
