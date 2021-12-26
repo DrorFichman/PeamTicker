@@ -33,7 +33,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerAdapter;
 import com.teampicker.drorfichman.teampicker.BuildConfig;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
-import com.teampicker.drorfichman.teampicker.Controller.Sort.sortType;
+import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity
     private boolean showArchivedPlayers = false;
     private boolean showPastedPlayers = false;
 
-    Sorting sorting = new Sorting(this::sortingChanged, sortType.coming);
+    Sorting sorting = new Sorting(this::sortingChanged, SortType.coming);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,14 +164,16 @@ public class MainActivity extends AppCompatActivity
     private void setHeadlines(boolean show) {
 
         if (show) {
-            sorting.setHeadlineSorting(this, R.id.player_name, this.getString(R.string.name), sortType.name);
-            sorting.setHeadlineSorting(this, R.id.player_age, this.getString(R.string.age), sortType.age);
-            sorting.setHeadlineSorting(this, R.id.player_attributes, this.getString(R.string.attributes), sortType.attributes);
-            sorting.setHeadlineSorting(this, R.id.player_recent_performance, this.getString(R.string.plus_minus), sortType.suggestedGrade);
-            sorting.setHeadlineSorting(this, R.id.player_grade, this.getString(R.string.grade), sortType.grade);
-            sorting.setHeadlineSorting(this, R.id.player_coming, null, sortType.coming);
+            sorting.setHeadlineSorting(this, R.id.player_name, this.getString(R.string.name), SortType.name);
+            sorting.setHeadlineSorting(this, R.id.player_age, this.getString(R.string.age), SortType.age);
+            sorting.setHeadlineSorting(this, R.id.player_attributes, this.getString(R.string.attributes), SortType.attributes);
+            sorting.setHeadlineSorting(this, R.id.player_recent_performance, this.getString(R.string.plus_minus), SortType.suggestedGrade);
+            sorting.setHeadlineSorting(this, R.id.player_grade, this.getString(R.string.grade), SortType.grade);
+            sorting.setHeadlineSorting(this, R.id.player_coming, null, SortType.coming);
 
-            ((CheckBox) findViewById(R.id.player_coming)).setTextColor(Color.BLACK);
+            ((CheckBox) findViewById(R.id.player_coming)).setChecked(
+                    sorting.getCurrentSorting().equals(SortType.coming) && sorting.isAscending());
+
         } else {
             sorting.removeHeadlineSorting(this, R.id.player_name, this.getString(R.string.name));
             sorting.removeHeadlineSorting(this, R.id.player_age, "");
@@ -179,6 +181,8 @@ public class MainActivity extends AppCompatActivity
             sorting.removeHeadlineSorting(this, R.id.player_recent_performance, "");
             sorting.removeHeadlineSorting(this, R.id.player_grade, "");
             sorting.removeHeadlineSorting(this, R.id.player_coming, "");
+
+            ((CheckBox) findViewById(R.id.player_coming)).setVisibility(View.INVISIBLE);
         }
     }
 

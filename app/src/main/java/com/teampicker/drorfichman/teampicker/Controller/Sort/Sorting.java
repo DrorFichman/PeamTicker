@@ -14,13 +14,13 @@ import java.util.HashMap;
 
 public class Sorting {
 
-    private HashMap<View, sortType> headlines = new HashMap<>();
+    private HashMap<View, SortType> headlines = new HashMap<>();
 
     public interface sortingCallbacks {
         void sortingChanged();
     }
 
-    private sortType sort;
+    private SortType type;
     private boolean originalOrder = true;
     private sortingCallbacks handler;
 
@@ -30,9 +30,17 @@ public class Sorting {
         None
     }
 
-    public Sorting(sortingCallbacks handle, sortType defaultSort) {
-        sort = defaultSort;
+    public Sorting(sortingCallbacks handle, SortType defaultSort) {
+        type = defaultSort;
         handler = handle;
+    }
+
+    public SortType getCurrentSorting() {
+        return type;
+    }
+
+    public boolean isAscending() {
+        return originalOrder;
     }
 
     public void sort(ArrayList<? extends Sortable> players) {
@@ -50,7 +58,7 @@ public class Sorting {
 
     private Comparator<Sortable> getSortableComparator() {
 
-        switch (sort) {
+        switch (type) {
 
             // Main
             case name:
@@ -96,14 +104,6 @@ public class Sorting {
         }
     }
 
-    public void setHeadlineSorting(View root, int textField, String headline, final sortType sorting) {
-        TextView headlineView = null;
-        if (textField > 0)
-            headlineView = root.findViewById(textField);
-
-        setHeadlineSorting(headlineView, headline, sorting);
-    }
-
     public void removeHeadlineSorting(Activity ctx, int textField, String title) {
         TextView headlineView = null;
         if (textField > 0)
@@ -120,30 +120,38 @@ public class Sorting {
         }
     }
 
-    public void setHeadlineSorting(Activity ctx, int textField, String headline, final sortType sorting) {
-        TextView headlineView = null;
+    public void setHeadlineSorting(View root, int textField, String headline, final SortType sorting) {
+        View headlineView = null;
         if (textField > 0)
-            headlineView = ctx.findViewById(textField);
+            headlineView = root.findViewById(textField);
 
         setHeadlineSorting(headlineView, headline, sorting);
     }
 
-    void setHeadlineSorting(View headlineView, String headlineTitle, final sortType sorting) {
+    public void setHeadlineSorting(Activity ctx, int resourceId, String headline, final SortType sorting) {
+        View headlineView = null;
+        if (resourceId > 0)
+            headlineView = ctx.findViewById(resourceId);
+
+        setHeadlineSorting(headlineView, headline, sorting);
+    }
+
+    private void setHeadlineSorting(View headlineView, String headlineTitle, final SortType sortBy) {
 
         if (headlineView != null) {
-            headlines.put(headlineView, sorting);
+            headlines.put(headlineView, sortBy);
 
             if (headlineView instanceof TextView)
                 ((TextView) headlineView).setText(headlineTitle);
 
             headlineView.setOnClickListener(view -> {
-                if (sort == sorting) {
+                if (type == sortBy) {
                     originalOrder = !originalOrder;
                     if (originalOrder) setSorted((TextView) view);
                     else setReverseSorted((TextView) view);
                 } else {
                     originalOrder = true;
-                    sort = sorting;
+                    type = sortBy;
                     setSorted((TextView) view);
                 }
                 handler.sortingChanged();
@@ -160,14 +168,14 @@ public class Sorting {
         }
     }
 
-    private void setReverseSorted(TextView reversedSortingView) {
+    private void setReverseSorted(View reversedSortingView) {
         if (reversedSortingView != null) {
             setSelected(reversedSortingView, HeadlineSortType.Reversed);
             resetSorting(reversedSortingView);
         }
     }
 
-    private void resetSorting(TextView exceptView) {
+    private void resetSorting(View exceptView) {
         for (View otherHeadlines : headlines.keySet()) {
             if (otherHeadlines.getId() != exceptView.getId()) {
                 setSelected(otherHeadlines, HeadlineSortType.None);

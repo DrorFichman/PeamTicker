@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerStatisticsAdapter;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
-import com.teampicker.drorfichman.teampicker.Controller.Sort.sortType;
+import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
@@ -31,7 +31,7 @@ public class StatisticsActivity extends AppCompatActivity implements Sorting.sor
     TextView gradeTitle;
 
     private PlayerStatisticsAdapter playersAdapter;
-    Sorting sorting = new Sorting(this::sortingChanged, sortType.success);
+    Sorting sorting = new Sorting(this::sortingChanged, SortType.success);
 
     private static final int ACTIVITY_RESULT_PLAYER = 1;
 
@@ -61,11 +61,11 @@ public class StatisticsActivity extends AppCompatActivity implements Sorting.sor
 
     private void setHeadlines() {
         gradeTitle = findViewById(R.id.stat_player_grade);
-        sorting.setHeadlineSorting(this, R.id.stat_player_grade, this.getString(R.string.grade), sortType.grade);
-        sorting.setHeadlineSorting(this, R.id.player_name, this.getString(R.string.name), sortType.name);
-        sorting.setHeadlineSorting(this, R.id.stat_success, this.getString(R.string.success), sortType.success);
-        sorting.setHeadlineSorting(this, R.id.stat_games_count, this.getString(R.string.games), sortType.games);
-        sorting.setHeadlineSorting(this, R.id.stat_wins_percentage, this.getString(R.string.win_rate), sortType.winPercentage);
+        sorting.setHeadlineSorting(this, R.id.stat_player_grade, this.getString(R.string.grade), SortType.grade);
+        sorting.setHeadlineSorting(this, R.id.player_name, this.getString(R.string.name), SortType.name);
+        sorting.setHeadlineSorting(this, R.id.stat_success, this.getString(R.string.success), SortType.success);
+        sorting.setHeadlineSorting(this, R.id.stat_games_count, this.getString(R.string.games), SortType.games);
+        sorting.setHeadlineSorting(this, R.id.stat_wins_percentage, this.getString(R.string.win_rate), SortType.winPercentage);
     }
 
     @Override

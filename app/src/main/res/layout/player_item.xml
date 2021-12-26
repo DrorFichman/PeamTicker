@@ -11,6 +11,7 @@
 
     <CheckBox
         android:id="@+id/player_coming"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="left"
