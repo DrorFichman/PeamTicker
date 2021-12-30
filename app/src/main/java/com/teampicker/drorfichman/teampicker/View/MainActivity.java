@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
             case R.id.make_teams:
-                startActivity(MakeTeamsActivity.getInstance(this, false));
+                launchMakeTeams();
                 break;
             case R.id.enter_results:
                 startEnterResultActivity();
@@ -289,6 +289,15 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void launchMakeTeams() {
+        ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(this, 0);
+        if (comingPlayers.size() > 0) {
+            startActivity(MakeTeamsActivity.getInstance(this, false));
+        } else {
+            Toast.makeText(this, "First - select coming players", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void setNavigationDrawer(Toolbar toolbar) {

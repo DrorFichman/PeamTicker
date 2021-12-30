@@ -152,6 +152,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
         initialTeams();
     }
 
+    private ArrayList<Player> getPlayers() {
+        return DbHelper.getComingPlayers(this, RECENT_GAMES);
+    }
+
     private void saveResults() {
         int currGame = DbHelper.getActiveGame(this);
         Game game = new Game(currGame, getGameDateString(),
@@ -228,7 +232,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
             players1 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team1, RECENT_GAMES);
             players2 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team2, RECENT_GAMES);
 
-            ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(this, RECENT_GAMES);
+            ArrayList<Player> comingPlayers = getPlayers();
 
             if (players1 != null && players1.size() > 0 && players2 != null && players2.size() > 0) {
                 boolean changed = handleComingChanges(comingPlayers, players1, players2);
@@ -321,7 +325,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     protected void divideComingPlayers(TeamDivision.DivisionStrategy selectedDivision, boolean refreshPlayersView) {
 
-        ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(this, RECENT_GAMES);
+        ArrayList<Player> comingPlayers = getPlayers();
 
         int totalPlayers = comingPlayers.size();
         int teamSize = totalPlayers / 2;
@@ -652,6 +656,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private boolean showMakeTeamOptionsDialog() {
 
         if (makeTeamsDialog != null && makeTeamsDialog.isShowing()) {
+            return false;
+        }
+
+        if (getPlayers().size() == 0) {
             return false;
         }
 
