@@ -278,6 +278,11 @@ public class FirebaseHelper implements CloudSync {
 
     private static void pullPlayersGamesFromCloud(Context ctx, DataCallback handler) {
         ArrayList<Player> players = DbHelper.getPlayers(ctx);
+        if (players.size() == 0) {
+            handler.DataChanged();
+            return;
+        }
+
         ArrayList<Player> clone = (ArrayList<Player>) players.clone();
         for (Player p : players) {
             ValueEventListener playersGamesListener = new ValueEventListener() {
