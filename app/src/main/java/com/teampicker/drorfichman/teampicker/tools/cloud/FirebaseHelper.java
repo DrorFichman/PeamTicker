@@ -9,7 +9,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.teampicker.drorfichman.teampicker.BuildConfig;
 import com.teampicker.drorfichman.teampicker.Data.AccountData;
+import com.teampicker.drorfichman.teampicker.Data.AppData;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
@@ -47,7 +49,8 @@ public class FirebaseHelper implements CloudSync {
         players,
         games,
         playersGames,
-        account
+        account,
+        app
     }
 
     public static DatabaseReference games() {
@@ -60,6 +63,10 @@ public class FirebaseHelper implements CloudSync {
 
     public static DatabaseReference account() {
         return getNode(Node.account);
+    }
+
+    public static DatabaseReference app() {
+        return getNode(Node.app);
     }
 
     public static DatabaseReference players() {
@@ -330,6 +337,7 @@ public class FirebaseHelper implements CloudSync {
     @Override
     public void storeAccountData() {
         account().setValue(new AccountData(AuthHelper.getUser()));
+        app().setValue(new AppData(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
     }
 
     public static boolean isAdmin() {
