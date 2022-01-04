@@ -51,7 +51,7 @@ public class DBSnapshotUtils {
     }
 
     public static File getSnapshotPath() {
-        return new File(Environment.getExternalStorageDirectory().toString() + EXPORT_PATH);
+        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + EXPORT_PATH);
     }
 
     private static String getSnapshotFileName() {

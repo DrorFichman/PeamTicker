@@ -70,7 +70,7 @@ public class ScreenshotHelper {
         String name = DateHelper.getNow() + "-" + System.currentTimeMillis();
         if (quality < 0) quality = 50;
 
-        File imagePath = new File(Environment.getExternalStorageDirectory().toString() + "/TeamPicker/");
+        File imagePath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/TeamPicker/");
         imagePath.mkdirs();
         File imageFile = new File(imagePath, name + ".jpg");
 
