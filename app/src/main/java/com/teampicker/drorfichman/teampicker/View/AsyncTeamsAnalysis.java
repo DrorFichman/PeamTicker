@@ -49,9 +49,7 @@ class AsyncTeamsAnalysis extends AsyncTask<Void, Void, String> {
 
         doneHandler.execute();
 
-        activity.teamStatsLayout.setVisibility(View.VISIBLE);
-        activity.analysisHeaders1.setVisibility(View.VISIBLE);
-        activity.analysisHeaders2.setVisibility(View.VISIBLE);
+        activity.enterAnalysis();
         activity.analysisView.setEnabled(true);
     }
 }

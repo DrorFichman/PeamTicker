@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -69,8 +70,6 @@ public class MainActivity extends AppCompatActivity
 
     private PlayerAdapter playersAdapter;
 
-    FloatingActionsMenu fab;
-
     View syncInProgress;
     TextView syncProgressStatus;
 
@@ -88,9 +87,9 @@ public class MainActivity extends AppCompatActivity
 
         setActivityTitle();
 
-        setFloatingActionButton();
-
         setNavigationDrawer(toolbar);
+
+        setActionButtons();
 
         ArrayList<Player> players = DbHelper.getPlayers(getApplicationContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
         setPlayersList(players, null);
@@ -99,6 +98,16 @@ public class MainActivity extends AppCompatActivity
         syncProgressStatus = findViewById(R.id.sync_progress_status);
 
         AuthHelper.requireLogin(this, ACTIVITY_RESULT_SIGN_IN);
+    }
+
+    private void setActionButtons() {
+        findViewById(R.id.main_add_player).setOnClickListener(view -> {
+            startActivityForResult(new Intent(MainActivity.this, NewPlayerActivity.class), ACTIVITY_RESULT_PLAYER);
+        });
+        findViewById(R.id.main_make_teams).setOnClickListener(view -> {
+            launchMakeTeams();
+            // startEnterResultActivity();
+        });
     }
 
     private void setPlayersList(List<Player> players, AdapterView.OnItemClickListener clickHandler) {
@@ -125,40 +134,6 @@ public class MainActivity extends AppCompatActivity
         playersList.setAdapter(playersAdapter);
 
         setActivityTitle();
-    }
-
-    private void setFloatingActionButton() {
-        fab = findViewById(R.id.fab);
-
-        FloatingActionButton enterResultsButton = new FloatingActionButton(this);
-        enterResultsButton.setTitle("Results");
-        enterResultsButton.setOnClickListener(v -> {
-            fab.collapse();
-            startEnterResultActivity();
-        });
-
-        FloatingActionButton makeTeamsButton = new FloatingActionButton(this);
-        makeTeamsButton.setTitle("Teams");
-        makeTeamsButton.setOnClickListener(v -> {
-            fab.collapse();
-            ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(MainActivity.this, 0);
-            if (comingPlayers.size() == 0) {
-                Toast.makeText(MainActivity.this, "Why you wanna play alone?!?", Toast.LENGTH_LONG).show();
-            } else {
-                startActivity(new Intent(MainActivity.this, MakeTeamsActivity.class));
-            }
-        });
-
-        FloatingActionButton addPlayerButton = new FloatingActionButton(this);
-        addPlayerButton.setTitle("New Player");
-        addPlayerButton.setOnClickListener(v -> {
-            fab.collapse();
-            startActivityForResult(new Intent(MainActivity.this, NewPlayerActivity.class), ACTIVITY_RESULT_PLAYER);
-        });
-
-        fab.addButton(enterResultsButton);
-        fab.addButton(makeTeamsButton);
-        fab.addButton(addPlayerButton);
     }
 
     private void setHeadlines(boolean show) {
@@ -239,8 +214,6 @@ public class MainActivity extends AppCompatActivity
         } else if (showPastedPlayers) {
             showPastedPlayers = false;
             refreshPlayers();
-        } else if (fab != null && fab.isExpanded()) { // collapse floating button
-            fab.collapse();
         } else {
             super.onBackPressed();
         }
@@ -259,9 +232,6 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.make_teams:
                 launchMakeTeams();
-                break;
-            case R.id.enter_results:
-                startEnterResultActivity();
                 break;
             case R.id.paste_coming_players:
                 pasteComingPlayers();
@@ -294,7 +264,7 @@ public class MainActivity extends AppCompatActivity
     private void launchMakeTeams() {
         ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(this, 0);
         if (comingPlayers.size() > 0) {
-            startActivity(MakeTeamsActivity.getInstance(this, false));
+            startActivity(MakeTeamsActivity.getInstance(this));
         } else {
             Toast.makeText(this, "First - select coming players", Toast.LENGTH_LONG).show();
         }
@@ -468,15 +438,13 @@ public class MainActivity extends AppCompatActivity
         builder.show();
     }
 
-    private void startEnterResultActivity() {
-        startActivity(MakeTeamsActivity.getInstance(this, true));
-    }
-
     public void setActivityTitle() {
         if (showArchivedPlayers) {
             setTitle("Archived players");
         } else {
-            setTitle(getString(R.string.main_title, DbHelper.getComingPlayersCount(this)));
+            int comingPlayersCount = DbHelper.getComingPlayersCount(this);
+            setTitle(getString(R.string.main_title, comingPlayersCount));
+            ((Button)findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, comingPlayersCount));
         }
     }
 

@@ -51,7 +51,7 @@
     <string name="team_data_headline_forecast">" Count \n Grade \n Success \n Win Rate \n 50% StdDev \n Chemistry "</string>
     <string name="team_data">" %1$d \n %2$.1f (&#177;%3$.1f) \n %4$d \n %5$d%% \n %6$s \n %7$s "</string>
     <string name="team_data_forecast">" %1$d%%"</string>
-    <string name="team_data_win_rate_stddev">"&#177;%1$d%%"</string>
+    <string name="team_data_win_rate_stdev">"&#177;%1$d%%"</string>
     <string name="team_public_stats">" Age: %1$d "</string>
     <string name="player_stat">"Games: %1$s \nWins: %2$s"</string>
     <string name="player_wins_participation">"%1$s (%2$s)"</string>
@@ -67,4 +67,5 @@
     <string name="operation_divide_by_age">* Divide by age :)</string>
     <string name="operation_analysis">* Click the players for deeper analysis \n* Click icon to exit analysis mode</string>
     <string name="copy_players_success">Teams division applied</string>
+    <string name="main_make_teams">"Make Teams\n(%1$d players)"</string>
 </resources>

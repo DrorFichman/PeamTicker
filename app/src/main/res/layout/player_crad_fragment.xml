@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layoutDirection="ltr"
+    android:orientation="vertical"
     android:padding="10dp">
 
     <LinearLayout
@@ -32,10 +32,10 @@
                 android:id="@+id/edit_player_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="80dp"
                 android:gravity="center"
                 android:hint="@string/name"
                 android:inputType="text"
+                android:minWidth="80dp"
                 android:singleLine="true"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -84,69 +84,76 @@
                 android:id="@+id/edit_player_birthday"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="18sp"
-                android:textColor="?attr/editTextColor"
                 android:background="?attr/editTextBackground"
+                android:gravity="center"
+                android:hint="@string/age"
                 android:textAppearance="?android:attr/textAppearanceMediumInverse"
-                android:hint="@string/age" />
+                android:textColor="?attr/editTextColor"
+                android:textSize="18sp" />
         </LinearLayout>
 
-
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="start|center_vertical"
-            android:text="Properties"
-            android:layout_marginBottom="10dp"
-            android:textSize="18sp" />
-
-        <CheckBox
-            android:id="@+id/player_is_gk"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="GK" />
-
-        <CheckBox
-            android:id="@+id/player_is_defender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Defender" />
-
-        <CheckBox
-            android:id="@+id/player_is_playmaker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Playmaker" />
-
-        <CheckBox
-            android:id="@+id/player_is_unbreaking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unbreakable" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
-
-        <Button
-            android:id="@+id/save"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableEnd="@drawable/save_small"
-            android:text="@string/save"
-            android:textAllCaps="false" />
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="start|center_vertical"
+                android:text="Properties"
+                android:textSize="18sp" />
+
+            <CheckBox
+                android:id="@+id/player_is_gk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GK" />
+
+            <CheckBox
+                android:id="@+id/player_is_defender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Defender" />
+
+            <CheckBox
+                android:id="@+id/player_is_playmaker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Playmaker" />
+
+            <CheckBox
+                android:id="@+id/player_is_unbreaking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unbreakable" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="10dp">
+
+            <Button
+                android:id="@+id/save"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/save"
+                android:textAllCaps="false" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

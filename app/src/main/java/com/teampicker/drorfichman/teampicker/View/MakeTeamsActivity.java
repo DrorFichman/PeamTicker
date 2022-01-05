@@ -46,8 +46,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MakeTeamsActivity extends AppCompatActivity {
-    private static String EXTRA_SET_RESULT = "EXTRA_SET_RESULT";
-
     static final int RECENT_GAMES = 50;
     static final int MAX_SCORE = 15;
 
@@ -58,6 +56,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     public Collaboration analysisResult;
     private String analysisSelectedPlayer;
+
+    private View enterResultView;
     private boolean mSetResult;
     private TeamDivision.DivisionStrategy selectedDivision = TeamDivision.DivisionStrategy.Grade;
 
@@ -76,7 +76,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private View sendView;
     private View moveView;
     private View shuffleView;
-    private ImageView analysisView;
+    public ImageView analysisView;
 
     private Button team1Score;
     private Button team2Score;
@@ -87,10 +87,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
     protected View analysisHeaders1;
     protected View analysisHeaders2;
 
-    public static Intent getInstance(Context ctx, boolean setResult) {
-        Intent intent = new Intent(ctx, MakeTeamsActivity.class);
-        intent.putExtra(EXTRA_SET_RESULT, setResult);
-        return intent;
+    public static Intent getInstance(Context ctx) {
+        return new Intent(ctx, MakeTeamsActivity.class);
     }
 
     @Override
@@ -123,6 +121,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         moveView.setOnClickListener(onMoveClicked);
         moveView.setOnLongClickListener(switchTeamsColors);
 
+        enterResultView = findViewById(R.id.enter_game_result);
         saveView = findViewById(R.id.save);
         saveView.setOnClickListener(view -> saveResults());
 
@@ -139,15 +138,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         analysisView = findViewById(R.id.game_prediction_button);
         analysisView.setOnClickListener(v -> analysisClicked());
         analysisView.setOnLongClickListener(explainOperation);
-
-        if (getIntent().getBooleanExtra(EXTRA_SET_RESULT, false)) {
-            if (DbHelper.getActiveGame(this) > 0) {
-                InitSetResults();
-            } else {
-                Toast.makeText(this, "No saved teams found, \n" +
-                        "Make teams first", Toast.LENGTH_LONG).show();
-            }
-        }
 
         initialTeams();
     }
@@ -171,22 +161,36 @@ public class MakeTeamsActivity extends AppCompatActivity {
         finish();
     }
 
-    private void InitSetResults() {
-
-        mSetResult = true;
-
-        moveView.setVisibility(View.GONE);
-        shuffleView.setVisibility(View.GONE);
-        sendView.setVisibility(View.GONE);
-        analysisView.setVisibility(View.GONE);
-
-        saveView.setVisibility(View.VISIBLE);
-        team1Score.setVisibility(View.VISIBLE);
-        team2Score.setVisibility(View.VISIBLE);
-        setGameDate.setVisibility(View.VISIBLE);
-
+    public void initSetResults(View button) {
+        team1Score.setText("0");
+        team2Score.setText("0");
         team1Score.setOnClickListener(view -> team1Score.setText(String.valueOf((getScoreValue(team1Score) + 1) % MAX_SCORE)));
         team2Score.setOnClickListener(view -> team2Score.setText(String.valueOf((getScoreValue(team2Score) + 1) % MAX_SCORE)));
+
+        backFromAnalysis(false);
+
+        displayResultsViews(true);
+
+        DbHelper.saveTeams(this, players1, players2); // save teams when switching to results
+    }
+
+    private void cancelSetResults() {
+        displayResultsViews(false);
+    }
+
+    private void displayResultsViews(boolean enterResults) {
+        mSetResult = enterResults;
+        enterResultView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+
+        moveView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+        shuffleView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+        sendView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+        analysisView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+
+        saveView.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
+        team1Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
+        team2Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
+        setGameDate.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
     }
 
     //region set date
@@ -312,7 +316,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         selectedDivision = division;
 
         if (division == TeamDivision.DivisionStrategy.Optimize) {
-            Toast.makeText(this, R.string.operation_divide_by_collaboration, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.operation_divide_by_collaboration, Toast.LENGTH_SHORT).show();
 
             dividePlayersAsync();
         } else {
@@ -357,9 +361,11 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (backFromMove()) { // exit move mode
+        if (mSetResult) {
+          cancelSetResults();
+        } else if (backFromMove()) { // exit move mode
             return;
-        } else if (backFromAnalysis()) { // exit analysis modes
+        } else if (backFromAnalysis(true)) { // exit analysis modes
             return;
         } else {
             super.onBackPressed();
@@ -380,6 +386,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions,
                                            int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
             if (grantResults.length > 0 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -457,7 +464,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         if (isAnalysisMode()) {
             if (players.forecastWinRate != 0) {
                 collaborationWinRate = getString(R.string.team_data_forecast, players.forecastWinRate);
-                teamStdDev = getString(R.string.team_data_win_rate_stddev, players.forecastStdDev);
+                teamStdDev = getString(R.string.team_data_win_rate_stdev, players.forecastStdDev);
             }
         }
 
@@ -470,8 +477,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 teamStdDev,
                 collaborationWinRate));
 
-        publicStats.setText(getString(R.string.team_public_stats,
-                players.getAge()));
+        int age = players.getAge();
+        publicStats.setText(age > 0 ? getString(R.string.team_public_stats, age) : "");
 
         publicStats.setVisibility(View.VISIBLE);
     }
@@ -611,8 +618,11 @@ public class MakeTeamsActivity extends AppCompatActivity {
     //region Analysis
     private void analysisClicked() {
 
-        if (!backFromAnalysis()) { // enter analysis mode
+        if (!backFromAnalysis(false)) { // enter analysis mode
             analysisView.setAlpha(0.5F);
+            enterResultView.setVisibility(View.INVISIBLE);
+            moveView.setVisibility(View.INVISIBLE);
+            shuffleView.setVisibility(View.INVISIBLE);
             list1.setBackgroundColor(Color.GRAY);
             list2.setBackgroundColor(Color.GRAY);
             AsyncTeamsAnalysis async = new AsyncTeamsAnalysis(this, this::refreshPlayers);
@@ -620,26 +630,59 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
     }
 
-    private boolean backFromAnalysis() {
+    public void enterAnalysis() {
+        teamStatsLayout.setVisibility(View.VISIBLE);
+        analysisHeaders1.setVisibility(View.VISIBLE);
+        analysisHeaders2.setVisibility(View.VISIBLE);
+    }
+
+    private void hideAnalysis() {
+        enterResultView.setVisibility(View.VISIBLE);
+        moveView.setVisibility(View.VISIBLE);
+        shuffleView.setVisibility(View.VISIBLE);
+        refreshPlayers();
+    }
+
+    private boolean backFromAnalysis(boolean singleBack) {
+
+        boolean returnValue = false;
 
         if (isAnalysisPlayerSelectedMode()) { // cancel player analysis selection
             analysisSelectedPlayer = null;
             analysisView.setAlpha(0.5F);
-            refreshPlayers();
-            return true;
-        } else if (isAnalysisMode()) { // cancel analysis
+
+            if (singleBack) {
+                refreshPlayers();
+                return true;
+            } else {
+                returnValue = true;
+            }
+        }
+
+        if (isAnalysisMode()) { // cancel analysis
             analysisResult = null;
             analysisSelectedPlayer = null;
             analysisView.setAlpha(1F);
-            analysisHeaders1.setVisibility(View.INVISIBLE);
-            analysisHeaders2.setVisibility(View.INVISIBLE);
+            analysisHeaders1.setVisibility(View.GONE);
+            analysisHeaders2.setVisibility(View.GONE);
 
             setDefaultTeamColors();
 
-            refreshPlayers();
-            return true;
+            if (singleBack) {
+                hideAnalysis();
+                return true;
+            } else {
+                returnValue = true;
+            }
         }
-        return false;
+
+        // If not a single back - and if anything was cancelled
+        if (!singleBack && returnValue) {
+            hideAnalysis();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void setDefaultTeamColors() {
