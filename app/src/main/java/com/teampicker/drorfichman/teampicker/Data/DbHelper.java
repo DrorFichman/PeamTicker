@@ -102,7 +102,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private void createSamplePlayers(SQLiteDatabase db) {
         PlayerDbHelper.insertPlayer(db, new Player("Johan Cruyff", 95));
-        PlayerDbHelper.insertPlayer(db, new Player("Diego Maradona", 93));
+        PlayerDbHelper.insertPlayer(db, new Player("Maradona", 93));
         PlayerDbHelper.insertPlayer(db, new Player("Ronaldinho", 92));
         PlayerDbHelper.insertPlayer(db, new Player("Ian Rush", 91));
         PlayerDbHelper.insertPlayer(db, new Player("Gerd Muller", 91));
