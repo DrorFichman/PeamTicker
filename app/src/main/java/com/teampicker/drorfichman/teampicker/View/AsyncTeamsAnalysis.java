@@ -38,6 +38,7 @@ class AsyncTeamsAnalysis extends AsyncTask<Void, Void, String> {
         if (activity == null || activity.isFinishing()) return;
 
         activity.teamStatsLayout.setVisibility(View.INVISIBLE);
+        activity.analysisView.setEnabled(false);
     }
 
     @Override
@@ -51,5 +52,6 @@ class AsyncTeamsAnalysis extends AsyncTask<Void, Void, String> {
         activity.teamStatsLayout.setVisibility(View.VISIBLE);
         activity.analysisHeaders1.setVisibility(View.VISIBLE);
         activity.analysisHeaders2.setVisibility(View.VISIBLE);
+        activity.analysisView.setEnabled(true);
     }
 }
