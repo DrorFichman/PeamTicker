@@ -18,15 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
+            android:gravity="center"
             android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="start|center_vertical"
-                android:text="@string/name"
-                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/edit_player_name"
@@ -52,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="start|center_vertical"
-                android:text="@string/grade"
+                android:text="@string/grade_description"
                 android:textSize="18sp" />
 
             <EditText
@@ -77,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="start|center_vertical"
-                android:text="@string/age"
+                android:text="@string/age_description"
                 android:textSize="18sp" />
 
             <TextView

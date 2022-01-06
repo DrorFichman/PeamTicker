@@ -26,24 +26,22 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerAdapter;
 import com.teampicker.drorfichman.teampicker.BuildConfig;
-import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
+import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DBSnapshotUtils;
 import com.teampicker.drorfichman.teampicker.tools.FileHelper;
-import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.PermissionTools;
 import com.teampicker.drorfichman.teampicker.tools.SnapshotHelper;
+import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.SyncProgress;
 
 import java.io.File;
@@ -442,8 +440,8 @@ public class MainActivity extends AppCompatActivity
         if (showArchivedPlayers) {
             setTitle("Archived players");
         } else {
+            setTitle(getString(R.string.main_title));
             int comingPlayersCount = DbHelper.getComingPlayersCount(this);
-            setTitle(getString(R.string.main_title, comingPlayersCount));
             ((Button)findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, comingPlayersCount));
         }
     }
@@ -516,10 +514,10 @@ public class MainActivity extends AppCompatActivity
 
         alertDialogBuilder
                 .setMessage("Welcome! \n" +
-                        "1. Use the \"+\" New player - to create players \n" +
-                        "2. Mark the arriving players \n" +
-                        "3. Use the \"+\" Teams - to divide your teams \n" +
-                        "4. Use the \"+\" Results - once the game is over \n" +
+                        "1. 'New player' - to create players \n" +
+                        "2. Check mark the arriving players \n" +
+                        "3. 'Pick Teams' - to divide the players \n" +
+                        "4. 'Enter Results' - once the game is over \n" +
                         "\n" +
                         "And don't forget to be awesome :)")
                 .setCancelable(true)

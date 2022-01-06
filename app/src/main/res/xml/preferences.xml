@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Make Teams">
+    <PreferenceCategory android:title="Pick Teams">
 
         <EditTextPreference
             android:icon="@drawable/settings"
             android:key="divide_attempts"
-            android:summary="Make teams - number of teams division to consider (1-100)"
+            android:summary="Pick teams - number of teams division to consider (1-100)"
             android:title="Divide attempts" />
 
         <EditTextPreference
             android:icon="@drawable/settings"
             android:key="divide_grade_percentage"
-            android:summary="Make teams - grade weight % (0-100)"
+            android:summary="Pick teams - grade weight % (0-100)"
             android:title="Grade weight" />
     </PreferenceCategory>
 

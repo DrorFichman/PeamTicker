@@ -1,7 +1,7 @@
 <resources>
     <!--    App-->
     <string name="app_name">PeamTicker</string>
-    <string name="main_title">"PeamTicker (%1$d)"</string>
+    <string name="main_title">"PeamTicker - Team Picker"</string>
 
     <!--    Drawer-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -10,8 +10,10 @@
     <!--    Headlines-->
     <string name="name">Name</string>
     <string name="grade">Grade</string>
+    <string name="grade_description">Grade (0-99)</string>
     <string name="attributes">Attr</string>
     <string name="age">Age</string>
+    <string name="age_description">Age (birth date)</string>
     <string name="plus_minus">+/-</string>
     <string name="success">Success</string>
     <string name="games">Games</string>
@@ -67,5 +69,5 @@
     <string name="operation_divide_by_age">* Divide by age :)</string>
     <string name="operation_analysis">* Click the players for deeper analysis \n* Click icon to exit analysis mode</string>
     <string name="copy_players_success">Teams division applied</string>
-    <string name="main_make_teams">"Make Teams\n(%1$d players)"</string>
+    <string name="main_make_teams">"Pick Teams\n(%1$d players)"</string>
 </resources>

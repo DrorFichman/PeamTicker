@@ -24,9 +24,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center">
 
         <Button
             android:id="@+id/main_add_player"
@@ -34,16 +35,21 @@
             android:layout_height="60dp"
             android:layout_gravity="center"
             android:layout_marginEnd="10dp"
+            android:background="@color/fui_transparent"
             android:text="New Player"
-            android:textAllCaps="false" />
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
         <Button
             android:id="@+id/main_make_teams"
             android:layout_width="150dp"
             android:layout_height="60dp"
             android:layout_marginStart="10dp"
             android:layout_gravity="center"
-            android:text="Make teams"
-            android:textAllCaps="false" />
+            android:background="@color/fui_transparent"
+            android:text="Pick Teams"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 
 </RelativeLayout>
