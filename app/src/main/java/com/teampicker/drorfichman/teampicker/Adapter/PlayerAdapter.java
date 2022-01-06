@@ -69,7 +69,8 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     }
 
     private void setComing(CheckBox vComing, Player player) {
-        vComing.setVisibility(player.mName != null ? View.VISIBLE : View.INVISIBLE);
+        boolean canCome = (player.mName != null && !player.archived);
+        vComing.setVisibility(canCome ? View.VISIBLE : View.INVISIBLE);
         vComing.setChecked(player.isComing);
         vComing.setOnClickListener(view1 -> {
             player.isComing = vComing.isChecked();
