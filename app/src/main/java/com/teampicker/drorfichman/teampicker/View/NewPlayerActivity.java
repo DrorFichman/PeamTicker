@@ -107,6 +107,7 @@ public class NewPlayerActivity extends AppCompatActivity {
             }
 
             DbHelper.updatePlayerBirth(getApplicationContext(), p.mName, newYear, newMonth);
+            // TODO birth day
         }
     }
 

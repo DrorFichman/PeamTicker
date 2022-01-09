@@ -18,6 +18,7 @@ public class Player extends Sortable implements Serializable, Comparable {
     public int mGrade;
     public int mBirthYear;
     public int mBirthMonth;
+    public int mBirthDay;
     private int mAge;
 
     public boolean isComing;

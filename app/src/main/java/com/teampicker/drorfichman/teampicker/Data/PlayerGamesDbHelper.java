@@ -113,6 +113,7 @@ public class PlayerGamesDbHelper {
                             null,
                             null,
                             null,
+                            null,
                             PlayerContract.PlayerGameEntry.PLAYER_GRADE,
                             null, null, PlayerContract.PlayerGameEntry.ATTRIBUTES);
 
@@ -368,6 +369,7 @@ public class PlayerGamesDbHelper {
         Cursor c = db.rawQuery("select player.name as player_name, " +
                         " player.birth_year as birth_year, " +
                         " player.birth_month as birth_month, " +
+                        " player.birth_day as birth_day, " +
                         " player.grade as player_grade, " +
                         " player.attributes as player_attributes, " +
                         " sum(result) as results_sum, " +
@@ -393,6 +395,7 @@ public class PlayerGamesDbHelper {
                             null,
                             "birth_year",
                             "birth_month",
+                            "birth_day",
                             "player_grade",
                             null, null,
                             "player_attributes");

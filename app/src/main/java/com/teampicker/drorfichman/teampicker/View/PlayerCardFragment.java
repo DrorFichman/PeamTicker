@@ -154,9 +154,11 @@ public class PlayerCardFragment extends Fragment {
         int year = pPlayer.mBirthYear > 0 ? pPlayer.mBirthYear : 2000;
         int month = pPlayer.mBirthMonth > 0 ? pPlayer.mBirthMonth - 1 : 0;
         DatePickerDialog d = new DatePickerDialog(getContext(), 0, (datePicker, newYear, newMonth, i2) -> {
+        Log.i("Birth", "set " + pPlayer.mBirthDay);
             newMonth++; // starts at 0...
             pPlayer.mBirthMonth = newMonth;
             pPlayer.mBirthYear = newYear;
+            Log.i("Birth", "set " + newDay);
             setBirthday();
         }, year, month, 1);
         d.show();

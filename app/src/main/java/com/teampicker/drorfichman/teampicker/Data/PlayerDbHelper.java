@@ -22,6 +22,7 @@ public class PlayerDbHelper {
                     PlayerContract.PlayerEntry.IS_COMING + " INTEGER, " +
                     PlayerContract.PlayerEntry.BIRTH_YEAR + " INTEGER, " +
                     PlayerContract.PlayerEntry.BIRTH_MONTH + " INTEGER, " +
+                    PlayerContract.PlayerEntry.BIRTH_DAY + " INTEGER, " +
                     PlayerContract.PlayerEntry.ARCHIVED + " INTEGER DEFAULT 0, " +
                     PlayerContract.PlayerEntry.ATTRIBUTES + " TEXT DEFAULT '', " +
                     PlayerContract.PlayerEntry.MSG_IDENTIFIER + " TEXT DEFAULT '' " +
@@ -73,6 +74,7 @@ public class PlayerDbHelper {
                 PlayerContract.PlayerEntry.GRADE,
                 PlayerContract.PlayerEntry.BIRTH_YEAR,
                 PlayerContract.PlayerEntry.BIRTH_MONTH,
+                PlayerContract.PlayerEntry.BIRTH_DAY,
                 PlayerContract.PlayerEntry.IS_COMING,
                 PlayerContract.PlayerEntry.ARCHIVED,
                 PlayerContract.PlayerEntry.ATTRIBUTES
@@ -110,6 +112,7 @@ public class PlayerDbHelper {
                             PlayerContract.PlayerEntry.MSG_IDENTIFIER,
                             PlayerContract.PlayerEntry.BIRTH_YEAR,
                             PlayerContract.PlayerEntry.BIRTH_MONTH,
+                            PlayerContract.PlayerEntry.BIRTH_DAY,
                             PlayerContract.PlayerEntry.GRADE,
                             PlayerContract.PlayerEntry.IS_COMING,
                             PlayerContract.PlayerEntry.ARCHIVED,
@@ -130,6 +133,7 @@ public class PlayerDbHelper {
                                                 String player_msg_identifier,
                                                 String year,
                                                 String month,
+                                                String day,
                                                 String player_grade,
                                                 String is_coming,
                                                 String archived,
@@ -138,9 +142,10 @@ public class PlayerDbHelper {
         Player p = new Player(c.getString(c.getColumnIndex(player_name)), c.getInt(c.getColumnIndex(player_grade)));
         p.isComing = (is_coming != null) ? c.getInt(c.getColumnIndex(is_coming)) == 1 : true;
         p.archived = (archived != null) ? c.getInt(c.getColumnIndex(archived)) == 1 : false;
-        p.mBirthYear = (year != null && c.getColumnIndex(year) > 0) ? c.getInt(c.getColumnIndex(year)) : 0;
-        p.mBirthMonth = (month != null && c.getColumnIndex(month) > 0) ? c.getInt(c.getColumnIndex(month)) : 0;
-        p.msgDisplayName = (player_msg_identifier != null && c.getColumnIndex(player_msg_identifier) > 0) ? c.getString(c.getColumnIndex(player_msg_identifier)) : "";
+        p.mBirthYear = getInt(c, year, 0);
+        p.mBirthMonth = getInt(c, month, 0);
+        p.mBirthDay = getInt(c, day, 0);
+        p.msgDisplayName = getString(c, player_msg_identifier, "");
 
         if (attributes != null && c.getColumnIndex(attributes) > 0) {
             String attr = c.getString(c.getColumnIndex(attributes));
@@ -150,6 +155,14 @@ public class PlayerDbHelper {
             p.isUnbreakable = attr.contains(PlayerAttribute.isUnbreakable.displayName);
         }
         return p;
+    }
+
+    private static String getString(Cursor c, String key, String def) {
+        return (key != null && c.getColumnIndex(key) > 0) ? c.getString(c.getColumnIndex(key)) : def;
+    }
+
+    private static int getInt(Cursor c, String key, int def) {
+        return (key != null && c.getColumnIndex(key) > 0) ? c.getInt(c.getColumnIndex(key)) : def;
     }
 
     public static void deletePlayer(SQLiteDatabase db, String name) {
@@ -184,6 +197,7 @@ public class PlayerDbHelper {
                 PlayerContract.PlayerEntry.GRADE,
                 PlayerContract.PlayerEntry.BIRTH_YEAR,
                 PlayerContract.PlayerEntry.BIRTH_MONTH,
+                PlayerContract.PlayerEntry.BIRTH_DAY,
                 PlayerContract.PlayerEntry.IS_COMING,
                 PlayerContract.PlayerEntry.ARCHIVED,
                 PlayerContract.PlayerEntry.ATTRIBUTES
@@ -213,6 +227,7 @@ public class PlayerDbHelper {
                 PlayerContract.PlayerEntry.GRADE,
                 PlayerContract.PlayerEntry.BIRTH_YEAR,
                 PlayerContract.PlayerEntry.BIRTH_MONTH,
+                PlayerContract.PlayerEntry.BIRTH_DAY,
                 PlayerContract.PlayerEntry.IS_COMING,
                 PlayerContract.PlayerEntry.ARCHIVED,
                 PlayerContract.PlayerEntry.ATTRIBUTES
@@ -246,6 +261,7 @@ public class PlayerDbHelper {
                 PlayerContract.PlayerEntry.GRADE,
                 PlayerContract.PlayerEntry.BIRTH_YEAR,
                 PlayerContract.PlayerEntry.BIRTH_MONTH,
+                PlayerContract.PlayerEntry.BIRTH_DAY,
                 PlayerContract.PlayerEntry.IS_COMING,
                 PlayerContract.PlayerEntry.ARCHIVED,
                 PlayerContract.PlayerEntry.ATTRIBUTES
@@ -320,6 +336,7 @@ public class PlayerDbHelper {
         values.put(PlayerContract.PlayerEntry.IS_COMING, p.isComing ? 1 : 0);
         if (p.mBirthYear > 0) values.put(PlayerContract.PlayerEntry.BIRTH_YEAR, p.mBirthYear);
         if (p.mBirthMonth > 0) values.put(PlayerContract.PlayerEntry.BIRTH_MONTH, p.mBirthMonth);
+        if (p.mBirthDay > 0) values.put(PlayerContract.PlayerEntry.BIRTH_DAY, p.mBirthDay);
         values.put(PlayerContract.PlayerEntry.ATTRIBUTES, p.getAttributes());
         values.put(PlayerContract.PlayerEntry.ARCHIVED, p.archived ? 1 : 0);
 
@@ -338,10 +355,11 @@ public class PlayerDbHelper {
         updatePlayer(db, name, values);
     }
 
-    public static void updatePlayerBirth(SQLiteDatabase db, String name, int year, int month) {
+    public static void updatePlayerBirth(SQLiteDatabase db, String name, int year, int month, int day) {
         ContentValues values = new ContentValues();
         if (year > 0) values.put(PlayerContract.PlayerEntry.BIRTH_YEAR, year);
         if (month > 0) values.put(PlayerContract.PlayerEntry.BIRTH_MONTH, month);
+        if (day > 0) values.put(PlayerContract.PlayerEntry.BIRTH_DAY, day);
 
         updatePlayer(db, name, values);
     }
@@ -381,6 +399,7 @@ public class PlayerDbHelper {
                 PlayerContract.PlayerEntry.IS_COMING,
                 PlayerContract.PlayerEntry.BIRTH_YEAR,
                 PlayerContract.PlayerEntry.BIRTH_MONTH,
+                PlayerContract.PlayerEntry.BIRTH_DAY,
                 PlayerContract.PlayerEntry.ATTRIBUTES,
                 PlayerContract.PlayerEntry.ARCHIVED
         };
@@ -406,6 +425,7 @@ public class PlayerDbHelper {
                         null,
                         PlayerContract.PlayerEntry.BIRTH_YEAR,
                         PlayerContract.PlayerEntry.BIRTH_MONTH,
+                        PlayerContract.PlayerEntry.BIRTH_DAY,
                         PlayerContract.PlayerEntry.GRADE,
                         PlayerContract.PlayerEntry.IS_COMING,
                         PlayerContract.PlayerEntry.ARCHIVED,

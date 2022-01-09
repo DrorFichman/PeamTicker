@@ -89,6 +89,7 @@ public class DbHelper extends SQLiteOpenHelper {
         addColumn(db, PlayerContract.PlayerGameEntry.TABLE_NAME, PlayerContract.PlayerGameEntry.ATTRIBUTES, "TEXT", "''");
         modifyGameDates(db);
         addColumn(db, PlayerContract.PlayerEntry.TABLE_NAME, PlayerContract.PlayerEntry.MSG_IDENTIFIER, "TEXT", "''");
+        addColumn(db, PlayerContract.PlayerEntry.TABLE_NAME, PlayerContract.PlayerEntry.BIRTH_DAY, "INTEGER", null);
     }
 
     private void addColumn(SQLiteDatabase db, String table, String column, String type, String def) {
@@ -190,8 +191,8 @@ public class DbHelper extends SQLiteOpenHelper {
         PlayerDbHelper.setPlayerAttributes(getSqLiteDatabase(context), p.mName, p.getAttributes());
     }
 
-    public static void updatePlayerBirth(Context context, String name, int year, int month) {
-        PlayerDbHelper.updatePlayerBirth(getSqLiteDatabase(context), name, year, month);
+    public static void updatePlayerBirth(Context context, String name, int year, int month, int day) {
+        PlayerDbHelper.updatePlayerBirth(getSqLiteDatabase(context), name, year, month, day);
     }
 
     public static boolean insertPlayer(Context context, Player p) {
