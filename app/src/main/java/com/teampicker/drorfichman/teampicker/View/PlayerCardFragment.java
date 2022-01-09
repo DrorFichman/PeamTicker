@@ -113,8 +113,9 @@ public class PlayerCardFragment extends Fragment {
 
         if (vBirth.getTag() != null) { // update birth
             String date = (String) vBirth.getTag();
-            int newYear = Integer.parseInt(date.split("/")[1]);
-            int newMonth = Integer.parseInt(date.split("/")[0]);
+            int newYear = Integer.parseInt(date.split("/")[2]);
+            int newMonth = Integer.parseInt(date.split("/")[1]);
+            int newDay = Integer.parseInt(date.split("/")[0]);
 
             if (newYear < 1900 || newYear > Calendar.getInstance().get(Calendar.YEAR)) {
                 Toast.makeText(getContext(), "Year must be between 1900-now", Toast.LENGTH_LONG).show();
@@ -122,7 +123,7 @@ public class PlayerCardFragment extends Fragment {
             }
 
             Log.i("AGE", "Year " + newYear + " month " + newMonth);
-            DbHelper.updatePlayerBirth(ctx, pPlayer.mName, newYear, newMonth);
+            DbHelper.updatePlayerBirth(ctx, pPlayer.mName, newYear, newMonth, newDay);
             playerUpdated = true;
         }
 
@@ -153,19 +154,21 @@ public class PlayerCardFragment extends Fragment {
     public void showDatePicker(View view) {
         int year = pPlayer.mBirthYear > 0 ? pPlayer.mBirthYear : 2000;
         int month = pPlayer.mBirthMonth > 0 ? pPlayer.mBirthMonth - 1 : 0;
-        DatePickerDialog d = new DatePickerDialog(getContext(), 0, (datePicker, newYear, newMonth, i2) -> {
+        int day = pPlayer.mBirthDay > 0 ? pPlayer.mBirthDay : 1;
         Log.i("Birth", "set " + pPlayer.mBirthDay);
+        DatePickerDialog d = new DatePickerDialog(getContext(), 0, (datePicker, newYear, newMonth, newDay) -> {
             newMonth++; // starts at 0...
             pPlayer.mBirthMonth = newMonth;
             pPlayer.mBirthYear = newYear;
             Log.i("Birth", "set " + newDay);
+            pPlayer.mBirthDay = newDay;
             setBirthday();
-        }, year, month, 1);
+        }, year, month, day);
         d.show();
     }
 
     private void setBirthday() {
         vBirth.setText(String.valueOf(pPlayer.getAge()));
-        vBirth.setTag(pPlayer.mBirthMonth + "/" + pPlayer.mBirthYear);
+        vBirth.setTag(pPlayer.mBirthDay + "/" + pPlayer.mBirthMonth + "/" + pPlayer.mBirthYear);
     }
 }
