@@ -309,26 +309,6 @@ public class PlayerDbHelper {
 
     public static boolean insertPlayer(SQLiteDatabase db, Player p) {
 
-        String where = PlayerContract.PlayerEntry.NAME + " = ? ";
-        String[] whereArgs = new String[]{p.mName};
-        String[] projection = {
-                PlayerContract.PlayerEntry.ID};
-        Cursor c = db.query(
-                PlayerContract.PlayerEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                whereArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-        int count = c.getCount();
-        Log.d("DB", "Found " + count + " players with " + p.mName);
-        c.close();
-        if (count > 0) {
-            return false;
-        }
-
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
         values.put(PlayerContract.PlayerEntry.NAME, p.mName);

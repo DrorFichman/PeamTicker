@@ -35,6 +35,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
+import com.teampicker.drorfichman.teampicker.Data.PlayerDbHelper;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DBSnapshotUtils;
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity
 
     private void setActionButtons() {
         findViewById(R.id.main_add_player).setOnClickListener(view -> {
-            startActivityForResult(new Intent(MainActivity.this, NewPlayerActivity.class), ACTIVITY_RESULT_PLAYER);
+            startActivityForResult(new Intent(MainActivity.this, PlayerDetailsActivity.class), ACTIVITY_RESULT_PLAYER);
         });
         findViewById(R.id.main_make_teams).setOnClickListener(view -> {
             launchMakeTeams();
@@ -235,7 +236,7 @@ public class MainActivity extends AppCompatActivity
                 pasteComingPlayers();
                 break;
             case R.id.add_player:
-                startActivityForResult(new Intent(MainActivity.this, NewPlayerActivity.class), ACTIVITY_RESULT_PLAYER);
+                startActivityForResult(new Intent(MainActivity.this, PlayerDetailsActivity.class), ACTIVITY_RESULT_PLAYER);
                 break;
             case R.id.show_archived_players:
                 showArchivedPlayers = !showArchivedPlayers;

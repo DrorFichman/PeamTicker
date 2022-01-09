@@ -197,6 +197,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public static boolean insertPlayer(Context context, Player p) {
         p.mName = FirebaseHelper.sanitizeKey(p.mName);
+        if (getPlayer(context, p.mName) != null) return false;
         return PlayerDbHelper.insertPlayer(getSqLiteDatabase(context), p);
     }
 

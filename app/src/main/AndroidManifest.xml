@@ -38,12 +38,6 @@
         </activity>
 
         <activity
-            android:name=".View.NewPlayerActivity"
-            android:label="New player details"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-
-        <activity
             android:name=".View.PlayerDetailsActivity"
             android:label="Player details"
             android:screenOrientation="portrait"

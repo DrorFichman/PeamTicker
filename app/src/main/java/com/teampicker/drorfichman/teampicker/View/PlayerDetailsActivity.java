@@ -3,6 +3,7 @@ package com.teampicker.drorfichman.teampicker.View;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.google.android.material.tabs.TabLayout;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
@@ -21,7 +22,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYER = "player";
     Player pPlayer;
 
-    MyAdapter mAdapter;
+    PlayerViewAdapter mAdapter;
 
     ViewPager mPager;
 
@@ -41,11 +42,14 @@ public class PlayerDetailsActivity extends AppCompatActivity {
     }
 
     private void refreshData(String name) {
-        pPlayer = DbHelper.getPlayer(this, name);
+        if (!TextUtils.isEmpty(name)) {
+            pPlayer = DbHelper.getPlayer(this, name);
+            setTitle("Player details : " + pPlayer.mName);
+        } else {
+            setTitle("New Player");
+        }
 
-        setTitle("Player details : " + pPlayer.mName);
-
-        mAdapter = new MyAdapter(getSupportFragmentManager(), pPlayer, this::finish);
+        mAdapter = new PlayerViewAdapter(getSupportFragmentManager(), pPlayer, this::finish);
         mPager = findViewById(R.id.player_pager);
         mPager.setAdapter(mAdapter);
 
@@ -59,12 +63,12 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         finish();
     }
 
-    public static class MyAdapter extends FragmentPagerAdapter {
+    public static class PlayerViewAdapter extends FragmentPagerAdapter {
 
         Player p;
-        private final PlayerCardFragment.PlayerUpdated updateListener;
+        private final PlayerDetailsFragment.PlayerUpdated updateListener;
 
-        MyAdapter(FragmentManager fm, Player player, PlayerCardFragment.PlayerUpdated listener) {
+        PlayerViewAdapter(FragmentManager fm, Player player, PlayerDetailsFragment.PlayerUpdated listener) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             p = player;
             updateListener = listener;
@@ -72,7 +76,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 3;
+            return p != null ? 3 : 1;
         }
 
         @Override
@@ -84,7 +88,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 0) {
-                return "Card";
+                return "Details";
             } else if (position == 1) {
                 return "Games";
             } else {
@@ -96,7 +100,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         @NonNull
         public Fragment getItem(int position) {
             if (position == 0) {
-                return PlayerCardFragment.newInstance(p, updateListener);
+                return PlayerDetailsFragment.newInstance(p, updateListener);
             } else if (position == 1) {
                 return GamesFragment.newInstance(p.mName, null);
             } else {
