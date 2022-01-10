@@ -9,6 +9,10 @@ public class DivisionWeight {
         return grade / 100;
     }
 
+    public String gradeDisplay() {
+        return String.valueOf((int) grade);
+    }
+
     public double chemistry() {
         return chemistry / 100;
     }

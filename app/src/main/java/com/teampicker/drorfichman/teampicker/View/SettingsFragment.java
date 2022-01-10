@@ -23,6 +23,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         EditTextPreference gradeWeight = findPreference(SettingsHelper.SETTING_DIVIDE_GRADE);
         gradeWeight.setOnBindEditTextListener(editText ->
         {
+            editText.setText(String.valueOf(SettingsHelper.getDivisionWeight(getContext()).gradeDisplay()));
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
             editText.setSingleLine();
         });
@@ -33,6 +34,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         EditTextPreference attemptsPref = findPreference(SettingsHelper.SETTING_DIVIDE_ATTEMPTS);
         attemptsPref.setOnBindEditTextListener(editText ->
         {
+            editText.setText(String.valueOf(SettingsHelper.getDivideAttemptsCount(getContext())));
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
             editText.setSingleLine();
         });
