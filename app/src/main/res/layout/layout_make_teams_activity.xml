@@ -5,15 +5,6 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/enter_game_result"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Enter Results"
-        android:textAllCaps="false"
-        android:onClick="initSetResults" />
-
-    <Button
         android:id="@+id/set_game_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -180,21 +171,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/move" />
-
-        <ImageView
-            android:id="@+id/game_prediction_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@drawable/analysis" />
-
-        <ImageView
-            android:id="@+id/send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@drawable/send" />
+            android:src="@drawable/move" />
 
         <ImageView
             android:id="@+id/save"

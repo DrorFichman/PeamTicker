@@ -2,6 +2,9 @@
     <!--    App-->
     <string name="app_name">PeamTicker</string>
     <string name="main_title">"PeamTicker - Team Picker"</string>
+    <string name="pick_teams_title">"Pick Teams"</string>
+    <string name="pick_teams_title_results">"Results"</string>
+    <string name="pick_teams_title_analysis">"Analysis"</string>
 
     <!--    Drawer-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -30,8 +33,11 @@
     <string name="edit">Edit</string>
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>
-    <string name="clear_all_coming">Clear all</string>
+    <string name="clear_all_coming">Clear coming</string>
     <string name="action_send_statistics">Send Statistics</string>
+    <string name="action_analysis">Analysis</string>
+    <string name="action_share">Share</string>
+    <string name="action_enter_results">Enter results</string>
 
     <!--    Menus-->
     <string name="add_player">Add player</string>

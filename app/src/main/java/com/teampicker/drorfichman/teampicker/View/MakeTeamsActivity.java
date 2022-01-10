@@ -7,11 +7,13 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,8 +58,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     public Collaboration analysisResult;
     private String analysisSelectedPlayer;
+    public boolean analysisAsyncInProgress;
 
-    private View enterResultView;
     private boolean mSetResult;
     private TeamDivision.DivisionStrategy selectedDivision = TeamDivision.DivisionStrategy.Grade;
 
@@ -73,10 +75,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
     protected View teamStatsLayout;
     protected View buttonsLayout;
 
-    private View sendView;
     private View moveView;
     private View shuffleView;
-    public ImageView analysisView;
 
     private Button team1Score;
     private Button team2Score;
@@ -121,13 +121,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
         moveView.setOnClickListener(onMoveClicked);
         moveView.setOnLongClickListener(switchTeamsColors);
 
-        enterResultView = findViewById(R.id.enter_game_result);
         saveView = findViewById(R.id.save);
         saveView.setOnClickListener(view -> saveResults());
-
-        sendView = findViewById(R.id.send);
-        sendView.setOnClickListener(onSendClicked);
-        sendView.setOnLongClickListener(explainOperation);
 
         shuffleView = findViewById(R.id.shuffle);
         shuffleView.setOnClickListener(v -> divideComingPlayers(selectedDivision));
@@ -135,12 +130,33 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         analysisHeaders1 = findViewById(R.id.analysis_headers_1);
         analysisHeaders2 = findViewById(R.id.analysis_headers_2);
-        analysisView = findViewById(R.id.game_prediction_button);
-        analysisView.setOnClickListener(v -> analysisClicked());
-        analysisView.setOnLongClickListener(explainOperation);
 
         initialTeams();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.make_teams_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_analysis:
+                analysisClicked();
+                break;
+            case R.id.action_enter_results:
+                initSetResults();
+                break;
+            case R.id.action_share:
+                onSendClicked();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     private ArrayList<Player> getPlayers() {
         return DbHelper.getComingPlayers(this, RECENT_GAMES);
@@ -161,13 +177,14 @@ public class MakeTeamsActivity extends AppCompatActivity {
         finish();
     }
 
-    public void initSetResults(View button) {
+    public void initSetResults() {
         team1Score.setText("0");
         team2Score.setText("0");
         team1Score.setOnClickListener(view -> team1Score.setText(String.valueOf((getScoreValue(team1Score) + 1) % MAX_SCORE)));
         team2Score.setOnClickListener(view -> team2Score.setText(String.valueOf((getScoreValue(team2Score) + 1) % MAX_SCORE)));
 
         backFromAnalysis(false);
+        setActivityTitle(getString(R.string.pick_teams_title_results));
 
         displayResultsViews(true);
 
@@ -176,18 +193,18 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private void cancelSetResults() {
         displayResultsViews(false);
+        setActivityTitle(null);
     }
 
     private void displayResultsViews(boolean enterResults) {
         mSetResult = enterResults;
-        enterResultView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
 
         moveView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         shuffleView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
-        sendView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
-        analysisView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
 
         saveView.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
+        team1Score.setText("0");
+        team2Score.setText("0");
         team1Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
         team2Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
         setGameDate.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
@@ -282,8 +299,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         return isChanged;
     }
 
-    private View.OnClickListener onSendClicked = view -> {
-
+    private void onSendClicked() {
         Log.d("teams", "Enter send mode");
         DbHelper.saveTeams(MakeTeamsActivity.this, players1, players2);
         enterSendMode();
@@ -362,7 +378,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (mSetResult) {
-          cancelSetResults();
+            cancelSetResults();
         } else if (backFromMove()) { // exit move mode
             return;
         } else if (backFromAnalysis(true)) { // exit analysis modes
@@ -487,14 +503,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         Collections.sort(playersList, (p1, t1) -> p1.mName.compareTo(t1.mName));
     }
 
-    private boolean isAnalysisMode() {
-        return analysisResult != null;
-    }
-
-    private boolean isAnalysisPlayerSelectedMode() {
-        return analysisResult != null && analysisSelectedPlayer != null;
-    }
-
     private boolean isMoveMode() {
         return moveView != null && moveView.getAlpha() < 1F;
     }
@@ -508,6 +516,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private boolean backFromMove() {
         if (isMoveMode()) { // exit move mode
             clearMovedPlayers();
+            setActivityTitle(null);
             refreshPlayers();
             return true;
         }
@@ -530,17 +539,11 @@ public class MakeTeamsActivity extends AppCompatActivity {
         @Override
         public boolean onLongClick(View view) {
             switch (view.getId()) {
-                case R.id.game_prediction_button:
-                    Snackbar.make(sendView, "Enter players collaboration analysis mode", Snackbar.LENGTH_LONG).show();
-                    return true;
-                case R.id.send:
-                    Snackbar.make(sendView, "Share teams", Snackbar.LENGTH_SHORT).show();
-                    return true;
                 case R.id.shuffle:
-                    Snackbar.make(sendView, "Shuffle teams", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(shuffleView, "Shuffle teams", Snackbar.LENGTH_SHORT).show();
                     return true;
                 case R.id.move:
-                    Snackbar.make(sendView, "Enter manual players moving mode", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(shuffleView, "Enter manual players moving mode", Snackbar.LENGTH_SHORT).show();
                     return true;
             }
             return false;
@@ -615,16 +618,26 @@ public class MakeTeamsActivity extends AppCompatActivity {
         refreshPlayers();
     }
 
+    private void setDefaultTeamColors() {
+        int[] colors = ColorHelper.getTeamsColors(this);
+        list1.setBackgroundColor(colors[0]);
+        list2.setBackgroundColor(colors[1]);
+    }
+
+    private void setActivityTitle(String mode) {
+        setTitle(getString(R.string.pick_teams_title) + (!TextUtils.isEmpty(mode) ? " - " + mode : ""));
+    }
+
     //region Analysis
     private void analysisClicked() {
 
-        if (!backFromAnalysis(false)) { // enter analysis mode
-            analysisView.setAlpha(0.5F);
-            enterResultView.setVisibility(View.INVISIBLE);
+        if (!backFromAnalysis(false) && !analysisAsyncInProgress) { // enter analysis mode
+            cancelSetResults();
             moveView.setVisibility(View.INVISIBLE);
             shuffleView.setVisibility(View.INVISIBLE);
             list1.setBackgroundColor(Color.GRAY);
             list2.setBackgroundColor(Color.GRAY);
+            setActivityTitle(getString(R.string.pick_teams_title_analysis));
             AsyncTeamsAnalysis async = new AsyncTeamsAnalysis(this, this::refreshPlayers);
             async.execute();
         }
@@ -637,19 +650,19 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void hideAnalysis() {
-        enterResultView.setVisibility(View.VISIBLE);
         moveView.setVisibility(View.VISIBLE);
         shuffleView.setVisibility(View.VISIBLE);
+        setActivityTitle(null);
         refreshPlayers();
     }
 
     private boolean backFromAnalysis(boolean singleBack) {
 
+        // TODO Ugly
         boolean returnValue = false;
 
         if (isAnalysisPlayerSelectedMode()) { // cancel player analysis selection
             analysisSelectedPlayer = null;
-            analysisView.setAlpha(0.5F);
 
             if (singleBack) {
                 refreshPlayers();
@@ -662,7 +675,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         if (isAnalysisMode()) { // cancel analysis
             analysisResult = null;
             analysisSelectedPlayer = null;
-            analysisView.setAlpha(1F);
             analysisHeaders1.setVisibility(View.GONE);
             analysisHeaders2.setVisibility(View.GONE);
 
@@ -685,12 +697,16 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
     }
 
-    private void setDefaultTeamColors() {
-        int[] colors = ColorHelper.getTeamsColors(this);
-        list1.setBackgroundColor(colors[0]);
-        list2.setBackgroundColor(colors[1]);
+    private boolean isAnalysisMode() {
+        return analysisResult != null;
     }
 
+    private boolean isAnalysisPlayerSelectedMode() {
+        return analysisResult != null && analysisSelectedPlayer != null;
+    }
+    //endregion
+
+    //region team shuffle
     private void initCollaboration() {
         analysisResult = CollaborationHelper.getCollaborationData(MakeTeamsActivity.this, players1, players2);
         refreshPlayers();

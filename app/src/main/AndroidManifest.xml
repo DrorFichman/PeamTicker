@@ -45,9 +45,9 @@
 
         <activity
             android:name=".View.MakeTeamsActivity"
-            android:label="Divide player into teams"
+            android:label="Pick Teams"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <activity
             android:name=".View.PlayerParticipationActivity"

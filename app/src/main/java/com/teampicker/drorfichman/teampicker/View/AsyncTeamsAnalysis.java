@@ -38,7 +38,7 @@ class AsyncTeamsAnalysis extends AsyncTask<Void, Void, String> {
         if (activity == null || activity.isFinishing()) return;
 
         activity.teamStatsLayout.setVisibility(View.INVISIBLE);
-        activity.analysisView.setEnabled(false);
+        activity.analysisAsyncInProgress = true;
     }
 
     @Override
@@ -50,6 +50,6 @@ class AsyncTeamsAnalysis extends AsyncTask<Void, Void, String> {
         doneHandler.execute();
 
         activity.enterAnalysis();
-        activity.analysisView.setEnabled(true);
+        activity.analysisAsyncInProgress = false;
     }
 }
