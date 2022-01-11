@@ -4,13 +4,13 @@
     <PreferenceCategory android:title="Pick Teams">
 
         <EditTextPreference
-            android:icon="@drawable/settings"
+            android:icon="@drawable/nav_setting"
             android:key="divide_attempts"
             android:summary="Pick teams - number of teams division to consider (1-100)"
             android:title="@string/setting_title_divide_attempts" />
 
         <EditTextPreference
-            android:icon="@drawable/settings"
+            android:icon="@drawable/nav_setting"
             android:key="divide_grade_percentage"
             android:summary="Pick teams - grade weight % (0-100)"
             android:title="@string/setting_title_grade_weight" />
@@ -20,7 +20,7 @@
         <DropDownPreference
             android:entries="@array/settings_team_color_scheme"
             android:entryValues="@array/settings_team_color_scheme"
-            android:icon="@drawable/settings"
+            android:icon="@drawable/nav_setting"
             android:key="teams_color_scheme"
             android:summary="@string/setting_title_color_scheme"
             android:title="Teams Colors" />

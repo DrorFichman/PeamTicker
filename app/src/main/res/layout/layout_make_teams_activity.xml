@@ -9,8 +9,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone"
-        android:onClick="showDatePicker" />
+        android:onClick="showDatePicker"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/teams_list_area"
@@ -35,11 +35,11 @@
 
             <include
                 android:id="@+id/analysis_headers_1"
+                layout="@layout/player_team_analysis_item"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:visibility="gone"
-                layout="@layout/player_team_analysis_item" />
+                android:visibility="gone" />
 
             <ListView
                 android:id="@+id/team_1"
@@ -75,11 +75,11 @@
 
             <include
                 android:id="@+id/analysis_headers_2"
+                layout="@layout/player_team_analysis_item"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:visibility="gone"
-                layout="@layout/player_team_analysis_item" />
+                android:visibility="gone" />
 
             <ListView
                 android:id="@+id/team_2"
@@ -159,19 +159,23 @@
         android:layout_gravity="center_horizontal"
         android:layout_margin="30dp">
 
-        <ImageView
+        <Button
             android:id="@+id/shuffle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/shuffle" />
+            android:background="@android:color/transparent"
+            android:drawableTop="@drawable/shuffle"
+            android:text="shuffle" />
 
-        <ImageView
+        <Button
             android:id="@+id/move"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/move" />
+            android:background="@android:color/transparent"
+            android:drawableTop="@drawable/move"
+            android:text="Move" />
 
         <ImageView
             android:id="@+id/save"

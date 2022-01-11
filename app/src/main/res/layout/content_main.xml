@@ -38,6 +38,7 @@
             android:background="@color/fui_transparent"
             android:text="New Player"
             android:textAllCaps="false"
+            android:drawableStart="@drawable/new_player_icon"
             android:textColor="@android:color/white" />
 
         <Button
@@ -49,6 +50,7 @@
             android:background="@color/fui_transparent"
             android:text="Pick Teams"
             android:textAllCaps="false"
+            android:drawableStart="@drawable/make_teams_icon"
             android:textColor="@android:color/white" />
     </LinearLayout>
 

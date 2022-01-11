@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/clear_all"
-        android:title="@string/clear_all_coming"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/add_player"
         android:title="@string/add_player"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/clear_all"
+        android:title="@string/clear_all_coming"
         app:showAsAction="never" />
     <item
         android:id="@+id/paste_coming_players"
