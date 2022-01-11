@@ -102,31 +102,33 @@ public class MainActivity extends AppCompatActivity
         setUsernameView();
     }
 
-    private void authenticate() {
-        AuthHelper.requireLogin(this, ACTIVITY_RESULT_SIGN_IN);
-        setUsernameView();
-    }
-
     private void setUsernameView() {
+        View headerView = ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0);
+        TextView usernameView = headerView.findViewById(R.id.appConnectedUser);
+        TextView authActionView = headerView.findViewById(R.id.appConnectedUserAction);
+
         FirebaseUser user = AuthHelper.getUser();
-        Log.i("AccountFB", "setUsernameView " + user);
-        String username = (user != null) ? user.getEmail() : getString(R.string.main_sign_in);
-        TextView usernameView = ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0).findViewById(R.id.appConnectedUser);
-        usernameView.setText(username);
-        usernameView.setOnClickListener(view -> {
-            if (user != null) { // log out
+        usernameView.setText(user != null ? user.getEmail() : "");
+        authActionView.setText(user != null ? R.string.main_logout : R.string.main_login);
+        authActionView.setOnClickListener(view -> {
+            if (user == null) { // log in
+                authenticate();
+            } else { // log out
                 DialogHelper.showApprovalDialog(this,
                         getString(R.string.main_sign_out_dialog_title),
                         getString(R.string.main_sign_out_dialog_message),
                         (dialogInterface, i) ->
                                 AuthUI.getInstance().signOut(this).addOnCompleteListener(task ->
                                         setUsernameView()));
-            } else { // sign in
-                authenticate();
             }
         });
 
         FirebaseHelper.getInstance().storeAccountData();
+    }
+
+    private void authenticate() {
+        AuthHelper.requireLogin(this, ACTIVITY_RESULT_SIGN_IN);
+        setUsernameView();
     }
 
     private void setActionButtons() {

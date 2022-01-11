@@ -47,7 +47,6 @@
     <string name="nav_import_from_file">Import from file</string>
     <string name="nav_sync_to_cloud">Sync to cloud</string>
     <string name="nav_pull_from_cloud">Pull from cloud</string>
-    <string name="nav_logout">Logout</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_getting_started">Getting Started</string>
     <string name="nav_about">About</string>
@@ -94,6 +93,8 @@
     <string name="main_make_teams">"Pick Teams\n(%1$d players)"</string>
     <string name="main_auth_required">Google sign in required</string>
     <string name="main_sign_in">Sign in</string>
+    <string name="main_login">Sign-in</string>
+    <string name="main_logout">Log out</string>
     <string name="main_sign_out_dialog_title">Log out?</string>
-    <string name="main_sign_out_dialog_message">Authentication is required for cloud related features.\nYour local data will not be lost.</string>
+    <string name="main_sign_out_dialog_message">Cloud features will not be available.</string>
 </resources>
