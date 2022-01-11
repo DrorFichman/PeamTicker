@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -336,7 +337,8 @@ public class FirebaseHelper implements CloudSync {
 
     @Override
     public void storeAccountData() {
-        account().setValue(new AccountData(AuthHelper.getUser()));
+        FirebaseUser user = AuthHelper.getUser();
+        if (user != null) account().setValue(new AccountData(user));
         app().setValue(new AppData(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
     }
 

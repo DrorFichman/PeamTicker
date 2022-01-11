@@ -26,6 +26,8 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,10 +37,10 @@ import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.Data.PlayerDbHelper;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DBSnapshotUtils;
+import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.FileHelper;
 import com.teampicker.drorfichman.teampicker.tools.PermissionTools;
 import com.teampicker.drorfichman.teampicker.tools.SnapshotHelper;
@@ -51,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -96,7 +99,34 @@ public class MainActivity extends AppCompatActivity
         syncInProgress = findViewById(R.id.sync_progress);
         syncProgressStatus = findViewById(R.id.sync_progress_status);
 
+        setUsernameView();
+    }
+
+    private void authenticate() {
         AuthHelper.requireLogin(this, ACTIVITY_RESULT_SIGN_IN);
+        setUsernameView();
+    }
+
+    private void setUsernameView() {
+        FirebaseUser user = AuthHelper.getUser();
+        Log.i("AccountFB", "setUsernameView " + user);
+        String username = (user != null) ? user.getEmail() : getString(R.string.main_sign_in);
+        TextView usernameView = ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0).findViewById(R.id.appConnectedUser);
+        usernameView.setText(username);
+        usernameView.setOnClickListener(view -> {
+            if (user != null) { // log out
+                DialogHelper.showApprovalDialog(this,
+                        getString(R.string.main_sign_out_dialog_title),
+                        getString(R.string.main_sign_out_dialog_message),
+                        (dialogInterface, i) ->
+                                AuthUI.getInstance().signOut(this).addOnCompleteListener(task ->
+                                        setUsernameView()));
+            } else { // sign in
+                authenticate();
+            }
+        });
+
+        FirebaseHelper.getInstance().storeAccountData();
     }
 
     private void setActionButtons() {
@@ -169,19 +199,17 @@ public class MainActivity extends AppCompatActivity
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Log.i("AccountFB", "User success " + user);
-                Toast.makeText(this, "Welcome " + user.getEmail(), Toast.LENGTH_SHORT).show();
-
-                FirebaseHelper.getInstance().storeAccountData();
+                Log.i("AccountFB", "User sign in success");
 
             } else {
                 // Sign in failed. Either user canceled the sign-in flow using the back button.
                 // Or response.getError().getErrorCode() with additional details
                 Log.w("AccountFB", "Failed login - " + response);
                 Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show();
-                // TODO finish? enforce authentication (and connectivity)
+                // TODO connectivity issues?
             }
+
+            setUsernameView();
 
         } else if (requestCode == ACTIVITY_RESULT_IMPORT_FILE_SELECTED &&
                 resultCode == RESULT_OK &&
@@ -307,10 +335,6 @@ public class MainActivity extends AppCompatActivity
             FirebaseHelper.getInstance().syncToCloud(this, this::showSyncStatus);
         } else if (id == R.id.nav_data_pull) {
             FirebaseHelper.getInstance().pullFromCloud(this, this::showSyncStatus);
-        } else if (id == R.id.nav_auth_logout) {
-            Log.i("AccountFB", "Log out user " + AuthHelper.getUser());
-            AuthUI.getInstance().signOut(this);
-            finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -394,10 +418,8 @@ public class MainActivity extends AppCompatActivity
 
     private void setComingPlayerIdentity(String currName, String identity, Set<String> comingSet, String[] playerNames) {
 
-        // TODO Dialog with player names for selection?
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter player name for : \n" + identity);
+        builder.setTitle("Enter player name for : \n" + identity); // TODO string
 
         final AutoCompleteTextView input = new AutoCompleteTextView(this);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, playerNames);
@@ -443,7 +465,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             setTitle(getString(R.string.main_title));
             int comingPlayersCount = DbHelper.getComingPlayersCount(this);
-            ((Button)findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, comingPlayersCount));
+            ((Button) findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, comingPlayersCount));
         }
     }
 

@@ -92,4 +92,8 @@
     <string name="operation_analysis">* Click the players for deeper analysis \n* Click icon to exit analysis mode</string>
     <string name="copy_players_success">Teams division applied</string>
     <string name="main_make_teams">"Pick Teams\n(%1$d players)"</string>
+    <string name="main_auth_required">Google sign in required</string>
+    <string name="main_sign_in">Sign in</string>
+    <string name="main_sign_out_dialog_title">Log out?</string>
+    <string name="main_sign_out_dialog_message">Authentication is required for cloud related features.\nYour local data will not be lost.</string>
 </resources>

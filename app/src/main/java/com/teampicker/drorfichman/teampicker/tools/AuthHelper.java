@@ -2,7 +2,6 @@ package com.teampicker.drorfichman.teampicker.tools;
 
 import android.app.Activity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,7 +16,7 @@ import androidx.annotation.NonNull;
 
 public class AuthHelper {
 
-    public static void requireLogin(Activity ctx, int activityResultCode) {
+    public static FirebaseUser requireLogin(Activity ctx, int activityResultCode) {
         FirebaseUser user = AuthHelper.getUser();
         if (user == null) {
             Log.i("AccountFB", "User not found");
@@ -31,10 +30,11 @@ public class AuthHelper {
                             .setAvailableProviders(providers)
                             .build(),
                     activityResultCode);
+
+            return null;
         } else {
             Log.i("AccountFB", "User found " + user.getEmail() + " - " + user.getUid());
-            Toast.makeText(ctx, "Welcome " + user.getEmail(), Toast.LENGTH_SHORT).show();
-            FirebaseHelper.getInstance().storeAccountData();
+            return user;
         }
     }
 
