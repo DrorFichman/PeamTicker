@@ -362,8 +362,10 @@ public class PlayerGamesDbHelper {
         }
 
         String nameFilter = "";
+        String[] args = null;
         if (name != null) {
-            nameFilter = " AND player.name =  \"" + name + "\"";
+            nameFilter = " AND player.name =  ? ";
+            args = new String[]{name};
         }
 
         Cursor c = db.rawQuery("select player.name as player_name, " +
@@ -384,7 +386,7 @@ public class PlayerGamesDbHelper {
                         limitGamesCount +
                         " group by player_name " +
                         " order by results_sum DESC",
-                null, null);
+                args, null);
 
         ArrayList<Player> players = new ArrayList<>();
         try {
@@ -454,13 +456,13 @@ public class PlayerGamesDbHelper {
                         " game, team, result " +
                         " from player_game, player " +
                         " where " +
-                        " player.name = player_game.name AND player.name =  \"" + name + "\"" +
+                        " player.name = player_game.name AND player.name =  ? " +
                         limitUpToDate +
                         " AND result NOT IN ( " +
                         PlayerGamesDbHelper.EMPTY_RESULT + ", " +
                         PlayerGamesDbHelper.MISSED_GAME + " ) " +
                         limitGamesCount,
-                null, null);
+                new String[]{name}, null);
 
         HashMap<String, PlayerParticipation> result = new HashMap();
 
