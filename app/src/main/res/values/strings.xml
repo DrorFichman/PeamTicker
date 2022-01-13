@@ -33,6 +33,7 @@
     <string name="edit">Edit</string>
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>
+    <string name="new_player">New Player</string>
     <string name="clear_all_coming">Clear coming</string>
     <string name="action_send_statistics">Send Statistics</string>
     <string name="action_analysis">Analysis</string>
@@ -90,7 +91,7 @@
     <string name="operation_divide_by_age">* Divide by age :)</string>
     <string name="operation_analysis">* Click the players for deeper analysis \n* Click icon to exit analysis mode</string>
     <string name="copy_players_success">Teams division applied</string>
-    <string name="main_make_teams">"Pick Teams\n(%1$d players)"</string>
+    <string name="main_make_teams">"Teams\n(%1$d players)"</string>
     <string name="main_auth_required">Google sign in required</string>
     <string name="main_sign_in">Sign in</string>
     <string name="main_login">Sign-in</string>

@@ -334,14 +334,32 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             showAbout();
         } else if (id == R.id.nav_data_sync) {
-            FirebaseHelper.getInstance().syncToCloud(this, this::showSyncStatus);
+            syncToCloud();
         } else if (id == R.id.nav_data_pull) {
-            FirebaseHelper.getInstance().pullFromCloud(this, this::showSyncStatus);
+            pullFromCloud();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void pullFromCloud() {
+        if (AuthHelper.getUser() == null) {
+            Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
+            authenticate();
+        } else {
+            FirebaseHelper.getInstance().pullFromCloud(this, this::showSyncStatus);
+        }
+    }
+
+    private void syncToCloud() {
+        if (AuthHelper.getUser() == null) {
+            Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
+            authenticate();
+        } else {
+            FirebaseHelper.getInstance().syncToCloud(this, this::showSyncStatus);
+        }
     }
     //endregion
 
