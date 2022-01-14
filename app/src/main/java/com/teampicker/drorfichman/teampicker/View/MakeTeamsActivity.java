@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,8 +79,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private View moveView;
     private View shuffleView;
 
-    private Button team1Score;
-    private Button team2Score;
+    private View resultViews;
+    private NumberPicker team1Score;
+    private NumberPicker team2Score;
     private View saveView;
     private Button setGameDate;
 
@@ -101,6 +103,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         teamData2 = findViewById(R.id.total_list2);
         headlines = findViewById(R.id.total_headlines);
 
+        resultViews = findViewById(R.id.enter_result_views);
         team1Score = findViewById(R.id.team_1_score);
         team2Score = findViewById(R.id.team_2_score);
         setGameDate = findViewById(R.id.set_game_date);
@@ -121,7 +124,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         moveView.setOnClickListener(onMoveClicked);
         moveView.setOnLongClickListener(switchTeamsColors);
 
-        saveView = findViewById(R.id.save);
+        saveView = findViewById(R.id.save_results);
         saveView.setOnClickListener(view -> saveResults());
 
         shuffleView = findViewById(R.id.shuffle);
@@ -164,8 +167,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private void saveResults() {
         int currGame = DbHelper.getActiveGame(this);
-        Game game = new Game(currGame, getGameDateString(),
-                getScoreValue(team1Score), getScoreValue(team2Score));
+        Game game = new Game(currGame, getGameDateString(), team1Score.getValue(), team2Score.getValue());
 
         DbHelper.insertGame(this, game);
 
@@ -178,10 +180,14 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     public void initSetResults() {
-        team1Score.setText("0");
-        team2Score.setText("0");
-        team1Score.setOnClickListener(view -> team1Score.setText(String.valueOf((getScoreValue(team1Score) + 1) % MAX_SCORE)));
-        team2Score.setOnClickListener(view -> team2Score.setText(String.valueOf((getScoreValue(team2Score) + 1) % MAX_SCORE)));
+        team1Score.setValue(0);
+        team1Score.setMinValue(0);
+        team1Score.setMaxValue(100);
+        team1Score.setWrapSelectorWheel(false);
+        team2Score.setValue(0);
+        team2Score.setMinValue(0);
+        team2Score.setMaxValue(100);
+        team2Score.setWrapSelectorWheel(false);
 
         backFromAnalysis(false);
         setActivityTitle(getString(R.string.pick_teams_title_results));
@@ -199,12 +205,14 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private void displayResultsViews(boolean enterResults) {
         mSetResult = enterResults;
 
+        teamStatsLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         moveView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         shuffleView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
 
+        resultViews.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
         saveView.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
-        team1Score.setText("0");
-        team2Score.setText("0");
+        team1Score.setValue(0);
+        team2Score.setValue(0);
         team1Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
         team2Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
         setGameDate.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
@@ -237,10 +245,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         return DateHelper.getDate(getGameDate().getTimeInMillis());
     }
     //endregion
-
-    int getScoreValue(Button b) {
-        return Integer.valueOf(b.getText().toString());
-    }
 
     private void initialTeams() {
 

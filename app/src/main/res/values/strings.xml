@@ -34,6 +34,8 @@
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>
     <string name="new_player">New Player</string>
+    <string name="move_players">Move Players</string>
+    <string name="shuffle">Shuffle Teams</string>
     <string name="clear_all_coming">Clear coming</string>
     <string name="action_send_statistics">Send Statistics</string>
     <string name="action_analysis">Analysis</string>
