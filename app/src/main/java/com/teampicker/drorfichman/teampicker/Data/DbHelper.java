@@ -22,7 +22,7 @@ import androidx.annotation.NonNull;
 public class DbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "Players.db";
 
     private static SQLiteDatabase writableDatabase;
@@ -102,23 +102,27 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private void createSamplePlayers(SQLiteDatabase db) {
-        PlayerDbHelper.insertPlayer(db, new Player("Johan Cruyff", 95));
-        PlayerDbHelper.insertPlayer(db, new Player("Maradona", 93));
-        PlayerDbHelper.insertPlayer(db, new Player("Ronaldinho", 92));
-        PlayerDbHelper.insertPlayer(db, new Player("Ian Rush", 91));
-        PlayerDbHelper.insertPlayer(db, new Player("Gerd Muller", 91));
-        PlayerDbHelper.insertPlayer(db, new Player("Ferenc Puskas", 90));
-        PlayerDbHelper.insertPlayer(db, new Player("Kenny Dalglish", 88));
-        PlayerDbHelper.insertPlayer(db, new Player("Lev Yashin", 87));
-        PlayerDbHelper.insertPlayer(db, new Player("Alan Shearer", 85));
-        PlayerDbHelper.insertPlayer(db, new Player("George Best", 85));
+        try {
+            PlayerDbHelper.insertPlayer(db, new Player("Johan Cruyff", 95));
+            PlayerDbHelper.insertPlayer(db, new Player("Maradona", 93));
+            PlayerDbHelper.insertPlayer(db, new Player("Ronaldinho", 92));
+            PlayerDbHelper.insertPlayer(db, new Player("Ian Rush", 91));
+            PlayerDbHelper.insertPlayer(db, new Player("Gerd Muller", 91));
+            PlayerDbHelper.insertPlayer(db, new Player("Ferenc Puskas", 90));
+            PlayerDbHelper.insertPlayer(db, new Player("Kenny Dalglish", 88));
+            PlayerDbHelper.insertPlayer(db, new Player("Lev Yashin", 87));
+            PlayerDbHelper.insertPlayer(db, new Player("Alan Shearer", 85));
+            PlayerDbHelper.insertPlayer(db, new Player("George Best", 85));
 
-        PlayerDbHelper.updatePlayerComing(db, "Johan Cruyff", true);
-        PlayerDbHelper.updatePlayerComing(db, "Ronaldinho", true);
-        PlayerDbHelper.updatePlayerComing(db, "Ian Rush", true);
-        PlayerDbHelper.updatePlayerComing(db, "Alan Shearer", true);
-        PlayerDbHelper.updatePlayerComing(db, "Kenny Dalglish", true);
-        PlayerDbHelper.updatePlayerComing(db, "Lev Yashin", true);
+            PlayerDbHelper.updatePlayerComing(db, "Johan Cruyff", true);
+            PlayerDbHelper.updatePlayerComing(db, "Ronaldinho", true);
+            PlayerDbHelper.updatePlayerComing(db, "Ian Rush", true);
+            PlayerDbHelper.updatePlayerComing(db, "Alan Shearer", true);
+            PlayerDbHelper.updatePlayerComing(db, "Kenny Dalglish", true);
+            PlayerDbHelper.updatePlayerComing(db, "Lev Yashin", true);
+        } catch (Exception e) {
+            Log.e("Upgrade", "createSamplePlayers failed : " + e.getMessage(), e);
+        }
     }
 
     /*
