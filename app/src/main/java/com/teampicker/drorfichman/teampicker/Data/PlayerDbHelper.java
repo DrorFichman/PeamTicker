@@ -319,6 +319,7 @@ public class PlayerDbHelper {
         if (p.mBirthDay > 0) values.put(PlayerContract.PlayerEntry.BIRTH_DAY, p.mBirthDay);
         values.put(PlayerContract.PlayerEntry.ATTRIBUTES, p.getAttributes());
         values.put(PlayerContract.PlayerEntry.ARCHIVED, p.archived ? 1 : 0);
+        values.put(PlayerContract.PlayerEntry.MSG_IDENTIFIER, p.msgDisplayName);
 
         // Insert the new row, returning the primary key value of the new row
         db.insert(PlayerContract.PlayerEntry.TABLE_NAME,

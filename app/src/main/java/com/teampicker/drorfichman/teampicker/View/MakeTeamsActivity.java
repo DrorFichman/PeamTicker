@@ -743,6 +743,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
                                     divideComingPlayers(TeamDivision.DivisionStrategy.Age);
                                     break;
                                 case 2:
+                                    // TODO require 10 games history
                                     divideComingPlayers(TeamDivision.DivisionStrategy.Optimize);
                             }
                         });
