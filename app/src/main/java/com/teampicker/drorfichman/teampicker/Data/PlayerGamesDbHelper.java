@@ -57,6 +57,7 @@ public class PlayerGamesDbHelper {
         values.put(PlayerContract.PlayerGameEntry.PLAYER_GRADE, pg.playerGrade);
         values.put(PlayerContract.PlayerGameEntry.TEAM, pg.team.ordinal());
         values.put(PlayerContract.PlayerGameEntry.PLAYER_AGE, pg.playerAge);
+        values.put(PlayerContract.PlayerGameEntry.ATTRIBUTES, pg.attributes);
 
         if (pg.result != null) {
             values.put(PlayerContract.PlayerGameEntry.PLAYER_RESULT, pg.result.getValue());

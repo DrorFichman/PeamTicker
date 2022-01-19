@@ -42,11 +42,11 @@ public class DbHelper extends SQLiteOpenHelper {
         int currGame = DbHelper.getMaxGame(ctx) + 1;
 
         for (Player a : firstTeam) {
-            PlayerGame pg = new PlayerGame(currGame, a.mName, a.mGrade, TeamEnum.Team1, a.getAge());
+            PlayerGame pg = new PlayerGame(currGame, a.mName, a.mGrade, TeamEnum.Team1, a.getAge(), a.getAttributes());
             DbHelper.insertPlayerGame(ctx, pg);
         }
         for (Player b : secondTeam) {
-            PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Team2, b.getAge());
+            PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Team2, b.getAge(), b.getAttributes());
             DbHelper.insertPlayerGame(ctx, pg);
         }
     }
