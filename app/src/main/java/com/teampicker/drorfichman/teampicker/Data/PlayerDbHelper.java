@@ -149,10 +149,12 @@ public class PlayerDbHelper {
 
         if (attributes != null && c.getColumnIndex(attributes) > 0) {
             String attr = c.getString(c.getColumnIndex(attributes));
-            p.isGK = attr.contains(PlayerAttribute.isGK.displayName);
-            p.isDefender = attr.contains(PlayerAttribute.isDefender.displayName);
-            p.isPlaymaker = attr.contains(PlayerAttribute.isPlaymaker.displayName);
-            p.isUnbreakable = attr.contains(PlayerAttribute.isUnbreakable.displayName);
+            if (attr != null) {
+                p.isGK = attr.contains(PlayerAttribute.isGK.displayName);
+                p.isDefender = attr.contains(PlayerAttribute.isDefender.displayName);
+                p.isPlaymaker = attr.contains(PlayerAttribute.isPlaymaker.displayName);
+                p.isUnbreakable = attr.contains(PlayerAttribute.isUnbreakable.displayName);
+            }
         }
         return p;
     }
