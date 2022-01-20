@@ -7,6 +7,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.teampicker.drorfichman.teampicker.Data.AccountData;
+import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.Arrays;
@@ -28,6 +29,8 @@ public class AuthHelper {
                     AuthUI.getInstance()
                             .createSignInIntentBuilder()
                             .setAvailableProviders(providers)
+                            .setLogo(R.drawable.football)
+                            .setTheme(R.style.AppTheme)
                             .build(),
                     activityResultCode);
 
@@ -59,6 +62,7 @@ public class AuthHelper {
 
     // Allow fetching data on behalf of another user
     static AccountData fetchUser;
+
     public static void fetchFor(AccountData accountData) {
         fetchUser = accountData;
     }
