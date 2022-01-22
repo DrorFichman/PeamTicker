@@ -36,6 +36,27 @@
             android:layout_weight="1"
             android:divider="@null" />
 
+        <LinearLayout
+            android:id="@+id/edit_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/game_edit_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/edit" />
+
+            <Button
+                android:id="@+id/game_delete_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/delete" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout

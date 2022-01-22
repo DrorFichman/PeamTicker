@@ -102,7 +102,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             if (position == 0) {
                 return PlayerDetailsFragment.newInstance(p, updateListener);
             } else if (position == 1) {
-                return GamesFragment.newInstance(p.mName, null, null);
+                return GamesFragment.newInstance(p.mName, null, false, null);
             } else {
                 return PlayerParticipationFragment.newInstance(p, null, null);
             }

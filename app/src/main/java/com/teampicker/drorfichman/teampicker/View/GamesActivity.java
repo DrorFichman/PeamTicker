@@ -44,13 +44,9 @@ public class GamesActivity extends AppCompatActivity {
 
         getPlayerIntent();
 
-        if (!mEditable) {
-            findViewById(R.id.edit_actions).setVisibility(View.GONE);
-        }
-
         GamesFragment gamesFragment = getFragment();
         if (gamesFragment == null) {
-            gamesFragment = GamesFragment.newInstance(mPlayerName, mPlayerCollaborator, this::onGamesCount);
+            gamesFragment = GamesFragment.newInstance(mPlayerName, mPlayerCollaborator, mEditable, this::onGamesCount);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.games_container, gamesFragment);
             transaction.commit();
@@ -72,56 +68,6 @@ public class GamesActivity extends AppCompatActivity {
         if (mPlayerName != null && mPlayerCollaborator != null)
             addTitle += " + " + mPlayerCollaborator;
         setTitle(getTitle() + addTitle);
-    }
-
-    public void editGame(View view) {
-        GamesFragment gameFragment = getFragment();
-        if (gameFragment == null) return;
-
-        Game game = gameFragment.getSelectedGame();
-        if (game == null) {
-            Toast.makeText(this, "Select game to edit", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Calendar date = Calendar.getInstance();
-        date.setTime(game.getDate());
-
-        DatePickerDialog d = new DatePickerDialog(this, (datePicker, year, month, day) -> {
-            Calendar selectedDate = new Calendar.Builder().setDate(year, month, day).build();
-            if (selectedDate.getTimeInMillis() > Calendar.getInstance().getTimeInMillis())
-                Toast.makeText(this, "Future date is not allowed", Toast.LENGTH_LONG).show();
-            else
-                updateGameDate(gameFragment, game, DateHelper.getDate(selectedDate.getTimeInMillis()));
-        }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE));
-        d.show();
-    }
-
-    private void updateGameDate(GamesFragment gameFragment, Game game, String date) {
-        DbHelper.updateGameDate(this, game, date);
-        gameFragment.refreshGames();
-        Toast.makeText(this, "Game edited", Toast.LENGTH_SHORT).show();
-    }
-
-    public void deleteGame(View view) {
-        GamesFragment gameFragment = getFragment();
-        if (gameFragment == null) return;
-
-        Game game = gameFragment.getSelectedGame();
-        if (game == null) {
-            Toast.makeText(this, "Select game to delete", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        DialogHelper.showApprovalDialog(this,
-                getString(R.string.delete), "Do you want to remove (" + game.getDisplayDate(this) + ")?",
-                ((dialog, which) -> {
-                    DbHelper.deleteGame(this, game.gameId);
-                    gameFragment.onGameSelected(null);
-                    gameFragment.refreshGames();
-                    Toast.makeText(this, "Game deleted", Toast.LENGTH_SHORT).show();
-                })
-        );
     }
 
     public void onGamesCount(int count) {

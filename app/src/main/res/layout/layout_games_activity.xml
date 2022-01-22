@@ -10,25 +10,4 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <LinearLayout
-        android:id="@+id/edit_actions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="editGame"
-            android:text="@string/edit" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:onClick="deleteGame"
-            android:layout_weight="1"
-            android:text="@string/delete" />
-
-    </LinearLayout>
-
 </LinearLayout>
