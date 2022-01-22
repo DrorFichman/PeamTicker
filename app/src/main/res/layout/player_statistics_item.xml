@@ -23,7 +23,7 @@
 
     <TextView
         android:id="@+id/stat_games_count"
-        android:layout_width="60dp"
+        android:layout_width="65dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginLeft="2dp"
@@ -50,7 +50,6 @@
         android:layout_marginLeft="2dp"
         android:layout_marginRight="3dp"
         android:gravity="center"
-        android:text="@string/win_rate"
         android:textAppearance="@style/regularHeadline"
         android:textSize="14sp" />
 

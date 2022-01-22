@@ -21,16 +21,18 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
 
     private final Context context;
     private final List<Player> mPlayers;
+    private final int totalGamesCount;
+    private final boolean isGradeVisible;
+
     int maxSuccess = 0;
     int maxGames = 0;
 
-    boolean isGradeVisible;
-
-    public PlayerStatisticsAdapter(Context ctx, List<Player> players, boolean showGrades) {
+    public PlayerStatisticsAdapter(Context ctx, List<Player> players, int gamesCount, boolean showGrades) {
         super(ctx, -1, players);
         context = ctx;
         mPlayers = players;
         isGradeVisible = showGrades;
+        totalGamesCount = gamesCount;
 
         for (Player p : players) {
             if (Math.abs(p.statistics.successRate) > maxSuccess) {
@@ -46,30 +48,31 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.player_statistics_item, parent, false);
 
-        TextView name = view.findViewById(R.id.player_name);
-        TextView grade = view.findViewById(R.id.stat_player_grade);
-        TextView gamesCount = view.findViewById(R.id.stat_games_count);
-        TextView success = view.findViewById(R.id.stat_success);
-        TextView winRate = view.findViewById(R.id.stat_wins_percentage);
+        TextView nameView = view.findViewById(R.id.player_name);
+        TextView gradeView = view.findViewById(R.id.stat_player_grade);
+        TextView gamesCountView = view.findViewById(R.id.stat_games_count);
+        TextView successView = view.findViewById(R.id.stat_success);
+        TextView winRateView = view.findViewById(R.id.stat_wins_percentage);
 
         Player p = mPlayers.get(position);
 
-        name.setText(p.mName);
+        nameView.setText(p.mName);
 
         if (isGradeVisible) {
-            grade.setText(String.valueOf(p.mGrade));
+            gradeView.setText(String.valueOf(p.mGrade));
         } else {
-            grade.setVisibility(View.INVISIBLE);
+            gradeView.setVisibility(View.INVISIBLE);
         }
 
         if (p.statistics != null) {
-            success.setText(String.valueOf(p.statistics.successRate));
-            setColorAlpha(context, success, p.statistics.successRate, maxSuccess);
+            successView.setText(String.valueOf(p.statistics.successRate));
+            setColorAlpha(context, successView, p.statistics.successRate, maxSuccess);
 
-            gamesCount.setText(String.valueOf(p.statistics.gamesCount));
-            setColorAlpha(context, gamesCount, p.statistics.gamesCount, maxGames);
+            gamesCountView.setText(p.statistics.getGamesPercentageDisplay(context, totalGamesCount));
+            setColorAlpha(context, gamesCountView, p.statistics.getGamesPercentage(totalGamesCount));
 
-            winRate.setText(String.valueOf(p.statistics.getWinRateDisplay()));
+            winRateView.setText(String.valueOf(p.statistics.getWinRateDisplay()));
+            setColorAlpha(context, winRateView, p.statistics.getWinRate());
         }
 
         view.setTag(R.id.player_id, p.mName);

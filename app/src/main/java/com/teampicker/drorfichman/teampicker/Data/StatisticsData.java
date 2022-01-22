@@ -1,8 +1,10 @@
 package com.teampicker.drorfichman.teampicker.Data;
 
+import android.content.Context;
+
+import com.teampicker.drorfichman.teampicker.R;
+
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.MathContext;
 
 /**
  * Created by drorfichman on 10/8/16.
@@ -43,5 +45,17 @@ public class StatisticsData implements Serializable {
             return getWinRate() + "%";
         }
         return "-";
+    }
+
+    public int getGamesPercentage(int totalGamesCount) {
+        if (totalGamesCount > 0 && this.gamesCount > 0) {
+            return Math.round((float)this.gamesCount * 100 / totalGamesCount);
+        } else {
+            return 0;
+        }
+    }
+
+    public String getGamesPercentageDisplay(Context context, int totalGamesCount) {
+        return context.getString(R.string.stats_player_games, this.gamesCount, getGamesPercentage(totalGamesCount));
     }
 }

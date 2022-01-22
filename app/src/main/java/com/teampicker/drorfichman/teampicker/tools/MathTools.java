@@ -16,7 +16,7 @@ public class MathTools {
     }
 
     /**
-     * Returns a 0.35-1 value
+     * Returns a 0.35-1 value based on deviation from 0 to max
      */
     public static float getAlpha(int value, int max) {
         if (max == 0) return 1;
@@ -27,6 +27,17 @@ public class MathTools {
         if (alpha < 0.35) return (float) 0.35;
         return alpha;
     }
+
+    /**
+     * Returns a 0.35-1 value based on deviation from 50%
+     */
+    public static float getAlpha(int percentage) {
+        float alpha = (float) (Math.abs(percentage - 50) * 2) / 100;
+        if (alpha > 1) return 1;
+        if (alpha < 0.35) return (float) 0.35;
+        return alpha;
+    }
+
 
     public static int getPercentageOf(int value, int max) {
         return getLimitedValue(value, 0, max) * 100 / max;

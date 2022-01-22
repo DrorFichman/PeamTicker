@@ -5,6 +5,8 @@
     <string name="pick_teams_title">"Pick Teams"</string>
     <string name="pick_teams_title_results">"Results"</string>
     <string name="pick_teams_title_analysis">"Analysis"</string>
+    <string name="games_with_count">"Games (%1$d)"</string>
+    <string name="stats_with_count">"Statistics (%1$d players, %2$d games)"</string>
 
     <!--    Drawer-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -80,6 +82,7 @@
     <string name="team_data_win_rate_stdev">"&#177;%1$d%%"</string>
     <string name="team_public_stats">" Age: %1$d "</string>
     <string name="player_stat">"Games: %1$s \nWins: %2$s"</string>
+    <string name="stats_player_games">"%1$d (%2$d%%)"</string>
     <string name="player_wins_participation">"%1$s (%2$s)"</string>
     <string name="player_participation_statistics">"%1$s + \n(G:%2$d, W:%3$02d%%)"</string>
     <string name="player_analysis">"(W:%1$02d%% G:%2$02d) [%3$s]"</string>

@@ -50,7 +50,7 @@ public class GamesActivity extends AppCompatActivity {
 
         GamesFragment gamesFragment = getFragment();
         if (gamesFragment == null) {
-            gamesFragment = GamesFragment.newInstance(mPlayerName, mPlayerCollaborator);
+            gamesFragment = GamesFragment.newInstance(mPlayerName, mPlayerCollaborator, this::onGamesCount);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.games_container, gamesFragment);
             transaction.commit();
@@ -122,5 +122,9 @@ public class GamesActivity extends AppCompatActivity {
                     Toast.makeText(this, "Game deleted", Toast.LENGTH_SHORT).show();
                 })
         );
+    }
+
+    public void onGamesCount(int count) {
+        setTitle(getString(R.string.games_with_count, count));
     }
 }

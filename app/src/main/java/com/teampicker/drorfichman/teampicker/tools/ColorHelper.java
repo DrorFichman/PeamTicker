@@ -52,8 +52,25 @@ public class ColorHelper {
         return icons;
     }
 
-    public static void setColorAlpha(Context ctx, TextView textView, int delta, int maxDelta) {
+    /**
+     * Sets the appropriate color for the text view based on a percentage
+     * @param percentage - 0-100 value
+     */
+    public static void setColorAlpha(Context ctx, TextView textView, int percentage) {
+        if (percentage > 50) textView.setTextColor(ContextCompat.getColor(ctx, R.color.high));
+        else if (percentage < 50) textView.setTextColor(ContextCompat.getColor(ctx, R.color.low));
+        else textView.setTextColor(Color.BLACK);
 
+        float alpha = MathTools.getAlpha(percentage);
+        textView.setTextColor(textView.getTextColors().withAlpha((int) (alpha * 255)));
+    }
+
+    /**
+     * Sets the appropriate color for the text view based on a delta value out of a max value
+     * @param delta - difference from 0
+     * @param maxDelta - max difference
+     */
+    public static void setColorAlpha(Context ctx, TextView textView, int delta, int maxDelta) {
         if (delta > 0) textView.setTextColor(ContextCompat.getColor(ctx, R.color.high));
         else if (delta < 0) textView.setTextColor(ContextCompat.getColor(ctx, R.color.low));
         else textView.setTextColor(Color.BLACK);

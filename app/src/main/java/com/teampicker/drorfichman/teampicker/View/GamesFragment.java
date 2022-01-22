@@ -31,6 +31,7 @@ public class GamesFragment extends Fragment {
 
     private String mPlayerName;
     private String mPlayerCollaborator;
+    private gamesCountHandler mCountHandler;
 
     private ListView gamesList;
     private GameAdapter gamesAdapter;
@@ -44,14 +45,19 @@ public class GamesFragment extends Fragment {
     private ListView team1List;
     private ListView team2List;
 
+    public interface gamesCountHandler {
+        void onGamesCount(int count);
+    }
+
     public GamesFragment() {
         super(R.layout.layout_games_activity_fragment);
     }
 
-    public static GamesFragment newInstance(String playerName, String collaborator) {
+    public static GamesFragment newInstance(String playerName, String collaborator, gamesCountHandler handler) {
         GamesFragment gamesFragment = new GamesFragment();
         gamesFragment.mPlayerName = playerName;
         gamesFragment.mPlayerCollaborator = collaborator;
+        gamesFragment.mCountHandler = handler;
         return gamesFragment;
     }
 
@@ -108,6 +114,8 @@ public class GamesFragment extends Fragment {
         } else { // all games
             games = DbHelper.getGames(activity);
         }
+
+        if (mCountHandler != null) mCountHandler.onGamesCount(games.size());
 
         // Attach cursor adapter to the ListView
         gamesAdapter = new GameAdapter(activity, games, mCurrGameId);

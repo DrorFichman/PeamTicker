@@ -45,7 +45,6 @@ public class StatisticsActivity extends AppCompatActivity implements Sorting.sor
 
     private void setPlayersList() {
         playersList = findViewById(R.id.players_statistics_list);
-        playersAdapter = new PlayerStatisticsAdapter(this, new ArrayList<>(), true);
 
         refreshPlayers();
 
@@ -118,6 +117,7 @@ public class StatisticsActivity extends AppCompatActivity implements Sorting.sor
                 Toast.makeText(this, "We're ready! you can now share your screenshot :)", Toast.LENGTH_LONG).show();
             }
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void enterSendMode() {
@@ -145,13 +145,19 @@ public class StatisticsActivity extends AppCompatActivity implements Sorting.sor
     }
 
     public void refreshPlayers(boolean showInternalData) {
-
-        ArrayList<Player> players = DbHelper.getPlayersStatistics(getApplicationContext(), games);
+        ArrayList<Player> players = DbHelper.getPlayersStatistics(this, games);
 
         sorting.sort(players);
 
-        playersAdapter = new PlayerStatisticsAdapter(this, players, showInternalData);
+        playersAdapter = new PlayerStatisticsAdapter(this, players,  getGamesCountFilter(), showInternalData);
         playersList.setAdapter(playersAdapter);
+
+        setTitle(getString(R.string.stats_with_count, players.size(), getGamesCountFilter()));
+    }
+
+    private int getGamesCountFilter() {
+        if (games > 0) return games;
+        else return DbHelper.getGames(this).size();
     }
 
     @Override
