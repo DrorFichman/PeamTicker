@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="ltr"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <include
+        android:id="@+id/player_titles"
+        layout="@layout/player_item" />
+
+    <ListView
+        android:id="@+id/players_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/player_titles"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/fui_transparent"
+        android:gravity="start|center_vertical">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/main_make_teams"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/make_teams"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:theme="@style/Theme.MaterialComponents.Light"
+            app:cornerRadius="20dp"
+            app:icon="@drawable/make_teams_icon" />
+    </LinearLayout>
+</RelativeLayout>

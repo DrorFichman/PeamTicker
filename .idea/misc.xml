@@ -3,7 +3,24 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="app/src/main/res/layout/player_statistics_item.xml" value="0.375" />
+        <entry key="../../../../layout/custom_preview.xml" value="0.15" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/layout/content_main.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/game_item.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/layout_games_activity.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/layout/layout_games_activity_fragment.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/layout/layout_participation_fragment.xml" value="0.13858695652173914" />
+        <entry key="app/src/main/res/layout/layout_players_main.xml" value="0.5197255574614065" />
+        <entry key="app/src/main/res/layout/layout_statistics_activity.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/player_details_activity.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/player_item.xml" value="0.45" />
+        <entry key="app/src/main/res/layout/player_statistics_item.xml" value="0.55" />
+        <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.203125" />
+        <entry key="app/src/main/res/menu/games_menu.xml" value="0.1" />
+        <entry key="app/src/main/res/menu/make_teams_menu.xml" value="0.203125" />
+        <entry key="app/src/main/res/menu/statisctics_menu.xml" value="0.203125" />
       </map>
     </option>
   </component>

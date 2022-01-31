@@ -1,42 +1,37 @@
 package com.teampicker.drorfichman.teampicker.View;
 
 import android.Manifest;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.InputType;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseUser;
-import com.teampicker.drorfichman.teampicker.Adapter.PlayerAdapter;
 import com.teampicker.drorfichman.teampicker.BuildConfig;
-import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
-import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
+import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
-import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DBSnapshotUtils;
@@ -48,58 +43,45 @@ import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.SyncProgress;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, Sorting.sortingCallbacks,
-        SyncProgress {
+        implements NavigationView.OnNavigationItemSelectedListener, SyncProgress {
 
-    private static final int ACTIVITY_RESULT_PLAYER = 1;
     private static final int ACTIVITY_RESULT_IMPORT_FILE_SELECTED = 2;
     private static final int ACTIVITY_RESULT_SIGN_IN = 3;
-    private static final int RECENT_GAMES_COUNT = 10; // for +/- grade suggestion
-
-    private PlayerAdapter playersAdapter;
 
     View syncInProgress;
     TextView syncProgressStatus;
-
-    private boolean showArchivedPlayers = false;
-    private boolean showPastedPlayers = false;
-
-    Sorting sorting = new Sorting(this::sortingChanged, SortType.coming);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        setActivityTitle();
-
-        setNavigationDrawer(toolbar);
-
-        setActionButtons();
-
-        ArrayList<Player> players = DbHelper.getPlayers(getApplicationContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
-        setPlayersList(players, null);
-
         syncInProgress = findViewById(R.id.sync_progress);
         syncProgressStatus = findViewById(R.id.sync_progress_status);
 
+        setSupportActionBar(toolbar);
+
+        setNavigationDrawer(toolbar);
+
         setUsernameView();
+
+        setTabs();
+    }
+
+    private void setTabs() {
+        MainAdapter mAdapter = new MainAdapter(getSupportFragmentManager());
+        ViewPager mPager = findViewById(R.id.main_tabs_pager);
+        mPager.setAdapter(mAdapter);
+
+        TabLayout tabLayout = findViewById(R.id.main_tab);
+        tabLayout.setupWithViewPager(mPager);
+
+        tabLayout.getTabAt(0).setIcon(R.drawable.player_icon);
+        tabLayout.getTabAt(1).setIcon(R.drawable.soccer_icon);
+        tabLayout.getTabAt(2).setIcon(R.drawable.stat_icon);
     }
 
     private void setUsernameView() {
@@ -131,70 +113,11 @@ public class MainActivity extends AppCompatActivity
         setUsernameView();
     }
 
-    private void setActionButtons() {
-        findViewById(R.id.main_add_player).setOnClickListener(view -> {
-            startActivityForResult(new Intent(MainActivity.this, PlayerDetailsActivity.class), ACTIVITY_RESULT_PLAYER);
-        });
-        findViewById(R.id.main_make_teams).setOnClickListener(view -> {
-            launchMakeTeams();
-            // startEnterResultActivity();
-        });
-    }
-
-    private void setPlayersList(List<Player> players, AdapterView.OnItemClickListener clickHandler) {
-        setHeadlines(true);
-
-        ListView playersList = findViewById(R.id.players_list);
-        playersAdapter = new PlayerAdapter(this, players, this::setActivityTitle);
-
-        if (clickHandler != null) {
-            playersList.setOnItemClickListener(clickHandler);
-        } else {
-            playersList.setOnItemClickListener((adapterView, view, i, l) -> {
-                Player p = (Player) view.getTag();
-                Intent intent = PlayerDetailsActivity.getDetailsPlayerIntent(MainActivity.this, p.mName);
-                startActivityForResult(intent, ACTIVITY_RESULT_PLAYER);
-            });
-        }
-
-        playersList.setOnItemLongClickListener((adapterView, view, i, l) -> {
-            checkPlayerDeletion((Player) view.getTag());
-            return true;
-        });
-
-        playersList.setAdapter(playersAdapter);
-
-        setActivityTitle();
-    }
-
-    private void setHeadlines(boolean show) {
-
-        if (show) {
-            sorting.setHeadlineSorting(this, R.id.player_name, this.getString(R.string.name), SortType.name);
-            sorting.setHeadlineSorting(this, R.id.player_age, this.getString(R.string.age), SortType.age);
-            sorting.setHeadlineSorting(this, R.id.player_attributes, this.getString(R.string.attributes), SortType.attributes);
-            sorting.setHeadlineSorting(this, R.id.player_recent_performance, this.getString(R.string.plus_minus), SortType.suggestedGrade);
-            sorting.setHeadlineSorting(this, R.id.player_grade, this.getString(R.string.grade), SortType.grade);
-            sorting.setHeadlineSorting(this, R.id.player_coming, null, SortType.coming);
-
-            ((CheckBox) findViewById(R.id.player_coming)).setChecked(
-                    sorting.getCurrentSorting().equals(SortType.coming) && sorting.isAscending());
-
-        } else {
-            sorting.removeHeadlineSorting(this, R.id.player_name, this.getString(R.string.name));
-            sorting.removeHeadlineSorting(this, R.id.player_age, "");
-            sorting.removeHeadlineSorting(this, R.id.player_attributes, "");
-            sorting.removeHeadlineSorting(this, R.id.player_recent_performance, "");
-            sorting.removeHeadlineSorting(this, R.id.player_grade, "");
-            sorting.removeHeadlineSorting(this, R.id.player_coming, "");
-
-            ((CheckBox) findViewById(R.id.player_coming)).setVisibility(View.INVISIBLE);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        Log.i("Player", "Result to activity " + requestCode + " - " + resultCode);
 
         if (requestCode == ACTIVITY_RESULT_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
@@ -220,15 +143,7 @@ public class MainActivity extends AppCompatActivity
             // Import data result
             SnapshotHelper.checkImportApproved(this, getImportListener(),
                     FileHelper.getPath(this, data.getData()));
-        }
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (!showPastedPlayers) {
-            refreshPlayers();
         }
     }
 
@@ -237,65 +152,8 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) { // close drawer
             drawer.closeDrawer(GravityCompat.START);
-        } else if (showArchivedPlayers) { // return from archived players
-            showArchivedPlayers = false;
-            refreshPlayers();
-        } else if (showPastedPlayers) {
-            showPastedPlayers = false;
-            refreshPlayers();
         } else {
             super.onBackPressed();
-        }
-    }
-
-    //region Toolbar and Navigation
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.make_teams:
-                launchMakeTeams();
-                break;
-            case R.id.paste_coming_players:
-                pasteComingPlayers();
-                break;
-            case R.id.add_player:
-                startActivityForResult(new Intent(MainActivity.this, PlayerDetailsActivity.class), ACTIVITY_RESULT_PLAYER);
-                break;
-            case R.id.show_archived_players:
-                showArchivedPlayers = !showArchivedPlayers;
-                if (showArchivedPlayers) {
-                    ArrayList<Player> players = DbHelper.getPlayers(getApplicationContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
-                    if (players.size() == 0) {
-                        Toast.makeText(MainActivity.this, "No archived players found", Toast.LENGTH_LONG).show();
-                        showArchivedPlayers = false;
-                        break;
-                    }
-                }
-                refreshPlayers();
-                break;
-            case R.id.clear_all:
-                DbHelper.clearComingPlayers(this);
-                refreshPlayers();
-                setActivityTitle();
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void launchMakeTeams() {
-        ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(this, 0);
-        if (comingPlayers.size() > 0) {
-            startActivity(MakeTeamsActivity.getInstance(this));
-        } else {
-            Toast.makeText(this, "First - select coming players", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -317,13 +175,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_players) {
-            // nothing
-        } else if (id == R.id.nav_games) {
-            startActivity(GamesActivity.getGameActivityIntent(this, null, null, true));
-        } else if (id == R.id.nav_stats) {
-            startActivity(new Intent(this, StatisticsActivity.class));
-        } else if (id == R.id.nav_save_snapshot) {
+        if (id == R.id.nav_save_snapshot) {
             DBSnapshotUtils.takeDBSnapshot(this, getExportListener(), null);
         } else if (id == R.id.nav_import_snapshot) {
             selectFileForImport();
@@ -344,6 +196,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    //region cloud snapshot
     private void pullFromCloud() {
         if (AuthHelper.getUser() == null) {
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
@@ -361,133 +214,6 @@ public class MainActivity extends AppCompatActivity
             FirebaseHelper.getInstance().syncToCloud(this, this::showSyncStatus);
         }
     }
-    //endregion
-
-    public void refreshPlayers() {
-        ArrayList<Player> players = DbHelper.getPlayers(getApplicationContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
-
-        setPlayersList(players, null);
-
-        sorting.sort(players);
-    }
-
-    private void pasteComingPlayers() {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
-        CharSequence pasteData = item.getText();
-
-        try {
-            Set<String> comingSet = new HashSet<>();
-            String[] split = ((String) pasteData).split("\n");
-            for (String coming : split) {
-                try {
-                    String numberOrName = coming.split("] ")[1].split(":")[0];
-                    comingSet.add(numberOrName);
-                } catch (Exception e) {
-                    Log.e("Coming", "Failed to process " + coming);
-                }
-            }
-
-            ArrayList<Player> players = DbHelper.getPlayers(this, 0, false);
-            String[] playerNames = new String[players.size()];
-            int i = 0;
-            for (Player p : players) {
-                playerNames[i] = p.mName;
-                i++;
-            }
-
-            if (comingSet.size() > 0) {
-                displayPastedIdentifiers(comingSet, playerNames);
-            } else {
-                Toast.makeText(this, "Paste multiple messages", Toast.LENGTH_SHORT).show();
-            }
-
-        } catch (Exception e) {
-            Log.e("Coming", "Failed to process " + pasteData);
-            Toast.makeText(this, "Failed to process : " + pasteData, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void displayPastedIdentifiers(Set<String> set, String[] playerNames) {
-        Set<String> comingSet = new HashSet<>(set);
-        ArrayList<String> coming = new ArrayList<>(comingSet);
-
-        ArrayList<Player> knownPlayers = DbHelper.getPlayersByIdentifier(this, coming);
-        for (Player p : knownPlayers) {
-            comingSet.remove(p.msgDisplayName);
-        }
-
-        for (String identifier : comingSet) {
-            Player player = new Player(null, -1);
-            player.msgDisplayName = identifier;
-            knownPlayers.add(player);
-        }
-
-        showPastedPlayers = true;
-
-        AdapterView.OnItemClickListener handler = (parent, view, position, id) -> {
-            Player p = (Player) view.getTag();
-            Log.i("Identify", "Clicked on " + p.mName + " = " + p.msgDisplayName);
-            setComingPlayerIdentity(p.mName, p.msgDisplayName, set, playerNames);
-        };
-
-        // Filter the players list only to the pasted players identifiers
-        setPlayersList(knownPlayers, handler);
-        setHeadlines(false);
-    }
-
-    private void setComingPlayerIdentity(String currName, String identity, Set<String> comingSet, String[] playerNames) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter player name for : \n" + identity); // TODO string
-
-        final AutoCompleteTextView input = new AutoCompleteTextView(this);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, playerNames);
-        input.setAdapter(adapter);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.requestFocus();
-        input.setText(currName);
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String text = input.getText().toString();
-            Log.i("Identifier", "Identify " + text + " as " + identity);
-            int count = DbHelper.setPlayerIdentifier(MainActivity.this, text, identity);
-            if (count == 0) {
-                if (TextUtils.isEmpty(text) && !TextUtils.isEmpty(currName)) {
-                    DbHelper.clearPlayerIdentifier(MainActivity.this, currName);
-                    Toast.makeText(MainActivity.this, "Cleared " + currName, Toast.LENGTH_LONG).show();
-                    displayPastedIdentifiers(comingSet, playerNames);
-                } else {
-                    Toast.makeText(MainActivity.this, text + " not found", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(MainActivity.this, "Set " + text + " with " + identity, Toast.LENGTH_LONG).show();
-                if (currName != null) {
-                    DbHelper.clearPlayerIdentifier(MainActivity.this, currName);
-                }
-                displayPastedIdentifiers(comingSet, playerNames);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
-
-    public void setActivityTitle() {
-        if (showArchivedPlayers) {
-            setTitle("Archived players");
-        } else {
-            setTitle(getString(R.string.main_title));
-            int comingPlayersCount = DbHelper.getComingPlayersCount(this);
-            ((Button) findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, comingPlayersCount));
-        }
-    }
 
     @Override
     public void showSyncStatus(String status) {
@@ -498,53 +224,10 @@ public class MainActivity extends AppCompatActivity
             syncInProgress.setVisibility(View.GONE);
             syncProgressStatus.setText("");
             DbHelper.onUnderlyingDataChange();
-            refreshPlayers();
+
+            // refresh after sync
+            LocalNotifications.sendNotification(this, LocalNotifications.PULL_DATA_ACTION);
         }
-    }
-
-    //region player archive & deletion
-    private void checkPlayerDeletion(final Player player) {
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        if (showArchivedPlayers) {
-            alertDialogBuilder.setTitle("Do you want to remove the player?")
-                    .setCancelable(true)
-                    .setItems(new CharSequence[]
-                                    {"Unarchive", "Remove", "Cancel"},
-                            (dialog, which) -> {
-                                switch (which) {
-                                    case 0: // Unarchive
-                                        DbHelper.archivePlayer(MainActivity.this, player.mName, false);
-                                        refreshPlayers();
-                                        break;
-                                    case 1: // Remove
-                                        DbHelper.deletePlayer(MainActivity.this, player.mName);
-                                        refreshPlayers();
-                                        break;
-                                    case 2: // Cancel
-                                        break;
-                                }
-                            });
-        } else {
-            alertDialogBuilder.setTitle("Do you want to archive the player?")
-                    .setCancelable(true)
-                    .setItems(new CharSequence[]
-                                    {"Archive", "Cancel"},
-                            (dialog, which) -> {
-                                switch (which) {
-                                    case 0: // Archive
-                                        DbHelper.archivePlayer(MainActivity.this, player.mName, true);
-                                        refreshPlayers();
-                                        break;
-                                    case 2: // Cancel
-                                        break;
-                                }
-                            });
-        }
-
-
-        alertDialogBuilder.create().show();
     }
     //endregion
 
@@ -589,12 +272,11 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion
 
-    //region snapshot
+    //region local snapshot
     private DBSnapshotUtils.ImportListener getImportListener() {
         return new DBSnapshotUtils.ImportListener() {
             @Override
             public void preImport() {
-                refreshPlayers();
             }
 
             @Override
@@ -605,7 +287,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void importCompleted() {
                 Toast.makeText(MainActivity.this, "Import Completed", Toast.LENGTH_SHORT).show();
-                refreshPlayers();
+                LocalNotifications.sendNotification(MainActivity.this, LocalNotifications.PULL_DATA_ACTION);
             }
 
             @Override
@@ -651,8 +333,46 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion
 
-    @Override
-    public void sortingChanged() {
-        refreshPlayers();
+    //region MainAdapter
+    static class MainAdapter extends FragmentPagerAdapter {
+
+        MainAdapter(FragmentManager fm) {
+            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return super.getItemId(position);
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 0) {
+                return "Players";
+            } else if (position == 1) {
+                return "Games";
+            } else {
+                return "Insights";
+            }
+        }
+
+        @Override
+        @NonNull
+        public Fragment getItem(int position) {
+            if (position == 0) {
+                return PlayersFragment.newInstance();
+            } else if (position == 1) {
+                return GamesFragment.newInstance(null, null, true, null);
+            } else {
+                return StatisticsFragment.newInstance();
+            }
+        }
     }
+    //endregion
 }

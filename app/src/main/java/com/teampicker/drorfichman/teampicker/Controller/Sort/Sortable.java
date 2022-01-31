@@ -42,8 +42,8 @@ public class Sortable {
         return 0;
     }
 
-    public boolean attributes() {
-        return false;
+    public String attributes() {
+        return "";
     }
 
     public boolean coming() {

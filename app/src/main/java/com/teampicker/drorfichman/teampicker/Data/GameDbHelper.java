@@ -120,7 +120,9 @@ public class GameDbHelper {
         return getGames(c, -1);
     }
 
-    public static ArrayList<Game> getGames(SQLiteDatabase db) {
+    public static ArrayList<Game> getGames(SQLiteDatabase db, int limit) {
+
+        int count = limit > 0 ? limit : -1;
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -145,7 +147,7 @@ public class GameDbHelper {
                 sortOrder                                 // The sort order
         );
 
-        return getGames(c, -1);
+        return getGames(c, count);
     }
 
     @NonNull

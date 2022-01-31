@@ -8,50 +8,18 @@
     tools:context=".View.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <include
-        android:id="@+id/player_titles"
-        layout="@layout/player_item" />
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/main_tabs_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/main_tab"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <ListView
-        android:id="@+id/players_list"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/main_tab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/player_titles"
-        android:clipToPadding="false"
-        android:paddingBottom="100dp"
-        android:visibility="visible" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp"
         android:background="@color/colorPrimary"
-        android:gravity="center">
-
-        <Button
-            android:id="@+id/main_add_player"
-            android:layout_width="150dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:layout_marginEnd="10dp"
-            android:background="@color/fui_transparent"
-            android:text="@string/new_player"
-            android:textAllCaps="false"
-            android:drawableStart="@drawable/new_player_icon"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/main_make_teams"
-            android:layout_width="150dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="10dp"
-            android:layout_gravity="center"
-            android:background="@color/fui_transparent"
-            android:text="Pick Teams"
-            android:textAllCaps="false"
-            android:drawableStart="@drawable/make_teams_icon"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
-
+        app:tabTextAppearance="@style/AppTabTextAppearance" />
 </RelativeLayout>

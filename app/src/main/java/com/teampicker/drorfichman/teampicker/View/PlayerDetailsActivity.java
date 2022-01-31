@@ -5,11 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.google.android.material.tabs.TabLayout;
-import com.teampicker.drorfichman.teampicker.Data.DbHelper;
-import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.R;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
+import com.teampicker.drorfichman.teampicker.Data.DbHelper;
+import com.teampicker.drorfichman.teampicker.Data.Player;
+import com.teampicker.drorfichman.teampicker.R;
 
 public class PlayerDetailsActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYER = "player";
@@ -44,7 +44,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
     private void refreshData(String name) {
         if (!TextUtils.isEmpty(name)) {
             pPlayer = DbHelper.getPlayer(this, name);
-            setTitle("Player details : " + pPlayer.mName);
+            setTitle("Player : " + pPlayer.mName);
         } else {
             setTitle("New Player");
         }

@@ -17,7 +17,7 @@
         android:layout_gravity="center"
         android:layout_marginLeft="2dp"
         android:gravity="center"
-        android:textAppearance="@style/regularHeadline"
+        android:textAppearance="@style/regularText"
         android:textSize="14sp" />
 
     <TextView
@@ -29,7 +29,7 @@
         android:layout_marginRight="3dp"
         android:gravity="center"
         android:text="@string/win_rate"
-        android:textAppearance="@style/regularHeadline"
+        android:textAppearance="@style/regularText"
         android:textSize="14sp" />
 
     <TextView
@@ -39,7 +39,7 @@
         android:layout_gravity="center"
         android:layout_marginLeft="2dp"
         android:gravity="center"
-        android:textAppearance="@style/regularHeadline"
+        android:textAppearance="@style/regularText"
         android:textSize="14sp" />
 
     <TextView
@@ -51,7 +51,7 @@
         android:layout_marginRight="3dp"
         android:gravity="center"
         android:text="@string/win_rate"
-        android:textAppearance="@style/regularHeadline"
+        android:textAppearance="@style/regularText"
         android:textSize="14sp" />
 
     <TextView
@@ -62,7 +62,7 @@
         android:layout_weight="1"
         android:gravity="right"
         android:paddingRight="3dp"
-        android:textAppearance="@style/regularHeadline"
+        android:textAppearance="@style/regularText"
         android:textSize="14sp" />
 
     <ImageView

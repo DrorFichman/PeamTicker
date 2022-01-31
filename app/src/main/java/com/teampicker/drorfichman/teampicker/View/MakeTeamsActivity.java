@@ -19,9 +19,13 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamAdapter;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamAnalysisAdapter;
+import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.Collaboration;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.PlayerCollaboration;
@@ -44,9 +48,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 public class MakeTeamsActivity extends AppCompatActivity {
     static final int RECENT_GAMES = 50;
@@ -89,7 +90,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     protected View analysisHeaders1;
     protected View analysisHeaders2;
 
-    public static Intent getInstance(Context ctx) {
+    public static Intent getIntent(Context ctx) {
         return new Intent(ctx, MakeTeamsActivity.class);
     }
 
@@ -175,7 +176,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         // TODO initCollaboration(); and print / keep expected winner?
 
-        Toast.makeText(this, "Results saved", Toast.LENGTH_LONG).show();
+        LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
+
+        Toast.makeText(this, "Results saved", Toast.LENGTH_SHORT).show();
         finish();
     }
 
@@ -225,7 +228,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         DatePickerDialog d = new DatePickerDialog(this, (datePicker, year, month, day) -> {
             Calendar selectedDate = new Calendar.Builder().setDate(year, month, day).build();
             if (selectedDate.getTimeInMillis() > Calendar.getInstance().getTimeInMillis())
-                Toast.makeText(this, "Future date is not allowed", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Future date is not allowed", Toast.LENGTH_SHORT).show();
             else
                 setGameDate(selectedDate);
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE));

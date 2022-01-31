@@ -1,17 +1,30 @@
 package com.teampicker.drorfichman.teampicker.View;
 
 import android.app.DatePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 import com.teampicker.drorfichman.teampicker.Adapter.GameAdapter;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamGameHistoryAdapter;
+import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
+import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
@@ -25,13 +38,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-
 public class GamesFragment extends Fragment {
 
+    private int gamesCount = 50;
     private String mPlayerName;
     private String mPlayerCollaborator;
     private gamesCountHandler mCountHandler;
@@ -39,7 +48,7 @@ public class GamesFragment extends Fragment {
     private ListView gamesList;
     private GameAdapter gamesAdapter;
 
-    private int mCurrGameId;
+    private int mCurrGameId = -1;
     private Game mCurrGame;
     private boolean mEditable;
     private ArrayList<Player> mTeam1;
@@ -48,6 +57,8 @@ public class GamesFragment extends Fragment {
     private View gameDetails;
     private ListView team1List;
     private ListView team2List;
+    private GameResultBroadcast notificationHandler;
+    private Sorting sorting = new Sorting(null, null);
 
     public interface gamesCountHandler {
         void onGamesCount(int count);
@@ -66,10 +77,15 @@ public class GamesFragment extends Fragment {
         return gamesFragment;
     }
 
+    private boolean isAllGamesView() {
+        return (mPlayerName == null && mPlayerCollaborator == null);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
+        setHasOptionsMenu(isAllGamesView());
 
         gamesList = root.findViewById(R.id.games_list);
         gameDetails = root.findViewById(R.id.game_details_layout);
@@ -97,13 +113,58 @@ public class GamesFragment extends Fragment {
             root.findViewById(R.id.game_delete_game).setOnClickListener(view -> deleteGame());
         }
 
+        setHeadlines(root);
+
         refreshGames();
 
         return root;
     }
 
+    private void setHeadlines(View root) {
+        sorting.setHeadlineSorting(root, R.id.game_date, getString(R.string.date), null);
+        sorting.setHeadlineSorting(root, R.id.game_result_set, getString(R.string.score), null);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.games_menu, menu);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_last_50_games:
+                gamesCount = 50;
+                refreshGames();
+                break;
+            case R.id.action_all_games:
+                gamesCount = -1;
+                refreshGames();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        notificationHandler = new GameResultBroadcast();
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION, notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION, notificationHandler);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalNotifications.unregisterBroadcastReceiver(getContext(), notificationHandler);
+    }
+
     private void refreshTeams() {
-        Context activity = getContext(); if (activity == null) return;
+        Context activity = getContext();
+        if (activity == null) return;
         if (mCurrGameId < 0) return;
 
         mTeam1 = DbHelper.getCurrTeam(activity, mCurrGameId, TeamEnum.Team1, 0);
@@ -117,7 +178,8 @@ public class GamesFragment extends Fragment {
     }
 
     public void refreshGames() {
-        Context activity = getContext(); if (activity == null) return;
+        Context activity = getContext();
+        if (activity == null) return;
 
         ArrayList<Game> games;
         if (mPlayerName != null && mPlayerCollaborator != null) { // games in which both played
@@ -125,10 +187,16 @@ public class GamesFragment extends Fragment {
         } else if (mPlayerName != null) { // games in which selected player played
             games = DbHelper.getGames(activity, mPlayerName);
         } else { // all games
-            games = DbHelper.getGames(activity);
+            games = DbHelper.getGames(activity, gamesCount);
         }
 
-        if (mCountHandler != null) mCountHandler.onGamesCount(games.size());
+        if (games.size() > 0) {
+            mostRecentGameId = games.get(0).gameId;
+        }
+
+        if (mCountHandler != null) {
+            mCountHandler.onGamesCount(games.size());
+        }
 
         // Attach cursor adapter to the ListView
         gamesAdapter = new GameAdapter(activity, games, mCurrGameId);
@@ -183,7 +251,8 @@ public class GamesFragment extends Fragment {
     }
 
     private void copyGamePlayers() {
-        FragmentActivity activity = getActivity(); if (activity == null) return;
+        FragmentActivity activity = getActivity();
+        if (activity == null) return;
         DbHelper.clearComingPlayers(activity);
         DbHelper.setPlayerComing(activity, mTeam1);
         DbHelper.setPlayerComing(activity, mTeam2);
@@ -208,7 +277,8 @@ public class GamesFragment extends Fragment {
     }
 
     private void movePlayer(Player player) {
-        Context context = getContext(); if (context == null) return;
+        Context context = getContext();
+        if (context == null) return;
 
         DbHelper.modifyPlayerResult(context, mCurrGameId, player.mName);
         refreshTeams();
@@ -228,10 +298,12 @@ public class GamesFragment extends Fragment {
 
         DatePickerDialog d = new DatePickerDialog(getContext(), (datePicker, year, month, day) -> {
             Calendar selectedDate = new Calendar.Builder().setDate(year, month, day).build();
-            if (selectedDate.getTimeInMillis() > Calendar.getInstance().getTimeInMillis())
-                Toast.makeText(getContext(), "Future date is not allowed", Toast.LENGTH_LONG).show();
-            else
+            if (selectedDate.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+                Toast.makeText(getContext(), "Future date is not allowed", Toast.LENGTH_SHORT).show();
+            } else {
                 updateGameDate(game, DateHelper.getDate(selectedDate.getTimeInMillis()));
+                LocalNotifications.sendNotification(getContext(), LocalNotifications.GAME_UPDATE_ACTION);
+            }
         }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE));
         d.show();
     }
@@ -255,9 +327,20 @@ public class GamesFragment extends Fragment {
                     DbHelper.deleteGame(getContext(), game.gameId);
                     onGameSelected(null);
                     refreshGames();
+                    LocalNotifications.sendNotification(getContext(), LocalNotifications.GAME_UPDATE_ACTION);
                     Toast.makeText(getContext(), "Game deleted", Toast.LENGTH_SHORT).show();
                 })
         );
+    }
+    //endregion
+
+    //region broadcasts
+    class GameResultBroadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("Broadcast games", "new data");
+            refreshGames();
+        }
     }
     //endregion
 }

@@ -3,20 +3,18 @@
 
     <group android:checkableBehavior="none">
         <group
-            android:id="@+id/menu_top"
+            android:id="@+id/menu_sync"
             android:checkableBehavior="none">
             <item
-                android:id="@+id/nav_players"
-                android:icon="@drawable/player"
-                android:title="@string/nav_players" />
+                android:id="@+id/nav_data_sync"
+                android:icon="@drawable/nav_cloud_push"
+                android:title="@string/nav_sync_to_cloud"
+                android:visible="true" />
             <item
-                android:id="@+id/nav_games"
-                android:icon="@drawable/games"
-                android:title="@string/nav_games_history" />
-            <item
-                android:id="@+id/nav_stats"
-                android:icon="@drawable/stats"
-                android:title="@string/nav_statistics" />
+                android:id="@+id/nav_data_pull"
+                android:icon="@drawable/nav_cloud_pull"
+                android:title="@string/nav_pull_from_cloud"
+                android:visible="true" />
         </group>
         <group
             android:id="@+id/menu_snapshot"
@@ -30,20 +28,6 @@
                 android:id="@+id/nav_import_snapshot"
                 android:icon="@android:drawable/ic_menu_upload"
                 android:title="@string/nav_import_from_file"
-                android:visible="true" />
-        </group>
-        <group
-            android:id="@+id/menu_sync"
-            android:checkableBehavior="none">
-            <item
-                android:id="@+id/nav_data_sync"
-                android:icon="@drawable/nav_cloud_push"
-                android:title="@string/nav_sync_to_cloud"
-                android:visible="true" />
-            <item
-                android:id="@+id/nav_data_pull"
-                android:icon="@drawable/nav_cloud_pull"
-                android:title="@string/nav_pull_from_cloud"
                 android:visible="true" />
         </group>
         <group

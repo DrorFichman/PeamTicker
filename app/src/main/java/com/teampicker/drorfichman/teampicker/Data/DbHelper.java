@@ -248,7 +248,6 @@ public class DbHelper extends SQLiteOpenHelper {
         return players;
     }
 
-
     public static int getComingPlayersCount(Context context) {
         return PlayerDbHelper.getComingPlayersCount(getSqLiteDatabase(context));
     }
@@ -312,7 +311,11 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     public static ArrayList<Game> getGames(Context context) {
-        return GameDbHelper.getGames(getSqLiteDatabase(context));
+        return GameDbHelper.getGames(getSqLiteDatabase(context), -1);
+    }
+
+    public static ArrayList<Game> getGames(Context context, int limit) {
+        return GameDbHelper.getGames(getSqLiteDatabase(context), limit);
     }
 
     public static ArrayList<Game> getGames(Context context, String name) {

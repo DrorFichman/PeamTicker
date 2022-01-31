@@ -1,6 +1,7 @@
 package com.teampicker.drorfichman.teampicker.Controller.Sort;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
@@ -31,8 +32,8 @@ public class Sorting {
     }
 
     public Sorting(sortingCallbacks handle, SortType defaultSort) {
-        type = defaultSort;
         handler = handle;
+        type = defaultSort;
     }
 
     public SortType getCurrentSorting() {
@@ -141,27 +142,31 @@ public class Sorting {
         if (headlineView != null) {
             headlines.put(headlineView, sortBy);
 
-            if (headlineView instanceof TextView)
+            if (headlineView instanceof TextView) {
                 ((TextView) headlineView).setText(headlineTitle);
+                ((TextView) headlineView).setTypeface(null, Typeface.BOLD);
+            }
 
-            headlineView.setOnClickListener(view -> {
-                if (type == sortBy) {
-                    originalOrder = !originalOrder;
-                    if (originalOrder) setSorted((TextView) view);
-                    else setReverseSorted((TextView) view);
-                } else {
-                    originalOrder = true;
-                    type = sortBy;
-                    setSorted((TextView) view);
-                }
-                handler.sortingChanged();
-            });
+            if (handler != null) {
+                headlineView.setOnClickListener(view -> {
+                    if (type == sortBy) {
+                        originalOrder = !originalOrder;
+                        if (originalOrder) setSorted(view);
+                        else setReverseSorted(view);
+                    } else {
+                        originalOrder = true;
+                        type = sortBy;
+                        setSorted(view);
+                    }
+                    handler.sortingChanged();
+                });
+            }
 
             headlineView.setVisibility(View.VISIBLE);
         }
     }
 
-    private void setSorted(TextView sortingView) {
+    private void setSorted(View sortingView) {
         if (sortingView != null) {
             setSelected(sortingView, HeadlineSortType.Sorted);
             resetSorting(sortingView);
@@ -183,6 +188,10 @@ public class Sorting {
         }
     }
 
+    public void setSelected(View headline) {
+        setSelected(headline, HeadlineSortType.Sorted);
+    }
+
     private void setSelected(View headline, HeadlineSortType type) {
         if (headline instanceof TextView)
             if (type == HeadlineSortType.Sorted)
@@ -190,7 +199,7 @@ public class Sorting {
             else if (type == HeadlineSortType.Reversed)
                 ((TextView) headline).setTextAppearance(R.style.redHeadline);
             else // default
-                ((TextView) headline).setTextAppearance(R.style.regularHeadline);
+                ((TextView) headline).setTextAppearance(R.style.headline);
         if (headline instanceof CheckBox)
             if (type == HeadlineSortType.Sorted || type == HeadlineSortType.Reversed)
                 ((CheckBox) headline).setChecked(true);

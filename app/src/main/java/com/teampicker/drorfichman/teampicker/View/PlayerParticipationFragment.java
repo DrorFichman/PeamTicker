@@ -15,9 +15,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerParticipationAdapter;
-import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
+import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.BuilderPlayerCollaborationStatistics;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
@@ -28,10 +32,6 @@ import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 public class PlayerParticipationFragment extends Fragment implements Sorting.sortingCallbacks {
 
@@ -77,17 +77,23 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
         setTeamIcon(root);
 
-        sorting.setHeadlineSorting(root, R.id.player_name, null, SortType.name);
-        sorting.setHeadlineSorting(root, R.id.part_games_count_with, this.getString(R.string.games_with) , SortType.gamesWith);
-        sorting.setHeadlineSorting(root, R.id.part_wins_percentage_with, this.getString(R.string.success_with), SortType.successWith);
-        sorting.setHeadlineSorting(root, R.id.part_games_count_against, this.getString(R.string.games_vs), SortType.gamesVs);
-        sorting.setHeadlineSorting(root, R.id.part_wins_percentage_against, this.getString(R.string.success_vs), SortType.successVs);
+        setHeadlines(root);
 
         refreshPlayers();
 
         setHasOptionsMenu(true);
 
         return root;
+    }
+
+    private void setHeadlines(View root) {
+        sorting.setHeadlineSorting(root, R.id.player_name, null, SortType.name);
+        sorting.setHeadlineSorting(root, R.id.part_games_count_with, this.getString(R.string.games_with) , SortType.gamesWith);
+        sorting.setHeadlineSorting(root, R.id.part_wins_percentage_with, this.getString(R.string.success_with), SortType.successWith);
+        sorting.setHeadlineSorting(root, R.id.part_games_count_against, this.getString(R.string.games_vs), SortType.gamesVs);
+        sorting.setHeadlineSorting(root, R.id.part_wins_percentage_against, this.getString(R.string.success_vs), SortType.successVs);
+
+        sorting.setSelected(root.findViewById(R.id.part_games_count_with));
     }
 
     private void setTeamIcon(View root) {

@@ -14,16 +14,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.Calendar;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 public class PlayerDetailsFragment extends Fragment {
 
@@ -97,15 +98,17 @@ public class PlayerDetailsFragment extends Fragment {
         setAttributes();
 
         hideKeyboard();
-        getActivity().setResult(1);
-        Toast.makeText(getContext(), "Player saved", Toast.LENGTH_LONG).show();
+
+        LocalNotifications.sendNotification(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION);
+
+        Toast.makeText(getContext(), "Player saved", Toast.LENGTH_SHORT).show();
         updateListener.onUpdate(player.mName);
     };
 
     private String verifyName() {
         String newName = FirebaseHelper.sanitizeKey(vName.getText().toString().trim());
         if (TextUtils.isEmpty(newName)) {
-            Toast.makeText(getContext(), "Fill player's name", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Fill player's name", Toast.LENGTH_SHORT).show();
             return "";
         }
         return newName;
@@ -114,13 +117,13 @@ public class PlayerDetailsFragment extends Fragment {
     private int verifyGrade() {
         String stringGrade = vGrade.getText().toString();
         if (TextUtils.isEmpty(stringGrade)) {
-            Toast.makeText(getContext(), "Fill player's grade", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Fill player's grade", Toast.LENGTH_SHORT).show();
             return -1;
         }
 
         int newGrade = Integer.parseInt(stringGrade);
         if (newGrade > 99 || newGrade < 0) {
-            Toast.makeText(getContext(), "Grade must be between 0-99", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Grade must be between 0-99", Toast.LENGTH_SHORT).show();
             return -1;
         }
 
@@ -131,7 +134,7 @@ public class PlayerDetailsFragment extends Fragment {
         if (player != null) {
             if (!player.mName.equals(name)) {
                 if (!DbHelper.updatePlayerName(getContext(), player, name)) {
-                    Toast.makeText(getContext(), "Player name is already taken", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Player name is already taken", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
@@ -139,7 +142,7 @@ public class PlayerDetailsFragment extends Fragment {
         } else {
             Player p = new Player(name, grade);
             if (!DbHelper.insertPlayer(getContext(), p)) {
-                Toast.makeText(getContext(), "Player name is already taken", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Player name is already taken", Toast.LENGTH_SHORT).show();
                 return false;
             }
             player = p;
@@ -156,7 +159,7 @@ public class PlayerDetailsFragment extends Fragment {
             int newDay = Integer.parseInt(date.split("/")[0]);
 
             if (newYear < 1900 || newYear > Calendar.getInstance().get(Calendar.YEAR)) {
-                Toast.makeText(getContext(), "Year must be between 1900-now", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Year must be between 1900-now", Toast.LENGTH_SHORT).show();
                 return false;
             }
 

@@ -22,7 +22,7 @@ import java.util.List;
 public class PlayerAdapter extends ArrayAdapter<Player> {
 
     public interface onPlayerComingChange {
-        void handle();
+        void playerComingChanged();
     }
 
     private final Context context;
@@ -77,14 +77,14 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
             DbHelper.updatePlayerComing(context, player.mName, vComing.isChecked());
 
             if (handler != null) {
-                handler.handle();
+                handler.playerComingChanged();
             }
         });
     }
 
     private void setName(TextView name, Player player) {
         if (player.mName != null && isMsgIdentifier(player)) {
-            name.setText(player.mName + "\n" + player.msgDisplayName);
+            name.setText(player.mName + " (" + player.msgDisplayName + ")");
         } else if (player.mName != null) {
             name.setText(player.mName);
         } else if (isMsgIdentifier(player)) {

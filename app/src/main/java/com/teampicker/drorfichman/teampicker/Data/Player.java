@@ -207,8 +207,8 @@ public class Player extends Sortable implements Serializable, Comparable {
     }
 
     @Override
-    public boolean attributes() {
-        return hasAttributes();
+    public String attributes() {
+        return getAttributes();
     }
 
     @Override

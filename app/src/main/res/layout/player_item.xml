@@ -1,55 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="42dp"
     android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingBottom="5dp"
-    android:paddingRight="5dp"
     android:layoutDirection="ltr"
-    android:paddingTop="5dp">
+    android:orientation="horizontal"
+    android:paddingTop="5dp"
+    android:paddingRight="5dp"
+    android:paddingBottom="5dp">
 
     <CheckBox
         android:id="@+id/player_coming"
-        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:checked="false"
         android:focusable="false"
         android:padding="7dp"
-        android:paddingEnd="10dp" />
+        android:paddingEnd="10dp"
+        android:layout_marginLeft="5dp"
+        android:textColor="@android:color/black" />
 
     <TextView
         android:id="@+id/player_grade"
         android:layout_width="40dp"
         android:layout_height="match_parent"
-        android:gravity="center_vertical"
         android:layout_marginLeft="3dp"
-        android:layout_marginRight="9dp"
-        android:textAppearance="@style/regularHeadline"
-        android:textSize="14sp" />
+        android:layout_marginRight="6dp"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/regularText" />
 
     <TextView
         android:id="@+id/player_recent_performance"
         android:layout_width="30dp"
         android:layout_height="match_parent"
-        android:gravity="center_vertical"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="6dp"
-        android:textAppearance="@style/regularHeadline"
-        android:textSize="14sp" />
+        android:gravity="center_vertical"
+        android:textAppearance="@style/regularText" />
 
     <TextView
         android:id="@+id/player_attributes"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:layout_weight="1"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
-        android:textAppearance="@style/regularHeadline"
-        android:textSize="14sp" />
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/regularText" />
 
     <TextView
         android:id="@+id/player_age"
@@ -58,8 +56,7 @@
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
         android:gravity="center_vertical"
-        android:textAppearance="@style/regularHeadline"
-        android:textSize="14sp" />
+        android:textAppearance="@style/regularText" />
 
     <TextView
         android:id="@+id/player_name"
@@ -68,7 +65,6 @@
         android:layout_weight="1"
         android:gravity="right|center_vertical"
         android:paddingRight="3dp"
-        android:textAppearance="@style/regularHeadline"
-        android:textSize="14sp" />
+        android:textAppearance="@style/regularText" />
 
 </LinearLayout>
