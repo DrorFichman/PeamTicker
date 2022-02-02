@@ -8,6 +8,7 @@ import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by drorfichman on 7/27/16.
@@ -54,5 +55,18 @@ public class Game implements Serializable {
     @Exclude
     public Date getDate() {
         return DateHelper.getDate(this.dateString);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Game game = (Game) o;
+        return gameId == game.gameId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameId);
     }
 }

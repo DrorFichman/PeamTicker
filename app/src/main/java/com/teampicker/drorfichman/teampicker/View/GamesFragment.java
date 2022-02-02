@@ -128,7 +128,7 @@ public class GamesFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.games_menu, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -137,11 +137,11 @@ public class GamesFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_last_50_games:
                 gamesCount = 50;
-                refreshGames();
+                refreshGames(mCurrGame);
                 break;
             case R.id.action_all_games:
                 gamesCount = -1;
-                refreshGames();
+                refreshGames(mCurrGame);
                 break;
         }
 
@@ -178,6 +178,10 @@ public class GamesFragment extends Fragment {
     }
 
     public void refreshGames() {
+        refreshGames(null);
+    }
+
+    public void refreshGames(Game game) {
         Context activity = getContext();
         if (activity == null) return;
 
@@ -190,10 +194,6 @@ public class GamesFragment extends Fragment {
             games = DbHelper.getGames(activity, gamesCount);
         }
 
-        if (games.size() > 0) {
-            mostRecentGameId = games.get(0).gameId;
-        }
-
         if (mCountHandler != null) {
             mCountHandler.onGamesCount(games.size());
         }
@@ -201,6 +201,17 @@ public class GamesFragment extends Fragment {
         // Attach cursor adapter to the ListView
         gamesAdapter = new GameAdapter(activity, games, mCurrGameId);
         gamesList.setAdapter(gamesAdapter);
+
+        Game selectedGame = null;
+        if (game != null && games.size() > 0 && games.contains(game)) {
+            selectedGame = game;
+        } else if (games.size() > 0) {
+            selectedGame = games.get(0);
+        } else {
+            Log.i("refresh", "Refresh games null");
+        }
+
+        onGameSelected(selectedGame);
     }
 
     private void refreshSelectedGame() {
@@ -216,15 +227,17 @@ public class GamesFragment extends Fragment {
 
     //region game click
     public void onGameSelected(Game game) {
-        if (game == null || mCurrGameId == game.gameId) {
-            mCurrGameId = -1;
-            mCurrGame = null;
-            gameDetails.setVisibility(View.GONE);
-        } else {
+
+        if (game != null) {
             mCurrGameId = game.gameId;
             mCurrGame = game;
             gameDetails.setVisibility(View.VISIBLE);
+        } else {
+            mCurrGameId = -1;
+            mCurrGame = null;
+            gameDetails.setVisibility(View.GONE);
         }
+
         refreshSelectedGame();
         refreshTeams();
     }
@@ -258,6 +271,8 @@ public class GamesFragment extends Fragment {
         DbHelper.setPlayerComing(activity, mTeam2);
         DbHelper.saveTeams(activity, mTeam1, mTeam2);
         Toast.makeText(activity, R.string.copy_players_success, Toast.LENGTH_SHORT).show();
+
+        LocalNotifications.sendNotification(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION);
     }
     //endregion
 
@@ -310,7 +325,7 @@ public class GamesFragment extends Fragment {
 
     private void updateGameDate(Game game, String date) {
         DbHelper.updateGameDate(getContext(), game, date);
-        refreshGames();
+        refreshGames(game);
         Toast.makeText(getContext(), "Game edited", Toast.LENGTH_SHORT).show();
     }
 
@@ -325,7 +340,6 @@ public class GamesFragment extends Fragment {
                 getString(R.string.delete), "Do you want to remove (" + game.getDisplayDate(getContext()) + ")?",
                 ((dialog, which) -> {
                     DbHelper.deleteGame(getContext(), game.gameId);
-                    onGameSelected(null);
                     refreshGames();
                     LocalNotifications.sendNotification(getContext(), LocalNotifications.GAME_UPDATE_ACTION);
                     Toast.makeText(getContext(), "Game deleted", Toast.LENGTH_SHORT).show();
@@ -339,7 +353,7 @@ public class GamesFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i("Broadcast games", "new data");
-            refreshGames();
+            refreshGames(mCurrGame);
         }
     }
     //endregion
