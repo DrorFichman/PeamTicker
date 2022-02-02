@@ -175,7 +175,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         if (comingPlayers.size() > 0) {
             startActivity(MakeTeamsActivity.getIntent(getContext()));
         } else {
-            Toast.makeText(getContext(), "First - select coming players", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "First - select attending players", Toast.LENGTH_SHORT).show();
         }
     }
 
