@@ -157,7 +157,7 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
         players.clear();
         players.addAll(result.values());
 
-        setHeadline(context);
+        setTitle(context);
 
         sorting.sort(players);
 
@@ -165,17 +165,12 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
         playersList.setAdapter(playersAdapter);
     }
 
-    private void setHeadline(Context context) {
+    private void setTitle(Context context) {
         Player player = DbHelper.getPlayer(context, pPlayer.mName, games);
-
-        if (player.statistics.gamesCount == 0) {
-            titles.setVisibility(View.GONE);
-        } else {
-            name.setText(getString(R.string.player_participation_statistics,
+        name.setText(getString(R.string.player_participation_statistics,
                     player.mName,
                     player.statistics.gamesCount,
                     player.statistics.getWinRate()));
-        }
     }
 
     //region sort

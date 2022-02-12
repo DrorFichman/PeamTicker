@@ -259,7 +259,7 @@ public class GamesFragment extends Fragment {
     private void checkCopyGame() {
 
         DialogHelper.showApprovalDialog(getContext(), getString(R.string.copy),
-                "Copy coming players and teams?",
+                "Copy attendance and teams?",
                 ((dialog, which) -> copyGamePlayers()));
     }
 
