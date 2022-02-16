@@ -52,9 +52,9 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private boolean showArchivedPlayers = false;
     private boolean showPastedPlayers = false;
 
-    private ListView playersList;
-
     private View rootView;
+    private Button createPlayer;
+    private ListView playersList;
 
     private PlayerUpdateBroadcast notificationHandler;
 
@@ -75,6 +75,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
         this.rootView = root;
         playersList = root.findViewById(R.id.players_list);
+        createPlayer = root.findViewById(R.id.players_add_new_player);
+        createPlayer.setOnClickListener(view -> startActivity(new Intent(getContext(), PlayerDetailsActivity.class)));
 
         refreshPlayers();
 
@@ -180,6 +182,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void setPlayersList(List<Player> players, AdapterView.OnItemClickListener clickHandler) {
+        boolean hasPlayers = (players != null && players.size() > 0);
+        playersList.setVisibility(hasPlayers ? View.VISIBLE : View.GONE);
+        createPlayer.setVisibility(hasPlayers ? View.GONE : View.VISIBLE);
+
         setHeadlines(true);
         PlayerAdapter playersAdapter = new PlayerAdapter(getContext(), players, this::setComingPlayersCount);
 

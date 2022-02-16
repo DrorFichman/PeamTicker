@@ -12,6 +12,16 @@
         android:id="@+id/player_titles"
         layout="@layout/player_item" />
 
+    <Button
+        android:id="@+id/players_add_new_player"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/player_titles"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:text="Create player"
+        android:visibility="gone" />
+
     <ListView
         android:id="@+id/players_list"
         android:layout_width="match_parent"

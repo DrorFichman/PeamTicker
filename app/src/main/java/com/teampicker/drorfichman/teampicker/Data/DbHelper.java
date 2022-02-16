@@ -60,8 +60,6 @@ public class DbHelper extends SQLiteOpenHelper {
             db.execSQL(PlayerDbHelper.getSqlCreate());
             db.execSQL(PlayerGamesDbHelper.getSqlCreate());
             db.execSQL(GameDbHelper.getSqlCreate());
-
-            createSamplePlayers(db);
         } catch (SQLiteException e) {
             Log.w("Create", "Tables already exist " + e.getMessage());
         }
@@ -98,30 +96,6 @@ public class DbHelper extends SQLiteOpenHelper {
             Log.i("Upgrade", "Altering " + table + ": " + column);
         } catch (SQLiteException ex) {
             Log.e("Upgrade", "Altering " + table + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    private void createSamplePlayers(SQLiteDatabase db) {
-        try {
-            PlayerDbHelper.insertPlayer(db, new Player("Johan Cruyff", 95));
-            PlayerDbHelper.insertPlayer(db, new Player("Maradona", 93));
-            PlayerDbHelper.insertPlayer(db, new Player("Ronaldinho", 92));
-            PlayerDbHelper.insertPlayer(db, new Player("Ian Rush", 91));
-            PlayerDbHelper.insertPlayer(db, new Player("Gerd Muller", 91));
-            PlayerDbHelper.insertPlayer(db, new Player("Ferenc Puskas", 90));
-            PlayerDbHelper.insertPlayer(db, new Player("Kenny Dalglish", 88));
-            PlayerDbHelper.insertPlayer(db, new Player("Lev Yashin", 87));
-            PlayerDbHelper.insertPlayer(db, new Player("Alan Shearer", 85));
-            PlayerDbHelper.insertPlayer(db, new Player("George Best", 85));
-
-            PlayerDbHelper.updatePlayerComing(db, "Johan Cruyff", true);
-            PlayerDbHelper.updatePlayerComing(db, "Ronaldinho", true);
-            PlayerDbHelper.updatePlayerComing(db, "Ian Rush", true);
-            PlayerDbHelper.updatePlayerComing(db, "Alan Shearer", true);
-            PlayerDbHelper.updatePlayerComing(db, "Kenny Dalglish", true);
-            PlayerDbHelper.updatePlayerComing(db, "Lev Yashin", true);
-        } catch (Exception e) {
-            Log.e("Upgrade", "createSamplePlayers failed : " + e.getMessage(), e);
         }
     }
 
