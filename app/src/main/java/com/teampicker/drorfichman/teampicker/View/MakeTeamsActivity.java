@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamAdapter;
@@ -45,6 +46,7 @@ import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -76,17 +78,18 @@ public class MakeTeamsActivity extends AppCompatActivity {
     TextView progressBarTeamDivisionStatus;
     protected View teamStatsLayout;
     protected View buttonsLayout;
+    protected View shuffleLayout;
 
     private View moveView;
-    private View shuffleView;
+    private Button shuffleView;
+    private Button shuffleOptions;
 
     private View resultViews;
     private NumberPicker team1Score;
     private NumberPicker team2Score;
-    private View saveView;
+    private Button saveView;
     private Button setGameDate;
 
-    private AlertDialog makeTeamsDialog;
     protected View analysisHeaders1;
     protected View analysisHeaders2;
 
@@ -112,6 +115,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         teamsScreenArea = findViewById(R.id.teams_list_area);
         buttonsLayout = findViewById(R.id.buttons_layout);
+        shuffleLayout = findViewById(R.id.shuffle_views);
         progressBarTeamDivision = findViewById(R.id.calculating_teams_progress);
         progressBarTeamDivisionStatus = findViewById(R.id.calculating_teams_progress_status);
 
@@ -126,16 +130,43 @@ public class MakeTeamsActivity extends AppCompatActivity {
         moveView.setOnLongClickListener(switchTeamsColors);
 
         saveView = findViewById(R.id.save_results);
-        saveView.setOnClickListener(view -> saveResults());
+        saveView.setOnClickListener(view -> resultsClicked());
 
         shuffleView = findViewById(R.id.shuffle);
         shuffleView.setOnClickListener(v -> divideComingPlayers(selectedDivision));
-        shuffleView.setOnLongClickListener(v -> showMakeTeamOptionsDialog());
+
+        shuffleOptions = findViewById(R.id.shuffle_options);
+        shuffleOptions.setOnClickListener(view -> showShuffleOptions());
 
         analysisHeaders1 = findViewById(R.id.analysis_headers_1);
         analysisHeaders2 = findViewById(R.id.analysis_headers_2);
 
         initialTeams();
+    }
+
+    private void showShuffleOptions() {
+        PopupMenu popup = new PopupMenu(MakeTeamsActivity.this, shuffleOptions);
+        popup.getMenuInflater().inflate(R.menu.shuffle_options, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.divide_by_age:
+                    selectedDivision = TeamDivision.DivisionStrategy.Age;
+                    shuffleView.setText(getString(R.string.shuffle_age));
+                    return true;
+                case R.id.divide_by_grade:
+                    selectedDivision = TeamDivision.DivisionStrategy.Grade;
+                    shuffleView.setText(getString(R.string.shuffle_grade));
+                    return true;
+                case R.id.divide_by_ai:
+                    // TODO enable with more than 10 games history
+                    selectedDivision = TeamDivision.DivisionStrategy.Optimize;
+                    shuffleView.setText(getString(R.string.shuffle_stats));
+                    return true;
+                default:
+                    return false;
+            }
+        });
+        popup.show();
     }
 
     @Override
@@ -166,20 +197,23 @@ public class MakeTeamsActivity extends AppCompatActivity {
         return DbHelper.getComingPlayers(this, RECENT_GAMES);
     }
 
-    private void saveResults() {
-        int currGame = DbHelper.getActiveGame(this);
-        Game game = new Game(currGame, getGameDateString(), team1Score.getValue(), team2Score.getValue());
+    private void resultsClicked() {
+        if (!mSetResult) {
+            initSetResults();
+        } else {
+            int currGame = DbHelper.getActiveGame(this);
+            Game game = new Game(currGame, getGameDateString(), team1Score.getValue(), team2Score.getValue());
 
-        DbHelper.insertGame(this, game);
+            DbHelper.insertGame(this, game);
 
-        // TODO FirebaseHelper.syncGame(this, game)
+            // TODO FirebaseHelper.syncGame(this, game)
+            // TODO initCollaboration(); and print / keep expected winner?
 
-        // TODO initCollaboration(); and print / keep expected winner?
+            LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
 
-        LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
-
-        Toast.makeText(this, "Results saved", Toast.LENGTH_SHORT).show();
-        finish();
+            Toast.makeText(this, "Results saved", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     public void initSetResults() {
@@ -207,13 +241,13 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private void displayResultsViews(boolean enterResults) {
         mSetResult = enterResults;
+        saveView.setText(enterResults ? R.string.save : R.string.enter_results);
 
         teamStatsLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         moveView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
-        shuffleView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+        shuffleLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
 
         resultViews.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
-        saveView.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
         team1Score.setValue(0);
         team2Score.setValue(0);
         team1Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
@@ -318,7 +352,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         };
 
         new Handler().postDelayed(r, 200);
-    };
+    }
 
     private void enterSendMode() {
 
@@ -455,7 +489,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
             team2Data.forecastStdDev = analysisResult.getExpectedWinRateStdDiv(team2Data.players);
             if (team1Data.forecastWinRate > 0 && team2Data.forecastWinRate > 0) {
                 int sum = team1Data.forecastWinRate + team2Data.forecastWinRate;
-                team1Data.forecastWinRate = (int) Math.round((double)team1Data.forecastWinRate * 100 / sum);
+                team1Data.forecastWinRate = (int) Math.round((double) team1Data.forecastWinRate * 100 / sum);
                 team2Data.forecastWinRate = 100 - team1Data.forecastWinRate;
             }
         }
@@ -507,7 +541,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void sortPlayerNames(ArrayList<Player> playersList) {
-        Collections.sort(playersList, (p1, t1) -> p1.mName.compareTo(t1.mName));
+        Collections.sort(playersList, Comparator.comparing(p -> p.mName));
     }
 
     private boolean isMoveMode() {
@@ -516,6 +550,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private View.OnClickListener onMoveClicked = view -> {
         if (!backFromMove()) { // enter move mode
+            Toast.makeText(this, R.string.operation_move, Toast.LENGTH_SHORT).show();
             moveView.setAlpha(0.5F);
         }
     };
@@ -640,8 +675,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         if (!backFromAnalysis(false) && !analysisAsyncInProgress) { // enter analysis mode
             cancelSetResults();
-            moveView.setVisibility(View.INVISIBLE);
-            shuffleView.setVisibility(View.INVISIBLE);
+            buttonsLayout.setVisibility(View.INVISIBLE);
             list1.setBackgroundColor(Color.GRAY);
             list2.setBackgroundColor(Color.GRAY);
             setActivityTitle(getString(R.string.pick_teams_title_analysis));
@@ -657,8 +691,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void hideAnalysis() {
-        moveView.setVisibility(View.VISIBLE);
-        shuffleView.setVisibility(View.VISIBLE);
+        buttonsLayout.setVisibility(View.VISIBLE);
         setActivityTitle(null);
         refreshPlayers();
     }
@@ -717,45 +750,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private void initCollaboration() {
         analysisResult = CollaborationHelper.getCollaborationData(MakeTeamsActivity.this, players1, players2);
         refreshPlayers();
-    }
-
-    private boolean showMakeTeamOptionsDialog() {
-
-        if (makeTeamsDialog != null && makeTeamsDialog.isShowing()) {
-            return false;
-        }
-
-        if (getPlayers().size() == 0) {
-            return false;
-        }
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        alertDialogBuilder.setTitle("Shake things up?");
-
-        alertDialogBuilder
-                .setCancelable(true)
-                .setItems(new CharSequence[]
-                                {"Divide by grade", "Divide by age", "AI - beep boop beep"},
-                        (dialog, which) -> {
-                            switch (which) {
-                                case 0:
-                                    divideComingPlayers(TeamDivision.DivisionStrategy.Grade);
-                                    break;
-                                case 1:
-                                    divideComingPlayers(TeamDivision.DivisionStrategy.Age);
-                                    break;
-                                case 2:
-                                    // TODO require 10 games history
-                                    divideComingPlayers(TeamDivision.DivisionStrategy.Optimize);
-                            }
-                        });
-
-        makeTeamsDialog = alertDialogBuilder.create();
-
-        makeTeamsDialog.show();
-
-        return true;
     }
 
     private void dividePlayersAsync() {

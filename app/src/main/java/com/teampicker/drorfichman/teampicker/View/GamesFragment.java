@@ -353,7 +353,11 @@ public class GamesFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i("Broadcast games", "new data");
-            refreshGames(mCurrGame);
+            if (intent != null && LocalNotifications.PLAYER_UPDATE_ACTION.equals(intent.getAction())) {
+                refreshGames(mCurrGame);
+            } else {
+                refreshGames();
+            }
         }
     }
     //endregion

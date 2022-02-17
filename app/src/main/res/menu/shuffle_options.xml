@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/divide_by_grade"
+        android:title="Grade"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/divide_by_age"
+        android:title="Age"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/divide_by_ai"
+        android:title="Stats"
+        app:showAsAction="never" />
+</menu>
