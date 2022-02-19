@@ -31,6 +31,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseUser;
 import com.teampicker.drorfichman.teampicker.BuildConfig;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
+import com.teampicker.drorfichman.teampicker.Data.Configurations;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
@@ -106,11 +107,27 @@ public class MainActivity extends AppCompatActivity
         });
 
         FirebaseHelper.getInstance().storeAccountData();
+
+        fetchConfigurations();
     }
 
     private void authenticate() {
         AuthHelper.requireLogin(this, ACTIVITY_RESULT_SIGN_IN);
         setUsernameView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchConfigurations();
+    }
+
+    private void fetchConfigurations() {
+        if (Configurations.remote == null) {
+            FirebaseHelper.pullRemoteConfiguration(this, result -> {
+                Configurations.remote = result;
+            });
+        }
     }
 
     @Override
@@ -198,7 +215,7 @@ public class MainActivity extends AppCompatActivity
 
     //region cloud snapshot
     private void pullFromCloud() {
-        if (AuthHelper.getUser() == null) {
+        if (AuthHelper.getUser() == null && Configurations.isCloudFeatureSupported()) {
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
             authenticate();
         } else {
@@ -207,7 +224,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void syncToCloud() {
-        if (AuthHelper.getUser() == null) {
+        if (AuthHelper.getUser() == null && Configurations.isCloudFeatureSupported()) {
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
             authenticate();
         } else {

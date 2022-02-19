@@ -103,6 +103,8 @@
     <string name="copy_players_success">Teams division applied</string>
     <string name="main_make_teams">"Teams (%1$d)"</string>
     <string name="main_auth_required">Google sign in required</string>
+    <string name="main_cloud_not_allowed">Cloud feature is not allowed \nDetails in play store</string>
+    <string name="main_connectivity">Connectivity issue</string>
     <string name="main_sign_in">Sign in</string>
     <string name="main_login">Sign-in</string>
     <string name="main_logout">Log out</string>

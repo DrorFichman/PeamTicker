@@ -50,11 +50,12 @@ public class Sorting {
 
         if (comparator != null) { // last order is always by name
             comparator = comparator.thenComparing((p1, p2) -> p2.name().compareTo(p1.name()));
+
+            // Original order = from high to low -> reversed compare
+            if (originalOrder) comparator = comparator.reversed();
+            players.sort(comparator);
         }
 
-        // Original order = from high to low -> reversed compare
-        if (originalOrder) comparator = comparator.reversed();
-        players.sort(comparator);
     }
 
     private Comparator<Sortable> getSortableComparator() {

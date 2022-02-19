@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,19 +15,20 @@ import com.google.firebase.database.ValueEventListener;
 import com.teampicker.drorfichman.teampicker.BuildConfig;
 import com.teampicker.drorfichman.teampicker.Data.AccountData;
 import com.teampicker.drorfichman.teampicker.Data.AppData;
+import com.teampicker.drorfichman.teampicker.Data.Configurations;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.PlayerGame;
 import com.teampicker.drorfichman.teampicker.Data.TeamEnum;
+import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
+import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetConfiguration;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetLastGame;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetUsers;
 
 import java.util.ArrayList;
-
-import androidx.appcompat.app.AlertDialog;
 
 public class FirebaseHelper implements CloudSync {
 
@@ -51,11 +54,15 @@ public class FirebaseHelper implements CloudSync {
         games,
         playersGames,
         account,
-        app
+        app,
     }
 
     public static DatabaseReference games() {
         return getNode(Node.games);
+    }
+
+    public static DatabaseReference configurations() {
+        return getNode("configurations").child("v1");
     }
 
     public static DatabaseReference playersGames() {
@@ -84,13 +91,28 @@ public class FirebaseHelper implements CloudSync {
         return database.getReference(AuthHelper.getUserUID()).child(node.name());
     }
 
+    private static DatabaseReference getNode(String highLevelPath) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        return database.getReference(highLevelPath);
+    }
+
     public static String sanitizeKey(String key) {
         if (key == null) return null;
         return key.replaceAll("\\.", "");
     }
 
+    //region Sync
     @Override
     public void syncToCloud(Context ctx, SyncProgress progress) {
+
+        if (!Configurations.isCloudFeaturesAllowed()) {
+            if (Configurations.remote == null)
+                Toast.makeText(ctx, ctx.getString(R.string.main_connectivity), Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(ctx, ctx.getString(R.string.main_cloud_not_allowed), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         progress.showSyncStatus("Syncing...");
         syncPlayersToCloud(ctx, () ->
                 syncGamesToCloud(ctx, () ->
@@ -100,7 +122,6 @@ public class FirebaseHelper implements CloudSync {
                         })));
     }
 
-    //region Sync
     private static void syncPlayersToCloud(Context ctx, DataCallback handler) {
         players().removeValue((error, ref) -> {
             Log.i("syncPlayersToCloud", "Deleted error - " + error);
@@ -161,10 +182,31 @@ public class FirebaseHelper implements CloudSync {
             }
         });
     }
+
+    private static void storePlayer(Player p) {
+        players().child(sanitizeKey(p.name())).setValue(p);
+    }
+
+    private static void storeGame(Game g) {
+        games().child(String.valueOf(g.gameId)).setValue(g);
+    }
+
+    private static void storePlayerGame(PlayerGame pg) {
+        playersGames().child(sanitizeKey(pg.playerName)).child(String.valueOf(pg.gameId)).setValue(pg);
+    }
     //endregion
 
+    //region Pull
     @Override
     public void pullFromCloud(Context ctx, SyncProgress handler) {
+
+        if (!Configurations.isCloudFeaturesAllowed()) {
+            if (Configurations.remote == null)
+                Toast.makeText(ctx, ctx.getString(R.string.main_connectivity), Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(ctx, ctx.getString(R.string.main_cloud_not_allowed), Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (isAdmin()) {
 
@@ -188,12 +230,14 @@ public class FirebaseHelper implements CloudSync {
 
     private void showUsersDialog(Context ctx, ArrayList<AccountData> users, SyncProgress handler) {
         Log.d("showUsersDialog", users.size() + " users ");
-        String[] list = new String[users.size()];
-        int curr = 0;
+        ArrayList<String> l = new ArrayList<>();
         for (AccountData a : users) {
-            list[curr] = a.displayName;
-            curr++;
+            if (a != null && a.displayName != null) {
+                l.add(a.displayName);
+            }
         }
+
+        String[] list = l.toArray(new String[l.size()]);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         builder.setTitle("Pick a user");
@@ -234,7 +278,6 @@ public class FirebaseHelper implements CloudSync {
                         })));
     }
 
-    //region Pull
     private static void pullPlayersFromCloud(Context ctx, DataCallback handler) {
         ValueEventListener playerListener = new ValueEventListener() {
             @Override
@@ -323,17 +366,11 @@ public class FirebaseHelper implements CloudSync {
     }
     //endregion
 
-    private static void storePlayer(Player p) {
-        players().child(sanitizeKey(p.name())).setValue(p);
+    //region Remote config
+    public static void pullRemoteConfiguration(Context ctx, GetConfiguration.Results caller) {
+        GetConfiguration.query(ctx, caller);
     }
-
-    private static void storeGame(Game g) {
-        games().child(String.valueOf(g.gameId)).setValue(g);
-    }
-
-    private static void storePlayerGame(PlayerGame pg) {
-        playersGames().child(sanitizeKey(pg.playerName)).child(String.valueOf(pg.gameId)).setValue(pg);
-    }
+    //endregion
 
     @Override
     public void storeAccountData() {
