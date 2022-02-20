@@ -126,8 +126,22 @@ public class MainActivity extends AppCompatActivity
         if (Configurations.remote == null) {
             FirebaseHelper.pullRemoteConfiguration(this, result -> {
                 Configurations.remote = result;
+                if (!Configurations.isVersionSupported()) {
+                    showForceUpgradeDialog();
+                }
             });
         }
+    }
+
+    private void showForceUpgradeDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Version Outdated :/")
+                .setMessage("This release (" + BuildConfig.VERSION_NAME + ") \n" +
+                        "is no longer supported.\n\n" +
+                        Configurations.outdatedVersionMessage())
+                .setCancelable(false);
+
+        alertDialogBuilder.create().show();
     }
 
     @Override

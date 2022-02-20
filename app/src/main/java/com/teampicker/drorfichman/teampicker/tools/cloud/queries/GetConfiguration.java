@@ -22,7 +22,7 @@ public class GetConfiguration {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 Configurations conf = dataSnapshot.getValue(Configurations.class);
-                Log.i("GetConfiguration", conf.allowCloudFeatures + ", " + conf.allowedAccounts);
+                Log.i("GetConfiguration", conf.toString());
 
                 caller.queryResults(conf);
             }
