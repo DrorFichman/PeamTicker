@@ -108,40 +108,12 @@ public class MainActivity extends AppCompatActivity
 
         FirebaseHelper.getInstance().storeAccountData();
 
-        fetchConfigurations();
+        FirebaseHelper.fetchConfigurations(this, true, null);
     }
 
     private void authenticate() {
         AuthHelper.requireLogin(this, ACTIVITY_RESULT_SIGN_IN);
         setUsernameView();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        fetchConfigurations();
-    }
-
-    private void fetchConfigurations() {
-        if (Configurations.remote == null) {
-            FirebaseHelper.pullRemoteConfiguration(this, result -> {
-                Configurations.remote = result;
-                if (!Configurations.isVersionSupported()) {
-                    showForceUpgradeDialog();
-                }
-            });
-        }
-    }
-
-    private void showForceUpgradeDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Version Outdated :/")
-                .setMessage("This release (" + BuildConfig.VERSION_NAME + ") \n" +
-                        "is no longer supported.\n\n" +
-                        Configurations.outdatedVersionMessage())
-                .setCancelable(false);
-
-        alertDialogBuilder.create().show();
     }
 
     @Override
@@ -217,9 +189,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             showAbout();
         } else if (id == R.id.nav_data_sync) {
-            syncToCloud();
+            FirebaseHelper.fetchConfigurations(this, true, this::syncToCloud);
         } else if (id == R.id.nav_data_pull) {
-            pullFromCloud();
+            FirebaseHelper.fetchConfigurations(this, true, this::pullFromCloud);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -228,7 +200,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     //region cloud snapshot
-    private void pullFromCloud() {
+    private void pullFromCloud(Configurations remote) {
         if (AuthHelper.getUser() == null && Configurations.isCloudFeatureSupported()) {
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
             authenticate();
@@ -237,7 +209,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void syncToCloud() {
+    private void syncToCloud(Configurations remote) {
         if (AuthHelper.getUser() == null && Configurations.isCloudFeatureSupported()) {
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
             authenticate();

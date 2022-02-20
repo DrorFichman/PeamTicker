@@ -1,10 +1,14 @@
 package com.teampicker.drorfichman.teampicker.tools.cloud;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.text.HtmlCompat;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -367,6 +371,38 @@ public class FirebaseHelper implements CloudSync {
     //endregion
 
     //region Remote config
+    public static void fetchConfigurations(Context ctx, boolean forcePull, GetConfiguration.Results caller) {
+        if (Configurations.remote == null || forcePull) {
+            FirebaseHelper.pullRemoteConfiguration(ctx, result -> {
+                Configurations.remote = result;
+                if (!Configurations.isVersionSupported()) {
+                    showForceUpgradeDialog(ctx);
+                }
+                if (caller != null) caller.queryResults(result);
+            });
+        } else {
+            if (caller != null) caller.queryResults(Configurations.remote);
+        }
+    }
+
+    private static void showForceUpgradeDialog(Context ctx) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
+        alertDialogBuilder.setTitle("Version Outdated :/")
+                .setMessage("This release (" + BuildConfig.VERSION_NAME + ") \n" +
+                        "is no longer supported.\n\n")
+                .setCancelable(false);
+
+        if (!TextUtils.isEmpty(Configurations.outdatedVersionMessage())) {
+            TextView textView = new TextView(ctx);
+            textView.setPadding(32, 32, 32, 0);
+            textView.setMovementMethod(LinkMovementMethod.getInstance());
+            textView.setText(HtmlCompat.fromHtml(Configurations.outdatedVersionMessage(), HtmlCompat.FROM_HTML_MODE_LEGACY));
+            alertDialogBuilder.setView(textView);
+        }
+
+        alertDialogBuilder.create().show();
+    }
+
     public static void pullRemoteConfiguration(Context ctx, GetConfiguration.Results caller) {
         GetConfiguration.query(ctx, caller);
     }
