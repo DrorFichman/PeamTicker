@@ -9,17 +9,31 @@
     android:paddingRight="5dp"
     android:paddingBottom="5dp">
 
-    <CheckBox
-        android:id="@+id/player_coming"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="left"
-        android:checked="false"
-        android:focusable="false"
-        android:padding="7dp"
-        android:paddingEnd="10dp"
-        android:layout_marginLeft="5dp"
-        android:textColor="@android:color/black" />
+        android:layout_marginLeft="5dp">
+
+        <TextView
+            android:id="@+id/player_rsvp_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingEnd="10dp"
+            android:textAppearance="@style/regularText"
+            android:visibility="gone" />
+
+        <CheckBox
+            android:id="@+id/player_coming"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:checked="false"
+            android:focusable="false"
+            android:padding="7dp"
+            android:paddingEnd="10dp"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/player_grade"

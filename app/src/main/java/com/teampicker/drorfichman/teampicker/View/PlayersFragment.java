@@ -240,7 +240,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             sorting.setHeadlineSorting(rootView, R.id.player_attributes, this.getString(R.string.attributes), SortType.attributes);
             sorting.setHeadlineSorting(rootView, R.id.player_recent_performance, this.getString(R.string.plus_minus), SortType.suggestedGrade);
             sorting.setHeadlineSorting(rootView, R.id.player_grade, this.getString(R.string.grade), SortType.grade);
-            sorting.setHeadlineSorting(rootView, R.id.player_coming, null, SortType.coming);
+
+            rootView.findViewById(R.id.player_coming).setVisibility(View.GONE);
+            rootView.findViewById(R.id.player_rsvp_title).setVisibility(View.VISIBLE);
+            sorting.setHeadlineSorting(rootView, R.id.player_rsvp_title, "RSVP", SortType.coming);
 
             ((CheckBox) rootView.findViewById(R.id.player_coming)).setChecked(
                     sorting.getCurrentSorting().equals(SortType.coming) && sorting.isAscending());
@@ -254,6 +257,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             sorting.removeHeadlineSorting(activity, R.id.player_coming, "");
 
             rootView.findViewById(R.id.player_coming).setVisibility(View.INVISIBLE);
+            rootView.findViewById(R.id.player_rsvp_title).setVisibility(View.GONE);
         }
     }
 
