@@ -311,7 +311,12 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     //region pasted players
     private void pasteComingPlayers() {
         ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+        ClipData primaryClip = clipboard.getPrimaryClip();
+        if (primaryClip == null) {
+            Toast.makeText(getContext(), "Copy some whatsapp messages to set attending players", Toast.LENGTH_LONG).show();
+            return;
+        }
+        ClipData.Item item = primaryClip.getItemAt(0);
         CharSequence pasteData = item.getText();
 
         try {
