@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_getting_started) {
-            showTutorialDialog();
+            showGettingStartedDialog();
         } else if (id == R.id.nav_about) {
             showAbout();
         } else if (id == R.id.nav_data_sync) {
@@ -235,18 +235,20 @@ public class MainActivity extends AppCompatActivity
     //endregion
 
     //region Tutorial
-    private void showTutorialDialog() {
+    private void showGettingStartedDialog() {
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Getting Started");
 
         alertDialogBuilder
-                .setMessage("Welcome! \n" +
-                        "1. 'New player' - to create players \n" +
-                        "2. Check mark the arriving players \n" +
-                        "3. 'Pick Teams' - to divide the players \n" +
-                        "4. 'Enter Results' - once the game is over \n" +
+                .setMessage("Welcome! \n\n" +
+                        "1. 'Add player' - to create players. \n\n" +
+                        "2. RSVP the attending players\n" +
+                        "   (or paste whatsapp messages). \n\n" +
+                        "3. 'Teams' - to pick teams. \n\n" +
+                        "4. 'Results' under 'Teams' - \n" +
+                        "   once the game is over. \n" +
                         "\n" +
                         "And don't forget to be awesome :)")
                 .setCancelable(true)
