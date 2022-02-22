@@ -149,12 +149,12 @@
 
         <Button
             android:id="@+id/set_game_date"
-            android:layout_width="80dp"
+            android:layout_width="65dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:background="@color/fui_transparent"
-            android:drawableStart="@drawable/button_date"
+            android:drawableTop="@drawable/button_date"
             android:onClick="showDatePicker" />
 
         <NumberPicker
@@ -223,6 +223,7 @@
             android:drawableTop="@drawable/save"
             android:text="@string/action_button_results"
             android:textAllCaps="false"
+            android:layout_marginBottom="20dp"
             android:visibility="visible" />
 
     </LinearLayout>
