@@ -8,9 +8,20 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+    <SearchView
+        android:id="@+id/players_search_players"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:queryHint="Filter by name"
+        android:visibility="gone" />
+
     <include
         android:id="@+id/player_titles"
-        layout="@layout/player_item" />
+        layout="@layout/player_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/players_search_players"
+        android:layout_marginTop="5dp" />
 
     <Button
         android:id="@+id/players_add_new_player"
@@ -50,7 +61,7 @@
             android:textColor="@android:color/white"
             android:textSize="14sp"
             android:theme="@style/Theme.MaterialComponents.Light"
-            app:cornerRadius="20dp"
+            app:cornerRadius="25dp"
             app:icon="@drawable/make_teams_icon" />
     </LinearLayout>
 </RelativeLayout>
