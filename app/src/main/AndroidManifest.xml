@@ -27,12 +27,6 @@
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <activity
-            android:name=".View.StatisticsActivity"
-            android:label="Players statistics"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
-
-        <activity
             android:name=".View.SettingsActivity"
             android:label="Settings"
             android:screenOrientation="portrait"

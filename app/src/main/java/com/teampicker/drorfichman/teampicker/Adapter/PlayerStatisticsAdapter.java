@@ -1,12 +1,14 @@
 package com.teampicker.drorfichman.teampicker.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 
@@ -23,6 +25,7 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
     private final List<Player> mPlayers;
     private final int totalGamesCount;
     private final boolean isGradeVisible;
+    private String filterName;
 
     int maxSuccess = 0;
     int maxGames = 0;
@@ -57,6 +60,7 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
         Player p = mPlayers.get(position);
 
         nameView.setText(p.mName);
+        view.setBackgroundColor(FilterView.match(p.mName, filterName) ? Color.GRAY : Color.TRANSPARENT);
 
         if (isGradeVisible) {
             gradeView.setText(String.valueOf(p.mGrade));
@@ -78,5 +82,10 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
         view.setTag(R.id.player_id, p.mName);
 
         return view;
+    }
+
+    public void setFilter(String name) {
+        filterName = name;
+        notifyDataSetChanged();
     }
 }

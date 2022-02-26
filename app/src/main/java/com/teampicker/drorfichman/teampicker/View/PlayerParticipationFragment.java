@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerParticipationAdapter;
+import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.BuilderPlayerCollaborationStatistics;
@@ -49,6 +50,7 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
     private ListView playersList;
     private View titles;
     private TextView name;
+    private FilterView filterView;
 
     public PlayerParticipationFragment() {
         super(R.layout.layout_participation_fragment);
@@ -79,11 +81,18 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
         setHeadlines(root);
 
+        setSearchView(root);
         refreshPlayers();
 
         setHasOptionsMenu(true);
 
         return root;
+    }
+
+    private void setSearchView(View root) {
+        filterView = new FilterView(root.findViewById(R.id.player_participation_search_players), value -> {
+            playersAdapter.setFilter(value);
+        });
     }
 
     private void setHeadlines(View root) {
@@ -120,6 +129,9 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_stat_search_players:
+                filterView.toggleSearchVisibility();
+                break;
             case R.id.action_send_statistics:
                 final Runnable r = () -> ScreenshotHelper.takeListScreenshot(getActivity(),
                         playersList, titles, playersAdapter);
@@ -162,6 +174,7 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
         sorting.sort(players);
 
         playersAdapter = new PlayerParticipationAdapter(context, players, blue, orange);
+        playersAdapter.setFilter(filterView.getFilter());
         playersList.setAdapter(playersAdapter);
     }
 

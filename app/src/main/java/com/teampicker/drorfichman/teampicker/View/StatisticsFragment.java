@@ -12,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,6 +21,7 @@ import androidx.fragment.app.Fragment;
 
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerStatisticsAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
+import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
@@ -42,6 +42,7 @@ public class StatisticsFragment extends Fragment {
     private PlayerStatisticsAdapter playersAdapter;
     private ListView playersList;
     private View titles;
+    private FilterView filterView;
 
     public StatisticsFragment() {
         super(R.layout.layout_statistics_activity);
@@ -58,6 +59,7 @@ public class StatisticsFragment extends Fragment {
         View root = super.onCreateView(inflater, container, savedInstanceState);
         setHasOptionsMenu(true);
 
+        setSearchView(root);
         setPlayersList(root);
 
         return root;
@@ -99,7 +101,14 @@ public class StatisticsFragment extends Fragment {
         sorting.sort(players);
 
         playersAdapter = new PlayerStatisticsAdapter(getContext(), players,  getGamesCountFilter(), showInternalData);
+        playersAdapter.setFilter(filterView.getFilter());
         playersList.setAdapter(playersAdapter);
+    }
+
+    private void setSearchView(View root) {
+        filterView = new FilterView(root.findViewById(R.id.stat_search_players), value -> {
+            playersAdapter.setFilter(value);
+        });
     }
 
     private int getGamesCountFilter() {
@@ -131,6 +140,9 @@ public class StatisticsFragment extends Fragment {
         boolean notifyGameCount = false;
 
         switch (item.getItemId()) {
+            case R.id.action_stat_search_players:
+                filterView.toggleSearchVisibility();
+                break;
             case R.id.action_send_statistics:
                 takeScreenshot();
                 break;

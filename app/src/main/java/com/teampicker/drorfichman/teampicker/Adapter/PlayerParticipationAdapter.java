@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.PlayerParticipation;
 import com.teampicker.drorfichman.teampicker.R;
@@ -29,6 +30,7 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
     private final ArrayList<Player> mBlue;
     private final ArrayList<Player> mOrange;
     private final int[] teamsIcons;
+    private String filterName;
 
     int maxSuccess = 0;
     int maxGames = 0;
@@ -68,6 +70,7 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
         PlayerParticipation p = mPlayers.get(position);
 
         name.setText(p.mName);
+        view.setBackgroundColor(FilterView.match(p.mName, filterName) ? Color.GRAY : Color.TRANSPARENT);
 
         countWith.setText(String.valueOf(p.statisticsWith.gamesCount));
         setColorAlpha(context, countWith, p.gamesWithCount(), maxGames);
@@ -101,5 +104,10 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
         view.setTag(R.id.player_id, p.mName);
 
         return view;
+    }
+
+    public void setFilter(String value) {
+        filterName = value;
+        notifyDataSetChanged();
     }
 }

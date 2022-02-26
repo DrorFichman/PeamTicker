@@ -7,6 +7,7 @@
     <string name="pick_teams_title_analysis">"Analysis"</string>
     <string name="games_with_count">"Games (%1$d)"</string>
     <string name="stats_with_count">"Statistics (%1$d players, %2$d games)"</string>
+    <string name="search_title">Search</string>
 
     <!--    Drawer-->
     <string name="navigation_drawer_open">Open navigation drawer</string>

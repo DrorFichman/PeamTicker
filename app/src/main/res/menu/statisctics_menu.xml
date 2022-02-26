@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_stat_search_players"
+        android:title="@string/search_title"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_send_statistics"
         android:title="@string/action_send_statistics"
         app:showAsAction="never" />

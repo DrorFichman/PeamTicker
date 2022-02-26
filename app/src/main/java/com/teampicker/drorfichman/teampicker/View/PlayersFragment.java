@@ -32,6 +32,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
+import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
@@ -55,6 +56,9 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private View rootView;
     private Button createPlayer;
     private ListView playersList;
+    private FilterView filterView;
+
+    private PlayerAdapter playersAdapter;
 
     private PlayerUpdateBroadcast notificationHandler;
 
@@ -78,12 +82,19 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         createPlayer = root.findViewById(R.id.players_add_new_player);
         createPlayer.setOnClickListener(view -> startActivity(new Intent(getContext(), PlayerDetailsActivity.class)));
 
+        setSearchView(root);
         refreshPlayers();
 
         setActionButtons();
         setComingPlayersCount();
 
         return root;
+    }
+
+    private void setSearchView(View root) {
+        filterView = new FilterView(root.findViewById(R.id.players_search_players), value -> {
+            playersAdapter.setFilter(value);
+        });
     }
 
     final OnBackPressedCallback backPress = new OnBackPressedCallback(true) {
@@ -133,7 +144,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main, menu);
+        inflater.inflate(R.menu.players_menu, menu);
         super.onCreateOptionsMenu(menu,inflater);
     }
 
@@ -149,6 +160,9 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 break;
             case R.id.add_player:
                 startActivity(new Intent(getContext(), PlayerDetailsActivity.class));
+                break;
+            case R.id.search_players:
+                filterView.toggleSearchVisibility();
                 break;
             case R.id.show_archived_players:
                 switchArchivedPlayersView();
@@ -187,7 +201,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         createPlayer.setVisibility(hasPlayers ? View.GONE : View.VISIBLE);
 
         setHeadlines(true);
-        PlayerAdapter playersAdapter = new PlayerAdapter(getContext(), players, this::setComingPlayersCount);
+        playersAdapter = new PlayerAdapter(getContext(), players, this::setComingPlayersCount);
+        playersAdapter.setFilter(filterView.getFilter());
 
         if (clickHandler != null) {
             playersList.setOnItemClickListener(clickHandler);

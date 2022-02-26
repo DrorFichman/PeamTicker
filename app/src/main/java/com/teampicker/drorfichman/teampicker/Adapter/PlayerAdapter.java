@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
@@ -28,6 +29,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     private final Context context;
     private final List<Player> mPlayers;
     private onPlayerComingChange handler;
+    private String filterName;
 
     public PlayerAdapter(Context ctx, List<Player> players, onPlayerComingChange caller) {
         super(ctx, -1, players);
@@ -50,7 +52,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         final Player player = mPlayers.get(position);
         view.setTag(player);
 
-        setName(nameView, player);
+        setName(view, nameView, player);
         setGrade(gradeView, player);
         setAge(ageView, player);
         setPlayerRecentPerformance(recentPerformance, player);
@@ -85,7 +87,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         });
     }
 
-    private void setName(TextView name, Player player) {
+    private void setName(View view, TextView name, Player player) {
         if (player.mName != null && isMsgIdentifier(player)) {
             name.setText(player.mName + " (" + player.msgDisplayName + ")");
         } else if (player.mName != null) {
@@ -95,6 +97,8 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         } else {
             name.setText("");
         }
+
+        view.setBackgroundColor(FilterView.match(player.mName, filterName) ? Color.GRAY : Color.TRANSPARENT);
     }
 
     private void setAttributes(TextView attributes, Player player) {
@@ -134,6 +138,11 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         } else {
             recentPerformance.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public void setFilter(String name) {
+        filterName = name;
+        notifyDataSetChanged();
     }
 
     private boolean isMsgIdentifier(Player p) {
