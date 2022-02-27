@@ -19,7 +19,7 @@
         layout="@layout/player_participation_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/stat_search_players"
+        android:layout_below="@id/player_participation_search_players"
         android:layout_marginTop="5dp" />
 
     <ListView
