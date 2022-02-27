@@ -100,6 +100,16 @@
         android:textSize="8sp" />
 
     <TextView
+        android:id="@+id/player_extra"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="1dp"
+        android:text="E"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="8sp" />
+
+    <TextView
         android:id="@+id/player_team_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

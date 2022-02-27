@@ -30,10 +30,11 @@ public abstract class DividerBase implements IDivider {
 
         ArrayList<Player> GKs = new ArrayList<>();
         ArrayList<Player> Defenders = new ArrayList<>();
-        ArrayList<Player> Divs = new ArrayList<>();
+        ArrayList<Player> Unbreakable = new ArrayList<>();
         ArrayList<Player> Playmakers = new ArrayList<>();
+        ArrayList<Player> Extras = new ArrayList<>();
         ArrayList<Player> Others = new ArrayList<>();
-        extractSpecialPlayers(comingPlayers, GKs, Defenders, Divs, Playmakers, Others);
+        extractSpecialPlayers(comingPlayers, GKs, Defenders, Unbreakable, Playmakers, Extras, Others);
 
         Player extraPlayer = null;
         if (comingPlayers.size() % 2 == 1 && Others.size() > 0) {
@@ -42,11 +43,11 @@ public abstract class DividerBase implements IDivider {
         }
 
         if (update != null) update.update(0, "--");
-        OptionalDivision selected = getDivision(comingPlayers.size() / 2, Others, GKs, Defenders, Playmakers, Divs);
+        OptionalDivision selected = getDivision(comingPlayers.size() / 2, Others, GKs, Defenders, Playmakers, Unbreakable, Extras);
         int selectedGrade = gradeOption(ctx, selected);
 
         for (int option = 0; option < divideAttemptsCount; ++option) {
-            OptionalDivision another = getDivision(comingPlayers.size() / 2, Others, GKs, Defenders, Playmakers, Divs);
+            OptionalDivision another = getDivision(comingPlayers.size() / 2, Others, GKs, Defenders, Playmakers, Unbreakable, Extras);
             int otherGrade = gradeOption(ctx, another);
             if (preferNewOption(selectedGrade, otherGrade)) {
                 selected = another;
@@ -82,8 +83,9 @@ public abstract class DividerBase implements IDivider {
     private static void extractSpecialPlayers(@NonNull ArrayList<Player> comingPlayers,
                                               List<Player> GKs,
                                               List<Player> defenders,
-                                              List<Player> divs,
+                                              List<Player> unbreakable,
                                               List<Player> playmakers,
+                                              List<Player> extras,
                                               List<Player> others) {
 
         for (int n = 0; n < comingPlayers.size(); ++n) {
@@ -93,9 +95,11 @@ public abstract class DividerBase implements IDivider {
             } else if (currPlayer.isDefender) {
                 defenders.add(currPlayer);
             } else if (currPlayer.isUnbreakable) {
-                divs.add(currPlayer);
+                unbreakable.add(currPlayer);
             } else if (currPlayer.isPlaymaker) {
                 playmakers.add(currPlayer);
+            } else if (currPlayer.isExtra) {
+                extras.add(currPlayer);
             } else {
                 others.add(currPlayer);
             }
@@ -103,8 +107,9 @@ public abstract class DividerBase implements IDivider {
 
         Collections.sort(GKs);
         Collections.sort(defenders);
-        Collections.sort(divs);
+        Collections.sort(unbreakable);
         Collections.sort(playmakers);
+        Collections.sort(extras);
         Collections.sort(others);
     }
 
@@ -153,18 +158,21 @@ public abstract class DividerBase implements IDivider {
                                                 ArrayList<Player> iGKs,
                                                 ArrayList<Player> iDefenders,
                                                 ArrayList<Player> iPlaymakers,
-                                                ArrayList<Player> iDivs) {
+                                                ArrayList<Player> iUnbreakable,
+                                                ArrayList<Player> iExtras) {
         OptionalDivision option = new OptionalDivision();
         ArrayList<Player> Others = cloneList(iOthers);
-        ArrayList<Player> Divs = cloneList(iDivs);
+        ArrayList<Player> Unbreakable = cloneList(iUnbreakable);
         ArrayList<Player> GKs = cloneList(iGKs);
         ArrayList<Player> Defenders = cloneList(iDefenders);
         ArrayList<Player> Playmakers = cloneList(iPlaymakers);
+        ArrayList<Player> Extras = cloneList(iExtras);
 
         addSpecialPlayers(option, teamSize, GKs, PlayerAttribute.isGK);
         addSpecialPlayers(option, teamSize, Defenders, PlayerAttribute.isDefender);
         addSpecialPlayers(option, teamSize, Playmakers, PlayerAttribute.isPlaymaker);
-        addSpecialPlayers(option, teamSize, Divs, PlayerAttribute.isUnbreakable);
+        addSpecialPlayers(option, teamSize, Unbreakable, PlayerAttribute.isUnbreakable);
+        addSpecialPlayers(option, teamSize, Extras, PlayerAttribute.isExtra);
         addSpecialPlayers(option, teamSize, Others, null);
 
         return option;

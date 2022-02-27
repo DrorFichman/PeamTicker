@@ -154,6 +154,7 @@ public class PlayerDbHelper {
                 p.isDefender = attr.contains(PlayerAttribute.isDefender.displayName);
                 p.isPlaymaker = attr.contains(PlayerAttribute.isPlaymaker.displayName);
                 p.isUnbreakable = attr.contains(PlayerAttribute.isUnbreakable.displayName);
+                p.isExtra = attr.contains(PlayerAttribute.isExtra.displayName);
             }
         }
         return p;

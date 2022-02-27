@@ -42,6 +42,7 @@ public class PlayerDetailsFragment extends Fragment {
     private CheckBox isDefender;
     private CheckBox isPlaymaker;
     private CheckBox isUnbreakable;
+    private CheckBox isExtra;
 
     public PlayerDetailsFragment() {
         super(R.layout.player_crad_fragment);
@@ -69,6 +70,7 @@ public class PlayerDetailsFragment extends Fragment {
         isDefender = root.findViewById(R.id.player_is_defender);
         isPlaymaker = root.findViewById(R.id.player_is_playmaker);
         isUnbreakable = root.findViewById(R.id.player_is_unbreaking);
+        isExtra = root.findViewById(R.id.player_is_extra);
 
         if (player != null) {
             vName.setText(player.mName);
@@ -174,6 +176,7 @@ public class PlayerDetailsFragment extends Fragment {
         player.isDefender = isDefender.isChecked();
         player.isPlaymaker = isPlaymaker.isChecked();
         player.isUnbreakable = isUnbreakable.isChecked();
+        player.isExtra = isExtra.isChecked();
         DbHelper.updatePlayerAttributes(getContext(), player);
     }
 
@@ -183,6 +186,7 @@ public class PlayerDetailsFragment extends Fragment {
         isDefender.setChecked(player.isDefender);
         isPlaymaker.setChecked(player.isPlaymaker);
         isUnbreakable.setChecked(player.isUnbreakable);
+        isExtra.setChecked(player.isExtra);
     }
 
     public void showBirthdayPicker(View view) {

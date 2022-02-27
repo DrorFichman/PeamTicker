@@ -131,6 +131,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Unbreakable" />
+
+            <CheckBox
+                android:id="@+id/player_is_extra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Extra" />
         </LinearLayout>
 
         <LinearLayout

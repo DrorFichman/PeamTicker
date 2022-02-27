@@ -28,6 +28,7 @@ public class Player extends Sortable implements Serializable, Comparable {
     public boolean isDefender;
     public boolean isPlaymaker;
     public boolean isUnbreakable;
+    public boolean isExtra;
 
     public Player() {
     }
@@ -146,7 +147,7 @@ public class Player extends Sortable implements Serializable, Comparable {
     }
 
     public boolean hasAttributes() {
-        return isGK || isPlaymaker || isDefender || isUnbreakable;
+        return isGK || isPlaymaker || isDefender || isUnbreakable || isExtra;
     }
 
     @Exclude
@@ -158,6 +159,7 @@ public class Player extends Sortable implements Serializable, Comparable {
         if (isGK) attributes += "GK,";
         if (isPlaymaker) attributes += "PM,";
         if (isDefender) attributes += "D,";
+        if (isExtra) attributes += "E,";
         return attributes.substring(0, attributes.length() - 1);
     }
 
@@ -172,6 +174,8 @@ public class Player extends Sortable implements Serializable, Comparable {
                     return isPlaymaker;
                 case isUnbreakable:
                     return isUnbreakable;
+                case isExtra:
+                    return isExtra;
             }
         }
         return false;
