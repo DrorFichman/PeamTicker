@@ -145,7 +145,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.players_menu, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 pasteComingPlayers();
                 break;
             case R.id.add_player:
-                startActivity(new Intent(getContext(), PlayerDetailsActivity.class));
+                startActivity(PlayerDetailsActivity.getNewPlayerIntent(getContext()));
                 break;
             case R.id.search_players:
                 filterView.toggleSearchVisibility();
@@ -209,7 +209,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         } else {
             playersList.setOnItemClickListener((adapterView, view, i, l) -> {
                 Player p = (Player) view.getTag();
-                Intent intent = PlayerDetailsActivity.getDetailsPlayerIntent(getContext(), p.mName);
+                Intent intent = PlayerDetailsActivity.getEditPlayerIntent(getContext(), p.mName);
                 startActivity(intent);
             });
         }
@@ -399,37 +399,56 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         setHeadlines(false);
     }
 
-    private void setComingPlayerIdentity(String currName, String identity, Set<String> comingSet, String[] playerNames) {
+    private void setComingPlayerIdentity(String currPlayer, String identity, Set<String> comingSet, String[] playerNames) {
+
+        if (TextUtils.isEmpty(identity)) {
+            Log.i("Identifier", "Empty identifier");
+            Toast.makeText(getContext(), "Empty identifier can't be set", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Enter player name for : \n" + identity); // TODO string
+        builder.setTitle("Enter player name for : \n" + identity);
 
         final AutoCompleteTextView input = new AutoCompleteTextView(getContext());
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, playerNames);
         input.setAdapter(adapter);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.requestFocus();
-        input.setText(currName);
+        input.setText(currPlayer);
         builder.setView(input);
 
         builder.setPositiveButton("OK", (dialog, which) -> {
-            String text = input.getText().toString();
-            Log.i("Identifier", "Identify " + text + " as " + identity);
-            int count = DbHelper.setPlayerIdentifier(getContext(), text, identity);
-            if (count == 0) {
-                if (TextUtils.isEmpty(text) && !TextUtils.isEmpty(currName)) {
-                    DbHelper.clearPlayerIdentifier(getContext(), currName);
-                    Toast.makeText(getContext(), "Cleared " + currName, Toast.LENGTH_LONG).show();
+            String newPlayer = input.getText().toString();
+            if (!TextUtils.isEmpty(newPlayer) && !TextUtils.isEmpty(currPlayer) &&
+                    newPlayer.equals(currPlayer)) { // current name for identifier hasn't changed
+                Log.i("Identifier", "Curr name " + currPlayer + " not modified for " + identity);
+                return;
+            }
+            if (TextUtils.isEmpty(newPlayer)) {
+                if (!TextUtils.isEmpty(currPlayer)) { // empty name, for current player == clearing
+                    Log.i("Identifier", "Count 0 - Clearing " + currPlayer);
+                    DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
+                    Toast.makeText(getContext(), "Cleared " + currPlayer, Toast.LENGTH_LONG).show();
                     displayPastedIdentifiers(comingSet, playerNames);
-                } else {
-                    Toast.makeText(getContext(), text + " not found", Toast.LENGTH_SHORT).show();
+                } else { // empty name set
+                    Log.i("Identifier", "No name set for identifier " + identity);
                 }
-            } else {
-                Toast.makeText(getContext(), "Set " + text + " with " + identity, Toast.LENGTH_SHORT).show();
-                if (currName != null) {
-                    DbHelper.clearPlayerIdentifier(getContext(), currName);
+                return;
+            }
+
+            Log.i("Identifier", "Identify " + newPlayer + " as " + identity);
+            int count = DbHelper.setPlayerIdentifier(getContext(), newPlayer, identity);
+            if (count == 1) { // new player found and updated with the identifier
+                Log.i("Identifier", "Count + " + count + " remove identifier from " + currPlayer);
+                Toast.makeText(getContext(), "Set " + newPlayer + " with " + identity, Toast.LENGTH_SHORT).show();
+                if (currPlayer != null) { // clear previous name from the identifier
+                    DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
                 }
                 displayPastedIdentifiers(comingSet, playerNames);
+            } else { // new player name not found
+                Log.i("Identifier", "Count 0 - " + newPlayer + " not found");
+                Toast.makeText(getContext(), newPlayer + " not found", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());

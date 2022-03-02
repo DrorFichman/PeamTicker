@@ -88,7 +88,7 @@ public class StatisticsFragment extends Fragment {
         setHeadlines(root);
 
         playersList.setOnItemClickListener((adapterView, view, i, l) -> {
-            Intent intent = PlayerDetailsActivity.getDetailsPlayerIntent(getContext(), (String) view.getTag(R.id.player_id));
+            Intent intent = PlayerDetailsActivity.getEditPlayerIntent(getContext(), (String) view.getTag(R.id.player_id));
             startActivity(intent);
         });
 

@@ -27,11 +27,17 @@ public class PlayerDetailsActivity extends AppCompatActivity {
     ViewPager mPager;
 
     @NonNull
-    public static Intent getDetailsPlayerIntent(Context context, String playerName) {
+    public static Intent getEditPlayerIntent(Context context, String playerName) {
         Intent intent = new Intent(context, PlayerDetailsActivity.class);
         intent.putExtra(PlayerDetailsActivity.EXTRA_PLAYER, playerName);
         return intent;
     }
+
+    @NonNull
+    public static Intent getNewPlayerIntent(Context context) {
+        return new Intent(context, PlayerDetailsActivity.class);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
