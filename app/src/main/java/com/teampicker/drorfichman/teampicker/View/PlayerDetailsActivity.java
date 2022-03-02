@@ -19,17 +19,26 @@ import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 
 public class PlayerDetailsActivity extends AppCompatActivity {
-    private static final String EXTRA_PLAYER = "player";
+    private static final String EXTRA_PLAYER = "existing_player";
+    private static final String EXTRA_PLAYER_IDENTIFIER = "new_player_identifier";
+
     Player pPlayer;
+    private String createFromIdentifier;
 
     PlayerViewAdapter mAdapter;
-
     ViewPager mPager;
 
     @NonNull
     public static Intent getEditPlayerIntent(Context context, String playerName) {
         Intent intent = new Intent(context, PlayerDetailsActivity.class);
         intent.putExtra(PlayerDetailsActivity.EXTRA_PLAYER, playerName);
+        return intent;
+    }
+
+    @NonNull
+    public static Intent getNewPlayerFromIdentifierIntent(Context context, String identifier) {
+        Intent intent = new Intent(context, PlayerDetailsActivity.class);
+        intent.putExtra(PlayerDetailsActivity.EXTRA_PLAYER_IDENTIFIER, identifier);
         return intent;
     }
 
@@ -44,6 +53,8 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_details_activity);
 
+        createFromIdentifier = getIntent().getStringExtra(EXTRA_PLAYER_IDENTIFIER);
+
         refreshData(getIntent().getStringExtra(EXTRA_PLAYER));
     }
 
@@ -55,7 +66,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             setTitle("New Player");
         }
 
-        mAdapter = new PlayerViewAdapter(getSupportFragmentManager(), pPlayer, this::finish);
+        mAdapter = new PlayerViewAdapter(getSupportFragmentManager(), pPlayer, createFromIdentifier, this::finish);
         mPager = findViewById(R.id.player_pager);
         mPager.setAdapter(mAdapter);
 
@@ -72,11 +83,13 @@ public class PlayerDetailsActivity extends AppCompatActivity {
     public static class PlayerViewAdapter extends FragmentPagerAdapter {
 
         Player p;
+        private final String createFromIdentifier;
         private final PlayerDetailsFragment.PlayerUpdated updateListener;
 
-        PlayerViewAdapter(FragmentManager fm, Player player, PlayerDetailsFragment.PlayerUpdated listener) {
+        PlayerViewAdapter(FragmentManager fm, Player player, String createFromIdentifier, PlayerDetailsFragment.PlayerUpdated listener) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             p = player;
+            this.createFromIdentifier = createFromIdentifier;
             updateListener = listener;
         }
 
@@ -106,7 +119,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         @NonNull
         public Fragment getItem(int position) {
             if (position == 0) {
-                return PlayerDetailsFragment.newInstance(p, updateListener);
+                return PlayerDetailsFragment.newInstance(p, createFromIdentifier, updateListener);
             } else if (position == 1) {
                 return GamesFragment.newInstance(p.mName, null, false, null);
             } else {

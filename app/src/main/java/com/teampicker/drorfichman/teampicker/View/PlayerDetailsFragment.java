@@ -28,13 +28,14 @@ import java.util.Calendar;
 
 public class PlayerDetailsFragment extends Fragment {
 
-    private PlayerUpdated updateListener = null;
-
     public interface PlayerUpdated {
         void onUpdate(String name);
     }
 
     private Player player;
+    private String createFromIdentifier;
+    private PlayerUpdated updateListener = null;
+
     private EditText vName;
     private EditText vGrade;
     private TextView vBirth;
@@ -48,9 +49,10 @@ public class PlayerDetailsFragment extends Fragment {
         super(R.layout.player_crad_fragment);
     }
 
-    public static PlayerDetailsFragment newInstance(Player p, PlayerUpdated update) {
+    public static PlayerDetailsFragment newInstance(Player p, String identifier, PlayerUpdated update) {
         PlayerDetailsFragment playerCardFragment = new PlayerDetailsFragment();
         playerCardFragment.player = p;
+        playerCardFragment.createFromIdentifier = identifier;
         playerCardFragment.updateListener = update;
         return playerCardFragment;
     }
@@ -77,6 +79,8 @@ public class PlayerDetailsFragment extends Fragment {
             vGrade.setText(String.valueOf(player.mGrade));
             initBirthdayView(player);
             initPlayerAttributesView();
+        } else if (createFromIdentifier != null) {
+            vName.setText(createFromIdentifier);
         }
 
         root.findViewById(R.id.save).setOnClickListener(saveClick);
@@ -148,6 +152,9 @@ public class PlayerDetailsFragment extends Fragment {
                 return false;
             }
             player = p;
+            if (createFromIdentifier != null) {
+                DbHelper.setPlayerIdentifier(getContext(), name, createFromIdentifier);
+            }
         }
 
         return true;

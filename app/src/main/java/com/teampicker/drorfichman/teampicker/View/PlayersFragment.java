@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -417,6 +418,12 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         input.requestFocus();
         input.setText(currPlayer);
         builder.setView(input);
+
+        if (TextUtils.isEmpty(currPlayer)) {
+            builder.setNeutralButton("New Player", (dialogInterface, i) -> {
+                startActivity(PlayerDetailsActivity.getNewPlayerFromIdentifierIntent(getContext(), identity));
+            });
+        }
 
         builder.setPositiveButton("OK", (dialog, which) -> {
             String newPlayer = input.getText().toString();
