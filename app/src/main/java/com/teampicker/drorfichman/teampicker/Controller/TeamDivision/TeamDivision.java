@@ -21,14 +21,25 @@ public class TeamDivision {
     }
 
     public enum DivisionStrategy {
-        Grade(new DivideByGrade()),
-        Age(new DivideByAge()),
-        Optimize(new DivideCollaboration());
+        Grade(new DivideByGrade(), "grade"),
+        Age(new DivideByAge(), "age"),
+        Optimize(new DivideCollaboration(), "stats");
 
         IDivider divider;
+        public final String text;
 
-        DivisionStrategy(IDivider selected) {
+        DivisionStrategy(IDivider selected, String name) {
             divider = selected;
+            text = name;
+        }
+
+        public static DivisionStrategy fromString(String name) {
+            for (DivisionStrategy strategy : DivisionStrategy.values()) {
+                if (strategy.text.equals(name)) {
+                    return strategy;
+                }
+            }
+            return null;
         }
     }
 

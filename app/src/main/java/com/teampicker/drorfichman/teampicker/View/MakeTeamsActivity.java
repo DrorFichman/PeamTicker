@@ -19,7 +19,6 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
@@ -41,6 +40,7 @@ import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
+import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 
 import java.util.ArrayList;
@@ -137,11 +137,43 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         shuffleOptions = findViewById(R.id.shuffle_options);
         shuffleOptions.setOnClickListener(view -> showShuffleOptions());
+        setDefaultShuffleStrategy();
 
         analysisHeaders1 = findViewById(R.id.analysis_headers_1);
         analysisHeaders2 = findViewById(R.id.analysis_headers_2);
 
         initialTeams();
+    }
+
+    private void setDefaultShuffleStrategy() {
+        String local = PreferenceHelper.getSharedPreference(MakeTeamsActivity.this).getString(PreferenceHelper.pref_shuffle, null);
+        if (local != null) {
+            TeamDivision.DivisionStrategy strategy = TeamDivision.DivisionStrategy.fromString(local);
+            if (strategy != null) {
+                setShuffleState(strategy);
+            }
+        }
+    }
+
+    private boolean setShuffleState(TeamDivision.DivisionStrategy state) {
+        switch (state) {
+            case Age:
+                selectedDivision = TeamDivision.DivisionStrategy.Age;
+                PreferenceHelper.setSharedPreferenceString(MakeTeamsActivity.this, PreferenceHelper.pref_shuffle, selectedDivision.text);
+                shuffleView.setText(getString(R.string.shuffle_age));
+                return true;
+            case Optimize:
+                // TODO enable with more than 10 games history
+                selectedDivision = TeamDivision.DivisionStrategy.Optimize;
+                PreferenceHelper.setSharedPreferenceString(MakeTeamsActivity.this, PreferenceHelper.pref_shuffle, selectedDivision.text);
+                shuffleView.setText(getString(R.string.shuffle_stats));
+                return true;
+            default:
+                selectedDivision = TeamDivision.DivisionStrategy.Grade;
+                PreferenceHelper.setSharedPreferenceString(MakeTeamsActivity.this, PreferenceHelper.pref_shuffle, selectedDivision.text);
+                shuffleView.setText(getString(R.string.shuffle_grade));
+                return true;
+        }
     }
 
     private void showShuffleOptions() {
@@ -150,17 +182,14 @@ public class MakeTeamsActivity extends AppCompatActivity {
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.divide_by_age:
-                    selectedDivision = TeamDivision.DivisionStrategy.Age;
-                    shuffleView.setText(getString(R.string.shuffle_age));
+                    setShuffleState(TeamDivision.DivisionStrategy.Age);
                     return true;
                 case R.id.divide_by_grade:
-                    selectedDivision = TeamDivision.DivisionStrategy.Grade;
-                    shuffleView.setText(getString(R.string.shuffle_grade));
+                    setShuffleState(TeamDivision.DivisionStrategy.Grade);
                     return true;
                 case R.id.divide_by_ai:
                     // TODO enable with more than 10 games history
-                    selectedDivision = TeamDivision.DivisionStrategy.Optimize;
-                    shuffleView.setText(getString(R.string.shuffle_stats));
+                    setShuffleState(TeamDivision.DivisionStrategy.Optimize);
                     return true;
                 default:
                     return false;

@@ -9,12 +9,14 @@ import android.content.SharedPreferences;
 public class PreferenceHelper {
     private final static String PREF_FILE = "PLAYERS";
 
+    public static String pref_shuffle = "shuffle_strategy";
+
     /**
      * Set a string shared preference
      * @param key - Key to set shared preference
      * @param value - Value for the key
      */
-    static void setSharedPreferenceString(Context context, String key, String value){
+    public static void setSharedPreferenceString(Context context, String key, String value){
         SharedPreferences settings = context.getSharedPreferences(PREF_FILE, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(key, value);
