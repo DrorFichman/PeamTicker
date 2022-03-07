@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -53,6 +52,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private boolean showArchivedPlayers = false;
     private boolean showPastedPlayers = false;
+    private Set<String> mPastedPlayers;
 
     private View rootView;
     private Button createPlayer;
@@ -109,6 +109,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             }
             if (showPastedPlayers) {
                 showPastedPlayers = false;
+                mPastedPlayers = null;
                 refreshPlayers();
             }
         }
@@ -227,6 +228,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void refreshPlayers() {
+        if (showPastedPlayers && mPastedPlayers != null) {
+            displayPastedIdentifiers(mPastedPlayers);
+            return;
+        }
+
         ArrayList<Player> players = DbHelper.getPlayers(getContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
 
         setPlayersList(players, null);
@@ -237,6 +243,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private void switchArchivedPlayersView() {
         showArchivedPlayers = !showArchivedPlayers;
         if (showArchivedPlayers) {
+            showPastedPlayers = false;
             ArrayList<Player> players = DbHelper.getPlayers(getContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
             if (players.size() == 0) {
                 Toast.makeText(getContext(), "No archived players found", Toast.LENGTH_SHORT).show();
@@ -341,27 +348,19 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         CharSequence pasteData = item.getText();
 
         try {
-            Set<String> comingSet = new HashSet<>();
+            Set<String> pasted = new HashSet<>();
             String[] split = ((String) pasteData).split("\n");
             for (String coming : split) {
                 try {
                     String numberOrName = coming.split("] ")[1].split(":")[0];
-                    comingSet.add(numberOrName);
+                    pasted.add(numberOrName);
                 } catch (Exception e) {
                     Log.e("Coming", "Failed to process " + coming);
                 }
             }
 
-            ArrayList<Player> players = DbHelper.getPlayers(getContext(), 0, false);
-            String[] playerNames = new String[players.size()];
-            int i = 0;
-            for (Player p : players) {
-                playerNames[i] = p.mName;
-                i++;
-            }
-
-            if (comingSet.size() > 0) {
-                displayPastedIdentifiers(comingSet, playerNames);
+            if (pasted.size() > 0) {
+                displayPastedIdentifiers(pasted);
             } else {
                 Toast.makeText(getContext(), "Paste multiple messages", Toast.LENGTH_SHORT).show();
             }
@@ -372,32 +371,39 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         }
     }
 
-    private void displayPastedIdentifiers(Set<String> set, String[] playerNames) {
-        Set<String> comingSet = new HashSet<>(set);
-        ArrayList<String> coming = new ArrayList<>(comingSet);
+    private void displayPastedIdentifiers(Set<String> pasted) {
+        Set<String> unknownPastedSet = new HashSet<>(pasted);
+        ArrayList<String> pastedArray = new ArrayList<>(unknownPastedSet);
 
-        ArrayList<Player> knownPlayers = DbHelper.getPlayersByIdentifier(getContext(), coming);
-        for (Player p : knownPlayers) {
-            comingSet.remove(p.msgDisplayName);
+        ArrayList<Player> knownPasted = DbHelper.getPlayersByIdentifier(getContext(), pastedArray);
+        for (Player known : knownPasted) {
+            unknownPastedSet.remove(known.msgDisplayName);
         }
 
-        for (String identifier : comingSet) {
-            Player player = new Player(null, -1);
-            player.msgDisplayName = identifier;
-            knownPlayers.add(player);
+        ArrayList<Player> unknownPasted = new ArrayList<>();
+        for (String identifier : unknownPastedSet) {
+            Player unknownPastedPlayer = new Player(null, -1);
+            unknownPastedPlayer.msgDisplayName = identifier;
+            unknownPasted.add(unknownPastedPlayer);
         }
+
+        ArrayList<Player> pastedPlayers = new ArrayList<>();
+        pastedPlayers.addAll(knownPasted);
+        pastedPlayers.addAll(unknownPasted);
 
         showPastedPlayers = true;
+        mPastedPlayers = pasted;
         backPress.setEnabled(true);
 
+        String[] allPlayerNames = DbHelper.getPlayersNames(getContext());
         AdapterView.OnItemClickListener handler = (parent, view, position, id) -> {
             Player p = (Player) view.getTag();
             Log.i("Identify", "Clicked on " + p.mName + " = " + p.msgDisplayName);
-            setComingPlayerIdentity(p.mName, p.msgDisplayName, set, playerNames);
+            setComingPlayerIdentity(p.mName, p.msgDisplayName, pasted, allPlayerNames);
         };
 
         // Filter the players list only to the pasted players identifiers
-        setPlayersList(knownPlayers, handler);
+        setPlayersList(pastedPlayers, handler);
         setHeadlines(false);
     }
 
@@ -438,7 +444,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                     Log.i("Identifier", "Count 0 - Clearing " + currPlayer);
                     DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
                     Toast.makeText(getContext(), "Cleared " + currPlayer, Toast.LENGTH_LONG).show();
-                    displayPastedIdentifiers(comingSet, playerNames);
+                    displayPastedIdentifiers(comingSet);
                 } else { // empty name set
                     Log.i("Identifier", "No name set for identifier " + identity);
                 }
@@ -453,7 +459,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 if (currPlayer != null) { // clear previous name from the identifier
                     DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
                 }
-                displayPastedIdentifiers(comingSet, playerNames);
+                displayPastedIdentifiers(comingSet);
             } else { // new player name not found
                 Log.i("Identifier", "Count 0 - " + newPlayer + " not found");
                 Toast.makeText(getContext(), newPlayer + " not found", Toast.LENGTH_SHORT).show();
