@@ -81,6 +81,8 @@ public class PlayerDetailsFragment extends Fragment {
             initPlayerAttributesView();
         } else if (createFromIdentifier != null) {
             vName.setText(createFromIdentifier);
+        } else {
+            vName.requestFocus();
         }
 
         root.findViewById(R.id.save).setOnClickListener(saveClick);

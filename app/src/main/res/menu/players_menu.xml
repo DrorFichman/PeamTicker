@@ -4,7 +4,8 @@
     <item
         android:id="@+id/add_player"
         android:title="@string/add_player"
-        app:showAsAction="never" />
+        android:icon="@drawable/plus"
+        app:showAsAction="always" />
     <item
         android:id="@+id/clear_all"
         android:title="@string/clear_all_coming"
