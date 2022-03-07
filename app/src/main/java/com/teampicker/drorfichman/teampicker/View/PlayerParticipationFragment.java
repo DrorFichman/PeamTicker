@@ -92,6 +92,7 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
     private void setSearchView(View root) {
         filterView = new FilterView(root.findViewById(R.id.player_participation_search_players), value -> {
             playersAdapter.setFilter(value);
+            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
         });
     }
 

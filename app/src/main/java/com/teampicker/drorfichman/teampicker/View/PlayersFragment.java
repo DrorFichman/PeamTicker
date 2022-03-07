@@ -95,6 +95,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private void setSearchView(View root) {
         filterView = new FilterView(root.findViewById(R.id.players_search_players), value -> {
             playersAdapter.setFilter(value);
+            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
         });
     }
 

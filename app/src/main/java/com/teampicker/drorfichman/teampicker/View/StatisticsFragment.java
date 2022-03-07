@@ -108,6 +108,7 @@ public class StatisticsFragment extends Fragment {
     private void setSearchView(View root) {
         filterView = new FilterView(root.findViewById(R.id.stat_search_players), value -> {
             playersAdapter.setFilter(value);
+            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
         });
     }
 

@@ -1,10 +1,11 @@
 package com.teampicker.drorfichman.teampicker.Data;
 
+import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sortable;
 
 import java.io.Serializable;
 
-public class PlayerParticipation extends Sortable implements Serializable {
+public class PlayerParticipation extends Sortable implements Serializable, FilterView.Filterable {
 
     public String mName;
     public String mParticipatedWith;
@@ -46,6 +47,13 @@ public class PlayerParticipation extends Sortable implements Serializable {
     @Override
     public int winRateVs() {
         return statisticsVs.getWinRate();
+    }
+    //endregion
+
+    //region Filterable
+    @Override
+    public String filterBy() {
+        return mName;
     }
     //endregion
 }

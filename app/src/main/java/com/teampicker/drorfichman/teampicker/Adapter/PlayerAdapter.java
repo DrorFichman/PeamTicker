@@ -140,12 +140,16 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         }
     }
 
+    private boolean isMsgIdentifier(Player p) {
+        return !TextUtils.isEmpty(p.msgDisplayName);
+    }
+
     public void setFilter(String name) {
         filterName = name;
         notifyDataSetChanged();
     }
 
-    private boolean isMsgIdentifier(Player p) {
-        return !TextUtils.isEmpty(p.msgDisplayName);
+    public int positionOfFirstFilterItem() {
+        return FilterView.positionOfFirstFilterItem(mPlayers, filterName);
     }
 }

@@ -1,6 +1,7 @@
 package com.teampicker.drorfichman.teampicker.Data;
 
 import com.google.firebase.database.Exclude;
+import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sortable;
 
 import java.io.Serializable;
@@ -12,7 +13,7 @@ import androidx.annotation.Nullable;
 /**
  * Created by drorfichman on 7/27/16.
  */
-public class Player extends Sortable implements Serializable, Comparable {
+public class Player extends Sortable implements Serializable, Comparable, FilterView.Filterable {
     public String mName;
     public String msgDisplayName;
     public int mGrade;
@@ -233,6 +234,13 @@ public class Player extends Sortable implements Serializable, Comparable {
     @Override
     public int success() {
         return statistics.successRate;
+    }
+    //endregion
+
+    //region Filterable
+    @Override
+    public String filterBy() {
+        return mName;
     }
     //endregion
 }

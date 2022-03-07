@@ -1,5 +1,7 @@
 package com.teampicker.drorfichman.teampicker.Adapter;
 
+import static com.teampicker.drorfichman.teampicker.tools.ColorHelper.setColorAlpha;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -17,8 +19,6 @@ import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.teampicker.drorfichman.teampicker.tools.ColorHelper.setColorAlpha;
 
 /**
  * Created by drorfichman on 7/30/16.
@@ -109,5 +109,9 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
     public void setFilter(String value) {
         filterName = value;
         notifyDataSetChanged();
+    }
+
+    public int positionOfFirstFilterItem() {
+        return FilterView.positionOfFirstFilterItem(mPlayers, filterName);
     }
 }
