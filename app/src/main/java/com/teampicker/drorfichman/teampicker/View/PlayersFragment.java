@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -93,7 +94,6 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
         setTutorials(root);
 
-        setSearchView(root);
         refreshPlayers();
 
         setActionButtons();
@@ -163,17 +163,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
     //endregion
 
-    private void setSearchView(View root) {
-        filterView = new FilterView(root.findViewById(R.id.players_search_players), value -> {
-            playersAdapter.setFilter(value);
-            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
-        });
-    }
-
     final OnBackPressedCallback backPress = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
             backPress.setEnabled(false);
+
             if (showArchivedPlayers) {
                 showArchivedPlayers = false;
                 refreshPlayers();
@@ -221,7 +215,16 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.players_menu, menu);
+        setSearchView((SearchView) menu.findItem(R.id.player_search).getActionView());
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void setSearchView(SearchView view) {
+        filterView = new FilterView(view, value -> {
+            playersAdapter.setFilter(value);
+            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
+        });
+        if (playersAdapter != null) playersAdapter.setFilter(null);
     }
 
     @Override
@@ -236,9 +239,6 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 break;
             case R.id.add_player:
                 startActivity(PlayerDetailsActivity.getNewPlayerIntent(getContext()));
-                break;
-            case R.id.search_players:
-                filterView.toggleSearchVisibility();
                 break;
             case R.id.show_archived_players:
                 switchArchivedPlayersView();
@@ -279,7 +279,6 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
         setHeadlines(true);
         playersAdapter = new PlayerAdapter(getContext(), players, this::setComingPlayersCount);
-        playersAdapter.setFilter(filterView.getFilter());
 
         if (clickHandler != null) {
             playersList.setOnItemClickListener(clickHandler);

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -81,7 +82,6 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
         setHeadlines(root);
 
-        setSearchView(root);
         refreshPlayers();
 
         setHasOptionsMenu(true);
@@ -89,11 +89,12 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
         return root;
     }
 
-    private void setSearchView(View root) {
-        filterView = new FilterView(root.findViewById(R.id.player_participation_search_players), value -> {
+    private void setSearchView(SearchView view) {
+        filterView = new FilterView(view, value -> {
             playersAdapter.setFilter(value);
             playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
         });
+        if (playersAdapter != null) playersAdapter.setFilter(null);
     }
 
     private void setHeadlines(View root) {
@@ -125,14 +126,13 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.statisctics_menu, menu);
+        setSearchView((SearchView) menu.findItem(R.id.action_stat_search_players).getActionView());
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_stat_search_players:
-                filterView.toggleSearchVisibility();
-                break;
             case R.id.action_send_statistics:
                 final Runnable r = () -> ScreenshotHelper.takeListScreenshot(getActivity(),
                         playersList, titles, playersAdapter);
@@ -175,7 +175,6 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
         sorting.sort(players);
 
         playersAdapter = new PlayerParticipationAdapter(context, players, blue, orange);
-        playersAdapter.setFilter(filterView.getFilter());
         playersList.setAdapter(playersAdapter);
     }
 

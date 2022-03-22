@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -59,7 +60,6 @@ public class StatisticsFragment extends Fragment {
         View root = super.onCreateView(inflater, container, savedInstanceState);
         setHasOptionsMenu(true);
 
-        setSearchView(root);
         setPlayersList(root);
 
         return root;
@@ -100,16 +100,16 @@ public class StatisticsFragment extends Fragment {
 
         sorting.sort(players);
 
-        playersAdapter = new PlayerStatisticsAdapter(getContext(), players,  getGamesCountFilter(), showInternalData);
-        playersAdapter.setFilter(filterView.getFilter());
+        playersAdapter = new PlayerStatisticsAdapter(getContext(), players, getGamesCountFilter(), showInternalData);
         playersList.setAdapter(playersAdapter);
     }
 
-    private void setSearchView(View root) {
-        filterView = new FilterView(root.findViewById(R.id.stat_search_players), value -> {
+    private void setSearchView(SearchView view) {
+        filterView = new FilterView(view, value -> {
             playersAdapter.setFilter(value);
             playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
         });
+        if (playersAdapter != null) playersAdapter.setFilter(null);
     }
 
     private int getGamesCountFilter() {
@@ -132,7 +132,8 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.statisctics_menu, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        setSearchView((SearchView) menu.findItem(R.id.action_stat_search_players).getActionView());
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -141,9 +142,6 @@ public class StatisticsFragment extends Fragment {
         boolean notifyGameCount = false;
 
         switch (item.getItemId()) {
-            case R.id.action_stat_search_players:
-                filterView.toggleSearchVisibility();
-                break;
             case R.id.action_send_statistics:
                 takeScreenshot();
                 break;

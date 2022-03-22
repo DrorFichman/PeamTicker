@@ -2,9 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/player_search"
+        android:title="@string/search_title"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/add_player"
-        android:title="@string/add_player"
         android:icon="@drawable/plus"
+        android:title="@string/add_player"
         app:showAsAction="always" />
     <item
         android:id="@+id/clear_all"
@@ -13,10 +18,6 @@
     <item
         android:id="@+id/paste_coming_players"
         android:title="@string/paste_players"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/search_players"
-        android:title="@string/search_title"
         app:showAsAction="never" />
     <item
         android:id="@+id/make_teams"

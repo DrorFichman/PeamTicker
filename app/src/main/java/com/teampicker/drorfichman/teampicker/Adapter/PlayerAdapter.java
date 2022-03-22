@@ -29,7 +29,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     private final Context context;
     private final List<Player> mPlayers;
     private onPlayerComingChange handler;
-    private String filterName;
+    private String filterValue;
 
     public PlayerAdapter(Context ctx, List<Player> players, onPlayerComingChange caller) {
         super(ctx, -1, players);
@@ -98,7 +98,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
             name.setText("");
         }
 
-        view.setBackgroundColor(FilterView.match(player.mName, filterName) ? Color.GRAY : Color.TRANSPARENT);
+        view.setBackgroundColor(FilterView.match(player.mName, filterValue) ? Color.GRAY : Color.TRANSPARENT);
     }
 
     private void setAttributes(TextView attributes, Player player) {
@@ -144,12 +144,12 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         return !TextUtils.isEmpty(p.msgDisplayName);
     }
 
-    public void setFilter(String name) {
-        filterName = name;
+    public void setFilter(String value) {
+        filterValue = value;
         notifyDataSetChanged();
     }
 
     public int positionOfFirstFilterItem() {
-        return FilterView.positionOfFirstFilterItem(mPlayers, filterName);
+        return FilterView.positionOfFirstFilterItem(mPlayers, filterValue);
     }
 }

@@ -6,19 +6,11 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <SearchView
-        android:id="@+id/stat_search_players"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:queryHint="Filter by name"
-        android:visibility="gone" />
-
     <include
         android:id="@+id/titles"
         layout="@layout/player_statistics_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/stat_search_players"
         android:layout_marginTop="5dp" />
 
     <ListView

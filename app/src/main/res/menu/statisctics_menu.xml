@@ -4,7 +4,8 @@
     <item
         android:id="@+id/action_stat_search_players"
         android:title="@string/search_title"
-        app:showAsAction="never" />
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_send_statistics"
         android:title="@string/action_send_statistics"
