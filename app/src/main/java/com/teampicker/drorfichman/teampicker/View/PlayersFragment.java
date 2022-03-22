@@ -116,8 +116,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void onTutorialClicked(int progressStatus) {
         if (progressStatus == 100) {
-            DialogHelper.showApprovalDialog(getContext(), "Tutorials Completed",
-                    "Tutorials will available in the side menu under Getting Started",
+            DialogHelper.showApprovalDialog(getContext(), getString(R.string.tutorial_completed_title),
+                    getString(R.string.tutorial_completed_message),
                     (dialogInterface, i) -> p.setVisibility(View.GONE));
         } else {
             TutorialManager.displayTutorialFlow(getContext(), null);
