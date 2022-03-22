@@ -1,5 +1,7 @@
 package com.teampicker.drorfichman.teampicker.View;
 
+import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialDisplayState.NotDisplayed;
+
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +44,7 @@ import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
+import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -133,7 +136,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         saveView.setOnClickListener(view -> resultsClicked());
 
         shuffleView = findViewById(R.id.shuffle);
-        shuffleView.setOnClickListener(v -> divideComingPlayers(selectedDivision));
+        shuffleView.setOnClickListener(v -> shuffleClicked());
 
         shuffleOptions = findViewById(R.id.shuffle_options);
         shuffleOptions.setOnClickListener(view -> showShuffleOptions());
@@ -143,6 +146,19 @@ public class MakeTeamsActivity extends AppCompatActivity {
         analysisHeaders2 = findViewById(R.id.analysis_headers_2);
 
         initialTeams();
+
+        showTutorials();
+    }
+
+    private void showTutorials() {
+        TutorialManager.TutorialDisplayState show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.pick_teams, false);
+        if (show == NotDisplayed) show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_shuffle_stats, false);
+        if (show == NotDisplayed) show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_analysis, false);
+    }
+
+    private void shuffleClicked() {
+        TutorialManager.userActionTaken(this, TutorialManager.TutorialUserAction.clicked_shuffle);
+        divideComingPlayers(selectedDivision);
     }
 
     private void setDefaultShuffleStrategy() {
@@ -163,7 +179,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 shuffleView.setText(getString(R.string.shuffle_age));
                 return true;
             case Optimize:
-                // TODO enable with more than 10 games history
                 selectedDivision = TeamDivision.DivisionStrategy.Optimize;
                 PreferenceHelper.setSharedPreferenceString(MakeTeamsActivity.this, PreferenceHelper.pref_shuffle, selectedDivision.text);
                 shuffleView.setText(getString(R.string.shuffle_stats));
@@ -188,7 +203,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
                     setShuffleState(TeamDivision.DivisionStrategy.Grade);
                     return true;
                 case R.id.divide_by_ai:
-                    // TODO enable with more than 10 games history
                     setShuffleState(TeamDivision.DivisionStrategy.Optimize);
                     return true;
                 default:
@@ -404,6 +418,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         if (division == TeamDivision.DivisionStrategy.Optimize) {
             Toast.makeText(this, R.string.operation_divide_by_collaboration, Toast.LENGTH_SHORT).show();
 
+            TutorialManager.userActionTaken(this, TutorialManager.TutorialUserAction.clicked_shuffle_stats);
             dividePlayersAsync();
         } else {
             if (division == TeamDivision.DivisionStrategy.Age)
@@ -606,21 +621,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         return true;
     };
 
-    View.OnLongClickListener explainOperation = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View view) {
-            switch (view.getId()) {
-                case R.id.shuffle:
-                    Snackbar.make(shuffleView, "Shuffle teams", Snackbar.LENGTH_SHORT).show();
-                    return true;
-                case R.id.move:
-                    Snackbar.make(shuffleView, "Enter manual players moving mode", Snackbar.LENGTH_SHORT).show();
-                    return true;
-            }
-            return false;
-        }
-    };
-
     AdapterView.OnItemClickListener playerClicked = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -701,6 +701,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     //region Analysis
     private void analysisClicked() {
+        TutorialManager.userActionTaken(this, TutorialManager.TutorialUserAction.clicked_analysis);
 
         if (!backFromAnalysis(false) && !analysisAsyncInProgress) { // enter analysis mode
             cancelSetResults();

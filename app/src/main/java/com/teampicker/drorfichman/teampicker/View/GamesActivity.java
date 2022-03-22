@@ -1,19 +1,10 @@
 package com.teampicker.drorfichman.teampicker.View;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Toast;
 
-import com.teampicker.drorfichman.teampicker.Data.DbHelper;
-import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.R;
-import com.teampicker.drorfichman.teampicker.tools.DateHelper;
-import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
-
-import java.util.Calendar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

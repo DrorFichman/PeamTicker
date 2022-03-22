@@ -28,6 +28,7 @@ import com.teampicker.drorfichman.teampicker.Data.TeamEnum;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
+import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetConfiguration;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetLastGame;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetUsers;
@@ -116,6 +117,8 @@ public class FirebaseHelper implements CloudSync {
                 Toast.makeText(ctx, ctx.getString(R.string.main_cloud_not_allowed), Toast.LENGTH_SHORT).show();
             return;
         }
+
+        TutorialManager.userActionTaken(ctx, TutorialManager.TutorialUserAction.click_sync_to_cloud);
 
         progress.showSyncStatus("Syncing...");
         syncPlayersToCloud(ctx, () ->

@@ -33,6 +33,7 @@ import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
+import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -99,7 +100,7 @@ public class GamesFragment extends Fragment {
 
         gamesList.setOnItemClickListener(
                 (adapterView, view, position, l) ->
-                        onGameSelected((Game) view.getTag(R.id.game)));
+                        onGameClicked((Game) view.getTag(R.id.game)));
 
         gamesList.setOnItemLongClickListener(
                 (adapterView, view, position, l) ->
@@ -118,6 +119,11 @@ public class GamesFragment extends Fragment {
         refreshGames();
 
         return root;
+    }
+
+    private void onGameClicked(Game g) {
+        TutorialManager.userActionTaken(getContext(), TutorialManager.TutorialUserAction.clicked_game_in_history);
+        onGameSelected(g);
     }
 
     private void setHeadlines(View root) {
@@ -227,7 +233,6 @@ public class GamesFragment extends Fragment {
 
     //region game click
     public void onGameSelected(Game game) {
-
         if (game != null) {
             mCurrGameId = game.gameId;
             mCurrGame = game;

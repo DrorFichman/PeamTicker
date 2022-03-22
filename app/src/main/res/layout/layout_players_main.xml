@@ -53,5 +53,40 @@
             android:theme="@style/Theme.MaterialComponents.Light"
             app:cornerRadius="25dp"
             app:icon="@drawable/make_teams_icon" />
+
+        <RelativeLayout
+            android:id="@+id/tutorial_main_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:paddingEnd="40dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/tutorial_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:indeterminate="false"
+                android:layoutDirection="rtl"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/circle_progressbar" />
+
+            <TextView
+                android:id="@+id/tutorial_progress_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/tutorial_progress"
+                android:layout_alignTop="@id/tutorial_progress"
+                android:layout_alignEnd="@id/tutorial_progress"
+                android:layout_alignBottom="@id/tutorial_progress"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="0%" />
+
+        </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>

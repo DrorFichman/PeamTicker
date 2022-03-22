@@ -40,6 +40,7 @@ import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.FileHelper;
 import com.teampicker.drorfichman.teampicker.tools.PermissionTools;
 import com.teampicker.drorfichman.teampicker.tools.SnapshotHelper;
+import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.SyncProgress;
 
@@ -236,27 +237,7 @@ public class MainActivity extends AppCompatActivity
 
     //region Tutorial
     private void showGettingStartedDialog() {
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        alertDialogBuilder.setTitle("Getting Started");
-
-        alertDialogBuilder
-                .setMessage("Welcome! \n\n" +
-                        "1. 'Add player' - to create players. \n\n" +
-                        "2. RSVP the attending players\n" +
-                        "   (or paste whatsapp messages). \n\n" +
-                        "3. 'Teams' - to pick teams. \n\n" +
-                        "4. 'Results' under 'Teams' - \n" +
-                        "   once the game is over. \n" +
-                        "\n" +
-                        "And don't forget to be awesome :)")
-                .setCancelable(true)
-                .setPositiveButton("Got it", (dialog, id) -> {
-                    dialog.dismiss();
-                });
-
-        alertDialogBuilder.create().show();
+        TutorialManager.displayTutorialFlow(this, null);
     }
 
     private void showAbout() {

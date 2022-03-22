@@ -26,4 +26,13 @@
             android:title="Teams Colors" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Tutorials">
+
+        <Preference
+            android:icon="@drawable/nav_setting"
+            android:key="setting_clear_tutorial"
+            android:summary="Reset tutorials"
+            android:title="Reset Tutorials skipped steps" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

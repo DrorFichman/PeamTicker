@@ -12,6 +12,7 @@ public class LocalNotifications {
     public static String GAME_UPDATE_ACTION = "com.teampicker.drorfichman.teampicker.game_update";
     public static String PLAYER_UPDATE_ACTION = "com.teampicker.drorfichman.teampicker.player_update";
     public static String PULL_DATA_ACTION = "com.teampicker.drorfichman.teampicker.pull_data";
+    public static String SETTING_MODIFIED_ACTION = "com.teampicker.drorfichman.teampicker.setting_modified";
 
     public static void sendNotification(Context ctx, String action) {
         Intent intent = new Intent(action);
