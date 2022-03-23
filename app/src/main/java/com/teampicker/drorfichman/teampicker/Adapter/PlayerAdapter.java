@@ -149,7 +149,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         notifyDataSetChanged();
     }
 
-    public int positionOfFirstFilterItem() {
-        return FilterView.positionOfFirstFilterItem(mPlayers, filterValue);
+    public int positionOfFirstFilterItem(FilterView.onFilterNoResults  handler) {
+        return FilterView.positionOfFirstFilterItem(mPlayers, filterValue, handler);
     }
 }

@@ -1,7 +1,6 @@
 package com.teampicker.drorfichman.teampicker.Controller.Search;
 
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.SearchView;
 
 import java.util.List;
@@ -13,6 +12,7 @@ public class FilterView {
     }
 
     SearchView mSearchView;
+    boolean expanded = false;
 
     public interface FilterInterface {
         void onFilter(String value);
@@ -22,6 +22,7 @@ public class FilterView {
         mSearchView = view;
 
         mSearchView.setOnCloseListener(() -> {
+            expanded = false;
             handler.onFilter(null);
             return false;
         });
@@ -39,13 +40,20 @@ public class FilterView {
                 return false;
             }
         });
+
+        mSearchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> expanded = hasFocus);
     }
 
     public static boolean match(String value, String filter) {
         return (value != null && filter != null && !filter.isEmpty() && value.contains(filter));
     }
 
-    public static int positionOfFirstFilterItem(List<? extends Filterable> list, String filter) {
+    public interface onFilterNoResults {
+        void noFilterResults();
+    }
+
+    public static int positionOfFirstFilterItem(List<? extends Filterable> list, String filter,
+                                                onFilterNoResults handler) {
         if (list == null) return 0;
         if (list.size() > 1000) return 0;
         if (TextUtils.isEmpty(filter)) return 0;
@@ -53,6 +61,16 @@ public class FilterView {
             Filterable p = list.get(i);
             if (FilterView.match(p.filterBy(), filter)) return i;
         }
+        if (handler != null) handler.noFilterResults();
         return 0;
+    }
+
+    public boolean isExpanded() {
+        return expanded;
+    }
+
+    public void collapseSearchView() {
+        if (!expanded) return; // nothing to collapse
+        mSearchView.onActionViewCollapsed();
     }
 }

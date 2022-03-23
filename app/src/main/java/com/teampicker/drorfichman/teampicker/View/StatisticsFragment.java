@@ -16,10 +16,12 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerStatisticsAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
@@ -72,6 +74,9 @@ public class StatisticsFragment extends Fragment {
         LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION, notificationHandler);
         LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION, notificationHandler);
         LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION, notificationHandler);
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, backPress);
+        backPress.setEnabled(false);
     }
 
     @Override
@@ -104,10 +109,27 @@ public class StatisticsFragment extends Fragment {
         playersList.setAdapter(playersAdapter);
     }
 
+    private boolean handleBackPress() {
+        return ((filterView != null && filterView.isExpanded()));
+    }
+
+    final OnBackPressedCallback backPress = new OnBackPressedCallback(true) {
+
+        @Override
+        public void handleOnBackPressed() {
+            if (filterView != null && filterView.isExpanded()) {
+                filterView.collapseSearchView();
+                backPress.setEnabled(handleBackPress());
+            }
+        }
+    };
+
     private void setSearchView(SearchView view) {
         filterView = new FilterView(view, value -> {
             playersAdapter.setFilter(value);
-            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
+            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem(() ->
+                    Snackbar.make(getContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));
+            backPress.setEnabled(handleBackPress());
         });
         if (playersAdapter != null) playersAdapter.setFilter(null);
     }

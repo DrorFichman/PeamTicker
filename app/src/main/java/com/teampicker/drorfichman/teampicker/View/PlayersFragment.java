@@ -36,6 +36,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
@@ -166,17 +167,28 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     final OnBackPressedCallback backPress = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
-            backPress.setEnabled(false);
+            if (filterView != null && filterView.isExpanded()) {
+                filterView.collapseSearchView();
+                backPress.setEnabled(handleBackPress());
+                return;
+            }
 
             if (showArchivedPlayers) {
                 showArchivedPlayers = false;
                 refreshPlayers();
+                backPress.setEnabled(handleBackPress());
+                return;
             }
+
             if (showPastedPlayers) {
                 showPastedPlayers = false;
                 mPastedPlayers = null;
                 refreshPlayers();
+                backPress.setEnabled(handleBackPress());
+                return;
             }
+
+            backPress.setEnabled(handleBackPress());
         }
     };
 
@@ -193,6 +205,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         backPress.setEnabled(false);
     }
 
+    private boolean handleBackPress() {
+        return (showArchivedPlayers || showPastedPlayers ||
+                (filterView != null && filterView.isExpanded()));
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -202,7 +219,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     @Override
     public void onResume() {
         super.onResume();
-        backPress.setEnabled(showArchivedPlayers || showPastedPlayers);
+        backPress.setEnabled(handleBackPress());
         showTutorials();
     }
 
@@ -222,7 +239,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private void setSearchView(SearchView view) {
         filterView = new FilterView(view, value -> {
             playersAdapter.setFilter(value);
-            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
+            int pos = playersAdapter.positionOfFirstFilterItem(() ->
+                    Snackbar.make(getContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show());
+            playersList.smoothScrollToPosition(pos);
+            backPress.setEnabled(handleBackPress());
         });
         if (playersAdapter != null) playersAdapter.setFilter(null);
     }
@@ -254,6 +274,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void setComingPlayersCount() {
         ((Button) rootView.findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, DbHelper.getComingPlayersCount(getContext())));
+        // TODO ugly
         if (progress.getProgress() < 20) showTutorials(); // when attendance is relevant..
     }
 

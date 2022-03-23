@@ -16,10 +16,12 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerParticipationAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
@@ -89,10 +91,35 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
         return root;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, backPress);
+        backPress.setEnabled(false);
+    }
+
+    final OnBackPressedCallback backPress = new OnBackPressedCallback(true) {
+
+        @Override
+        public void handleOnBackPressed() {
+            if (filterView != null && filterView.isExpanded()) {
+                filterView.collapseSearchView();
+                backPress.setEnabled(handleBackPress());
+            }
+        }
+    };
+
+    private boolean handleBackPress() {
+        return ((filterView != null && filterView.isExpanded()));
+    }
+
     private void setSearchView(SearchView view) {
         filterView = new FilterView(view, value -> {
             playersAdapter.setFilter(value);
-            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem());
+            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem(() ->
+                    Snackbar.make(getContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));
+            backPress.setEnabled(handleBackPress());
         });
         if (playersAdapter != null) playersAdapter.setFilter(null);
     }

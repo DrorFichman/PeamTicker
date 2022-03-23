@@ -111,7 +111,7 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
         notifyDataSetChanged();
     }
 
-    public int positionOfFirstFilterItem() {
-        return FilterView.positionOfFirstFilterItem(mPlayers, filterName);
+    public int positionOfFirstFilterItem(FilterView.onFilterNoResults  handler) {
+        return FilterView.positionOfFirstFilterItem(mPlayers, filterName, handler);
     }
 }
