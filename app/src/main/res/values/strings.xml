@@ -115,7 +115,7 @@
     <!--    Tutorials-->
     <string name="tutorial_headline">Getting Started - Tutorials</string>
     <string name="tutorial_create_player_title">Create Players</string>
-    <string name="tutorial_create_player_message">"Manually create players through the \"+\" icon at the top of the screen.\n\nOr \"Paste Players\" from WhatApp messages based on contact names."</string>
+    <string name="tutorial_create_player_message">"Manually create players through the \"+\" icon at the top of the screen.\n\nOr \"Paste Players\" from WhatApp messages based on contact names"</string>
     <string name="tutorial_attendance_title">Specify Attending Players</string>
     <string name="tutorial_attendance_message">"Before picking teams, you'll need to select which players will attend the upcoming game.\n\nCheck the checkbox associated with each attending player.\n\nYou can also paste WhatsApp messages to locate players quickly."</string>
     <string name="tutorial_start_pick_teams_title">Pick Teams</string>
@@ -123,16 +123,16 @@
     <string name="tutorial_pick_teams_title">Pick Teams</string>
     <string name="tutorial_pick_teams_message">"\"Shuffle\" teams based on grades.\n\n\"Transfer\" players manually.\n\nShare an image of the teams (excluding grades) through any messaging app."</string>
     <string name="tutorial_save_results_title">Save game result</string>
-    <string name="tutorial_save_results_message">"Entering the result of the game once it's over opens the way for game history, personal statistics, and the ability to pick teams based on win rate and players' chemistry.\n\nEnter \"Results\" in the \"Teams\" screen"</string>
+    <string name="tutorial_save_results_message">"Entering the result of the game once it's over opens the way for game history, personal statistics, and the ability to pick teams based on win rate and players' chemistry.\n\nEnter \"Results\" in the \"Teams\" screen."</string>
     <string name="tutorial_game_history_title">Games History</string>
     <string name="tutorial_game_history_message">"Select any game in the "Games" tab to view its teams.\n\nLong click to copy the teams."</string>
     <string name="tutorial_cloud_title">Cloud Features</string>
-    <string name="tutorial_cloud_message">"Sync your players and games to the cloud, as backup, or when you plan to pull the data in another device.\n\nFirst, sign in with your google account through the side drawer.\nThen \"Sync\" in the side drawer."</string>
+    <string name="tutorial_cloud_message">"Sync your players and games to the cloud, as backup, or when you plan to pull the data in another device.\n\nFirst, sign in with your Google account through the side drawer.\nThen \"Sync\" in the side drawer."</string>
     <string name="tutorial_team_analysis_title">Teams Analysis</string>
     <string name="tutorial_team_analysis_message">"Now, that enough game history is provided - click the \"Analysis\" icon at the top bar to observe individual win rates.\n\nClick a player to view their personal chemistry with the other participating players."</string>
     <string name="tutorial_team_shuffle_stats_title">Pick teams - AI mode</string>
-    <string name="tutorial_team_shuffle_stats_message">"Switch to optimized team picking mode through the 3 dots below the \"Shuffle\" button.\n\nThe \"Stats\" mode will generate optional teams based on win rates, and players' chemistry"</string>
+    <string name="tutorial_team_shuffle_stats_message">"Switch to optimized team picking mode through the 3 dots below the \"Shuffle\" button.\n\nThe \"Stats\" mode will generate optional teams based on win rates, and players' chemistry."</string>
     <string name="tutorial_completed_title">Tutorials Completed</string>
-    <string name="tutorial_completed_message">Tutorials will be available in the side menu under Getting Started</string>
+    <string name="tutorial_completed_message">Tutorials will be available in the side menu under \"Getting Started\"</string>
 
 </resources>
