@@ -6,7 +6,7 @@
         <EditTextPreference
             android:icon="@drawable/nav_setting"
             android:key="divide_attempts"
-            android:summary="Pick teams - number of teams division to consider (1-100)"
+            android:summary="Pick teams - number of teams division to consider (1-200)"
             android:title="@string/setting_title_divide_attempts" />
 
         <EditTextPreference
