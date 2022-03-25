@@ -20,6 +20,7 @@ public class PreferenceHelper {
     public static String pref_skip_tutorial_cloud = "pref_skip_tutorial_cloud";
     public static String pref_skip_tutorial_shuffle_stats = "pref_skip_tutorial_shuffle_stats";
     public static String pref_skip_tutorial_analysis = "pref_skip_tutorial_analysis";
+    public static String pref_skip_all_tutorial = "pref_skip_all_tutorial";
 
     public static String pref_tutorial_clicked_teams = "pref_tutorial_clicked_teams";
     public static String pref_tutorial_clicked_shuffle = "pref_tutorial_clicked_shuffle";

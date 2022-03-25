@@ -29,37 +29,6 @@ import java.util.Collections;
 
 public class TutorialManager {
 
-    public static TutorialDisplayState current;
-
-    public static void setDialogDismissed() {
-        current = TutorialManager.TutorialDisplayState.NotDisplayed;
-    }
-
-    public static void showTutorialDialog(Context ctx, String prefKey, boolean forceShow, String title, String message, int location) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
-        alertDialogBuilder.setIcon(R.drawable.information);
-
-        alertDialogBuilder.setTitle(title)
-                .setMessage(message)
-                .setCancelable(true)
-                .setOnCancelListener(dialogInterface -> TutorialManager.setDialogDismissed())
-                .setPositiveButton("OK", (dialog, which) -> {
-                    dialog.dismiss();
-                    TutorialManager.setDialogDismissed();
-                });
-
-        if (!forceShow)
-            alertDialogBuilder.setNeutralButton("Don't show again", (dialogInterface, i) -> {
-                PreferenceHelper.setSharedPreferenceString(ctx, prefKey, "1");
-                TutorialManager.setDialogDismissed();
-            });
-
-        AlertDialog dialog = alertDialogBuilder.create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.getWindow().setGravity(forceShow ? Gravity.CENTER : location);
-        dialog.show();
-    }
-
     public enum Tutorials {
         players(TutorialNewPlayer.instance),
         attendance(TutorialAttendance.instance),
@@ -78,18 +47,6 @@ public class TutorialManager {
         }
     }
 
-    public enum TutorialStepStatus {
-        ToDo,
-        Done,
-        NotApplicable
-    }
-
-    public enum TutorialDisplayState {
-        Displayed,
-        NotDisplayed,
-        AnotherDialogDisplayed
-    }
-
     public enum TutorialUserAction {
         clicked_teams(PreferenceHelper.pref_tutorial_clicked_teams),
         clicked_shuffle(PreferenceHelper.pref_tutorial_clicked_shuffle),
@@ -105,6 +62,45 @@ public class TutorialManager {
         }
     }
 
+    public enum TutorialStepStatus {
+        ToDo,
+        Done,
+        NotApplicable
+    }
+
+    public enum TutorialDisplayState {
+        Displayed,
+        NotDisplayed,
+        AnotherDialogDisplayed
+    }
+
+    public static TutorialDisplayState current;
+
+    public static void showTutorialDialog(Context ctx, String prefKey, boolean forceShow, String title, String message, int location) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
+        alertDialogBuilder.setIcon(R.drawable.information);
+
+        alertDialogBuilder.setTitle(title)
+                .setMessage(message)
+                .setCancelable(true)
+                .setOnCancelListener(dialogInterface -> TutorialManager.setCurrentDialogDismissed())
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.dismiss();
+                    TutorialManager.setCurrentDialogDismissed();
+                });
+
+        if (!forceShow)
+            alertDialogBuilder.setNeutralButton("Don't show again", (dialogInterface, i) -> {
+                PreferenceHelper.setSharedPreferenceString(ctx, prefKey, "1");
+                TutorialManager.setCurrentDialogDismissed();
+            });
+
+        AlertDialog dialog = alertDialogBuilder.create();
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.getWindow().setGravity(forceShow ? Gravity.CENTER : location);
+        dialog.show();
+    }
+
     public static void displayTutorialFlow(Context ctx, DialogInterface.OnCancelListener onCancel) {
         Dialog dialog = new Dialog(ctx);
         dialog.setContentView(R.layout.layout_tutorial_dialog_view);
@@ -116,6 +112,11 @@ public class TutorialManager {
         TutorialStepsAdapter playersAdapter = new TutorialStepsAdapter(ctx, ts);
         tutorials.setAdapter(playersAdapter);
 
+        dialog.findViewById(R.id.tutorials_dismiss_all).setOnClickListener(view1 -> {
+            TutorialManager.dismissAllTutorials(ctx);
+            dialog.dismiss();
+        });
+
         dialog.setOnCancelListener(onCancel);
         dialog.show();
     }
@@ -126,13 +127,23 @@ public class TutorialManager {
         }
 
         AbstractTutorialStep dialog = step.dialog;
-        if (forceShow || (dialog.shouldBeDisplayed(ctx) == ToDo && !dialog.isDialogDismissedByUser(ctx))) {
+        if (forceShow ||
+                (dialog.shouldBeDisplayed(ctx) == ToDo && !dialog.isDialogDismissedByUser(ctx) &&
+                        !PreferenceHelper.getSharedPreference(ctx).contains(PreferenceHelper.pref_skip_all_tutorial))) {
             dialog.display(ctx, forceShow);
             current = TutorialDisplayState.AnotherDialogDisplayed;
             return TutorialDisplayState.AnotherDialogDisplayed;
         } else {
             return TutorialDisplayState.NotDisplayed;
         }
+    }
+
+    public static void setCurrentDialogDismissed() {
+        current = TutorialManager.TutorialDisplayState.NotDisplayed;
+    }
+
+    public static void dismissAllTutorials(Context ctx) {
+        PreferenceHelper.setSharedPreferenceString(ctx, PreferenceHelper.pref_skip_all_tutorial, "1");
     }
 
     public static void userActionTaken(Context ctx, TutorialUserAction action) {
@@ -150,6 +161,7 @@ public class TutorialManager {
         for (Tutorials a : Tutorials.values()) {
             PreferenceHelper.getSharedPreference(ctx).edit().remove(a.dialog.prefKey()).commit();
         }
+        PreferenceHelper.getSharedPreference(ctx).edit().remove(PreferenceHelper.pref_skip_all_tutorial).commit();
     }
 
     public static int getProgress(Context context) {

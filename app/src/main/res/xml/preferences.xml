@@ -31,8 +31,8 @@
         <Preference
             android:icon="@drawable/nav_setting"
             android:key="setting_clear_tutorial"
-            android:summary="Reset tutorials"
-            android:title="Reset Tutorials skipped steps" />
+            android:summary="Reset tutorials skipped steps"
+            android:title="@string/setting_title_clear_tutorial" />
     </PreferenceCategory>
 
 </PreferenceScreen>

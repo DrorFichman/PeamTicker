@@ -127,6 +127,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void updateTutorialProgress() {
         int progressFrom = progress.getProgress();
+        if (getContext() == null) return;
+
         int tutorialProgress = TutorialManager.getProgress(getContext());
         if (progressFrom == 0 && tutorialProgress == 100) p.setVisibility(View.GONE);
 

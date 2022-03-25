@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.teampicker.drorfichman.teampicker.R;
@@ -33,25 +34,25 @@ public class TutorialStepsAdapter extends ArrayAdapter<TutorialManager.Tutorials
         View view = LayoutInflater.from(context).inflate(R.layout.tutorial_item, parent, false);
         TextView stepView = view.findViewById(R.id.tutorial_name);
         TextView statusView = view.findViewById(R.id.tutorial_status);
-        View infoView = view.findViewById(R.id.tutorial_info);
+        ImageView stateView = view.findViewById(R.id.tutorial_state_image);
 
         final TutorialManager.Tutorials step = mSteps.get(position);
         view.setTag(step);
 
-        setTutorial(stepView, statusView, infoView, step);
+        setTutorial(stepView, statusView, stateView, step);
         view.setOnClickListener(v -> TutorialManager.displayTutorialStep(context, step, true));
 
         return view;
     }
 
-    private void setTutorial(TextView stepView, TextView statusView, View infoView, TutorialManager.Tutorials step) {
+    private void setTutorial(TextView stepView, TextView statusView, ImageView stateView, TutorialManager.Tutorials step) {
         TutorialManager.TutorialStepStatus status = step.dialog.shouldBeDisplayed(context);
 
         stepView.setText(step.dialog.name());
 
         statusView.setText(getDialogRequiredString(status));
 
-        infoView.setVisibility(status == Done ? View.INVISIBLE : View.VISIBLE);
+        stateView.setImageResource(status == Done ? R.drawable.done : R.drawable.information);
     }
 
     private static String getDialogRequiredString(TutorialManager.TutorialStepStatus status) {
@@ -59,7 +60,7 @@ public class TutorialStepsAdapter extends ArrayAdapter<TutorialManager.Tutorials
             case ToDo:
                 return "To Do";
             case Done:
-                return "Done";
+                return "";
             default:
                 return "Not Applicable";
         }

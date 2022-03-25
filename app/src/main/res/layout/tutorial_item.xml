@@ -27,7 +27,7 @@
         android:textAppearance="@style/regularText" />
 
     <ImageView
-        android:id="@+id/tutorial_info"
+        android:id="@+id/tutorial_state_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"

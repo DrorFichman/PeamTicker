@@ -75,9 +75,10 @@
     <!--    Settings - values are saved in preferences - don't change-->
     <string name="setting_team_color_scheme_color_1">Orange -- Blue</string>
     <string name="setting_team_color_scheme_color_2">Black -- White</string>
-    <string name="setting_title_divide_attempts">Divide attempts</string>
-    <string name="setting_title_grade_weight">Grade weight</string>
+    <string name="setting_title_divide_attempts">Divide Attempts</string>
+    <string name="setting_title_grade_weight">Grade Weight</string>
     <string name="setting_title_color_scheme">Teams visualization - select color scheme</string>
+    <string name="setting_title_clear_tutorial">Reset Tutorials</string>
 
     <!--    Messages-->
     <string name="parentheses">"(%1$d)"</string>
@@ -114,6 +115,7 @@
 
     <!--    Tutorials-->
     <string name="tutorial_headline">Getting Started - Tutorials</string>
+    <string name="tutorial_dismiss_message">Dismiss all tutorial messages</string>
     <string name="tutorial_create_player_title">Create Players</string>
     <string name="tutorial_create_player_message">"Manually create players through the \"+\" icon at the top of the screen.\n\nOr \"Paste Players\" from WhatApp messages based on contact names"</string>
     <string name="tutorial_attendance_title">Specify Attending Players</string>
