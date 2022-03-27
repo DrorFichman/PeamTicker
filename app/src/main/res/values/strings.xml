@@ -115,7 +115,7 @@
 
     <!--    Tutorials-->
     <string name="tutorial_headline">Getting Started - Tutorials</string>
-    <string name="tutorial_dismiss_message">Dismiss all tutorial messages</string>
+    <string name="tutorial_dismiss_message">Dismiss tutorial messages</string>
     <string name="tutorial_create_player_title">Create Players</string>
     <string name="tutorial_create_player_message">"Manually create players through the \"+\" icon at the top of the screen.\n\nOr \"Paste Players\" from WhatApp messages based on contact names"</string>
     <string name="tutorial_attendance_title">Specify Attending Players</string>

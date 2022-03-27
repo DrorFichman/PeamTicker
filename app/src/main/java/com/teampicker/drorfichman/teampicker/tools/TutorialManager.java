@@ -7,12 +7,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.Gravity;
+import android.widget.CheckBox;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AlertDialog;
 
 import com.teampicker.drorfichman.teampicker.Adapter.TutorialStepsAdapter;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.tutorials.AbstractTutorialStep;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialAttendance;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialCloud;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialGameHistory;
@@ -21,7 +23,6 @@ import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialPickTeams;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialSaveResults;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialShuffleAI;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialStartPickTeams;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.AbstractTutorialStep;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialTeamAnalysis;
 
 import java.util.ArrayList;
@@ -112,10 +113,9 @@ public class TutorialManager {
         TutorialStepsAdapter playersAdapter = new TutorialStepsAdapter(ctx, ts);
         tutorials.setAdapter(playersAdapter);
 
-        dialog.findViewById(R.id.tutorials_dismiss_all).setOnClickListener(view1 -> {
-            TutorialManager.dismissAllTutorials(ctx);
-            dialog.dismiss();
-        });
+        CheckBox dismiss = ((CheckBox) dialog.findViewById(R.id.tutorials_dismiss_all));
+        dismiss.setChecked(TutorialManager.isSkipAllTutorials(ctx));
+        dismiss.setOnCheckedChangeListener((compoundButton, checked) -> TutorialManager.dismissAllTutorials(ctx, checked));
 
         dialog.setOnCancelListener(onCancel);
         dialog.show();
@@ -128,8 +128,8 @@ public class TutorialManager {
 
         AbstractTutorialStep dialog = step.dialog;
         if (forceShow ||
-                (dialog.shouldBeDisplayed(ctx) == ToDo && !dialog.isDialogDismissedByUser(ctx) &&
-                        !PreferenceHelper.getSharedPreference(ctx).contains(PreferenceHelper.pref_skip_all_tutorial))) {
+                (dialog.shouldBeDisplayed(ctx) == ToDo &&
+                        !dialog.isDialogDismissedByUser(ctx) && !isSkipAllTutorials(ctx))) {
             dialog.display(ctx, forceShow);
             current = TutorialDisplayState.AnotherDialogDisplayed;
             return TutorialDisplayState.AnotherDialogDisplayed;
@@ -142,8 +142,13 @@ public class TutorialManager {
         current = TutorialManager.TutorialDisplayState.NotDisplayed;
     }
 
-    public static void dismissAllTutorials(Context ctx) {
-        PreferenceHelper.setSharedPreferenceString(ctx, PreferenceHelper.pref_skip_all_tutorial, "1");
+    public static void dismissAllTutorials(Context ctx, boolean dismiss) {
+        PreferenceHelper.setSharedPreferenceString(ctx, PreferenceHelper.pref_skip_all_tutorial,
+                dismiss ? "1" : null);
+    }
+
+    public static boolean isSkipAllTutorials(Context ctx) {
+        return PreferenceHelper.getSharedPreference(ctx).contains(PreferenceHelper.pref_skip_all_tutorial);
     }
 
     public static void userActionTaken(Context ctx, TutorialUserAction action) {
