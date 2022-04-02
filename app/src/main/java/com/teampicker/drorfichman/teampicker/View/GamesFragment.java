@@ -128,7 +128,7 @@ public class GamesFragment extends Fragment {
 
     private void setHeadlines(View root) {
         sorting.setHeadlineSorting(root, R.id.game_date, getString(R.string.date), null);
-        sorting.setHeadlineSorting(root, R.id.game_result_set, getString(R.string.score), null);
+        sorting.setHeadlineSorting(root, R.id.game_result_set_divider, getString(R.string.score), null);
     }
 
     @Override

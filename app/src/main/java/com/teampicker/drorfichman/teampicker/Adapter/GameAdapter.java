@@ -2,6 +2,7 @@ package com.teampicker.drorfichman.teampicker.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,14 +40,16 @@ public class GameAdapter extends ArrayAdapter<Game> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.game_item, parent, false);
         TextView dateView = view.findViewById(R.id.game_date);
-        TextView resultSet = view.findViewById(R.id.game_result_set);
+        TextView resultSet1 = view.findViewById(R.id.game_result_set1);
+        TextView resultSet2 = view.findViewById(R.id.game_result_set2);
+        TextView resultDivider = view.findViewById(R.id.game_result_set_divider);
         ImageView res = view.findViewById(R.id.res_1);
         TextView playerGrade = view.findViewById(R.id.game_player_grade);
 
         Game g = mGames.get(position);
 
         dateView.setText(DateHelper.getDisplayDate(context, g.dateString));
-        resultSet.setText(g.getScore());
+        setResults(g, resultSet1, resultSet2, resultDivider);
 
         setPlayerResult(res, g);
         setPlayerGrade(playerGrade, g);
@@ -57,6 +60,15 @@ public class GameAdapter extends ArrayAdapter<Game> {
         view.setBackgroundColor(mSelectedGame == g.gameId ? Color.GRAY : Color.TRANSPARENT);
 
         return view;
+    }
+
+    private void setResults(Game g, TextView res1, TextView res2, TextView resultDivider) {
+        res1.setText(String.valueOf(g.team1Score));
+        res2.setText(String.valueOf(g.team2Score));
+        resultDivider.setText("-");
+
+        res1.setTypeface(null, g.team1Score > g.team2Score ? Typeface.BOLD : Typeface.NORMAL);
+        res2.setTypeface(null, g.team1Score < g.team2Score ? Typeface.BOLD : Typeface.NORMAL);
     }
 
     private void setPlayerGrade(TextView playerGrade, Game g) {
