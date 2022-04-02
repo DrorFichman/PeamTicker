@@ -23,28 +23,32 @@
         android:id="@+id/game_result_set1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:gravity="center"
+        android:minWidth="15dp"
         android:padding="5dp"
         android:paddingEnd="0dp"
-        android:layout_gravity="start|center_vertical"
         android:textAppearance="@style/regularText" />
 
     <TextView
         android:id="@+id/game_result_set_divider"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
         android:padding="5dp"
         android:paddingStart="2dp"
         android:paddingEnd="2dp"
-        android:layout_gravity="start|center_vertical"
         android:textAppearance="@style/regularText" />
 
     <TextView
         android:id="@+id/game_result_set2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:gravity="center"
+        android:minWidth="15dp"
         android:padding="5dp"
         android:paddingStart="0dp"
-        android:layout_gravity="start|center_vertical"
         android:textAppearance="@style/regularText" />
 
     <TextView
