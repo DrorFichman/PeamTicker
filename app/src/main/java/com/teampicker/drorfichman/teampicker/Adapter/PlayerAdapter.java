@@ -44,7 +44,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         TextView nameView = view.findViewById(R.id.player_name);
         TextView gradeView = view.findViewById(R.id.player_grade);
         final CheckBox vComing = view.findViewById(R.id.player_coming);
-        TextView vComingTitle = view.findViewById(R.id.player_rsvp_title);
+        View vComingTitle = view.findViewById(R.id.player_rsvp_title);
         TextView recentPerformance = view.findViewById(R.id.player_recent_performance);
         TextView ageView = view.findViewById(R.id.player_age);
         TextView attributes = view.findViewById(R.id.player_attributes);
@@ -71,7 +71,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         }
     }
 
-    private void setComing(CheckBox vComing, TextView vComingTitle, Player player) {
+    private void setComing(CheckBox vComing, View vComingTitle, Player player) {
         vComingTitle.setVisibility(View.GONE);
 
         boolean canCome = (player.mName != null && !player.archived);
