@@ -134,7 +134,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
         if (progressFrom < tutorialProgress) {
             final Runnable r = () -> {
-                int from = progressFrom + 1;
+                int from = progressFrom + Math.max(1, (tutorialProgress - progressFrom) / 6);
                 setProgress(from);
                 updateTutorialProgress();
             };
