@@ -72,10 +72,10 @@ public class ScreenshotHelper {
 
         File imagePath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/TeamPicker/");
         imagePath.mkdirs();
-        File imageFile = new File(imagePath, name + ".jpg");
+        File imageFile = new File(imagePath, name + ".png");
 
         FileOutputStream outputStream = new FileOutputStream(imageFile);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream);
         outputStream.flush();
         outputStream.close();
 
