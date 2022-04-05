@@ -3,12 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layoutDirection="ltr"
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
-        android:id="@+id/participation_chip_games"
+        android:id="@+id/stats_chip_games"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -16,7 +15,7 @@
         android:paddingEnd="10dp">
 
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/participation_chip_group_games"
+            android:id="@+id/stats_chip_group_games"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:chipSpacing="10dp"
@@ -24,43 +23,52 @@
             app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/participation_chip_10_games"
+                android:id="@+id/stat_chip_10_games"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/part_last_10_games"
+                android:text="@string/stats_10_games"
                 android:theme="@style/Theme.MaterialComponents.Light" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/participation_chip_50_games"
+                android:id="@+id/stat_chip_50_games"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stats_50_games"
+                android:theme="@style/Theme.MaterialComponents.Light" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/stat_chip_all_games"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="@string/part_last_50_games"
-                android:theme="@style/Theme.MaterialComponents.Light" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/participation_chip_all_games"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/part_all_games"
+                android:text="@string/stats_all_games"
                 android:theme="@style/Theme.MaterialComponents.Light" />
 
         </com.google.android.material.chip.ChipGroup>
+
+        <TextView
+            android:id="@+id/stats_total_values"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:textAppearance="@style/regularText" />
+
     </LinearLayout>
 
     <include
         android:id="@+id/titles"
-        layout="@layout/player_participation_item"
-        android:layout_below="@+id/participation_chip_games"
+        layout="@layout/player_statistics_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/stats_chip_games"
         android:layout_marginTop="5dp" />
 
     <ListView
-        android:id="@+id/players_participation_list"
+        android:id="@+id/players_statistics_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/titles"

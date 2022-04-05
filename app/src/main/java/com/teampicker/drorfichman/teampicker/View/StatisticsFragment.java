@@ -14,13 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerStatisticsAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 
 public class StatisticsFragment extends Fragment {
 
-    private int games = 50;
+    private int games = -1;
     Sorting sorting = new Sorting(this::sortingChanged, SortType.success);
     private StatisticsResultBroadcast notificationHandler;
 
@@ -45,10 +46,13 @@ public class StatisticsFragment extends Fragment {
     private PlayerStatisticsAdapter playersAdapter;
     private ListView playersList;
     private View titles;
+    private TextView statsTotals;
+    private View gameCountSelection;
+    private View chip50Games;
     private FilterView filterView;
 
     public StatisticsFragment() {
-        super(R.layout.layout_statistics_activity);
+        super(R.layout.layout_statistics_fragment);
     }
 
     public static StatisticsFragment newInstance() {
@@ -63,8 +67,25 @@ public class StatisticsFragment extends Fragment {
         setHasOptionsMenu(true);
 
         setPlayersList(root);
+        setGamesCountSelection(root);
 
         return root;
+    }
+
+    private void setGamesCountSelection(View root) {
+        ((ChipGroup) root.findViewById(R.id.stats_chip_group_games)).setOnCheckedChangeListener(
+                (group, checkedChip) -> {
+                    if (checkedChip == R.id.stat_chip_10_games) {
+                        games = 10;
+                        refreshPlayers(true);
+                    } else if (checkedChip == R.id.stat_chip_50_games) {
+                        games = 50;
+                        refreshPlayers(true);
+                    } else {
+                        games = -1;
+                        refreshPlayers(true);
+                    }
+                });
     }
 
     @Override
@@ -86,6 +107,9 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void setPlayersList(View root) {
+        gameCountSelection = root.findViewById(R.id.stats_chip_games);
+        chip50Games = root.findViewById(R.id.stat_chip_50_games);
+        statsTotals = root.findViewById(R.id.stats_total_values);
         playersList = root.findViewById(R.id.players_statistics_list);
 
         refreshPlayers(true);
@@ -107,6 +131,16 @@ public class StatisticsFragment extends Fragment {
 
         playersAdapter = new PlayerStatisticsAdapter(getContext(), players, getGamesCountFilter(), showInternalData);
         playersList.setAdapter(playersAdapter);
+
+        setGameCountValues();
+    }
+
+    private void setGameCountValues() {
+        int gamesCount = getGamesCountFilter();
+        int totalGames = DbHelper.getGames(getContext()).size();
+        gameCountSelection.setVisibility(totalGames > 10 ? View.VISIBLE : View.GONE);
+        chip50Games.setVisibility(totalGames >= 50 ? View.VISIBLE : View.GONE);
+        statsTotals.setText(getString(R.string.stats_with_count, players.size(), gamesCount));
     }
 
     private boolean handleBackPress() {
@@ -161,33 +195,8 @@ public class StatisticsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        boolean notifyGameCount = false;
-
-        switch (item.getItemId()) {
-            case R.id.action_send_statistics:
-                takeScreenshot();
-                break;
-            case R.id.action_last_10_games:
-                games = 10;
-                notifyGameCount = true;
-                refreshPlayers(true);
-                break;
-            case R.id.action_last_50_games:
-                games = 50;
-                notifyGameCount = true;
-                refreshPlayers(true);
-                break;
-            case R.id.action_no_limit:
-                games = -1;
-                notifyGameCount = true;
-                refreshPlayers(true);
-                break;
-        }
-
-        if (notifyGameCount) {
-            Toast.makeText(getContext(),
-                    getString(R.string.stats_with_count, players.size(), getGamesCountFilter()),
-                    Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.action_send_statistics) {
+            takeScreenshot();
         }
 
         return super.onOptionsItemSelected(item);

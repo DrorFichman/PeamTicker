@@ -6,7 +6,7 @@
     <string name="pick_teams_title_results">"Results"</string>
     <string name="pick_teams_title_analysis">"Analysis"</string>
     <string name="games_with_count">"Games (%1$d)"</string>
-    <string name="stats_with_count">"Statistics (%1$d players, %2$d games)"</string>
+    <string name="stats_with_count">"%1$d players\n%2$d games"</string>
     <string name="search_title">Search</string>
 
     <!--    Drawer-->
@@ -68,9 +68,14 @@
     <string name="show_archived">Players Archive</string>
     <string name="make_teams">Pick Teams</string>
     <string name="enter_results">Enter Results</string>
-    <string name="action_10_games">Last 10 games</string>
     <string name="action_50_games">Last 50 games</string>
     <string name="action_all_games">All games</string>
+    <string name="part_last_10_games">last 10 games</string>
+    <string name="part_last_50_games">last 50 games</string>
+    <string name="part_all_games">all games</string>
+    <string name="stats_50_games">50 games</string>
+    <string name="stats_10_games">10 games</string>
+    <string name="stats_all_games">all games</string>
 
     <!--    Settings - values are saved in preferences - don't change-->
     <string name="setting_team_color_scheme_color_1">Orange -- Blue</string>

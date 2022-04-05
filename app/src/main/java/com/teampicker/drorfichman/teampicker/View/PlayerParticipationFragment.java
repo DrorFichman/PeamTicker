@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerParticipationAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
@@ -54,6 +55,8 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
     private View titles;
     private TextView name;
     private FilterView filterView;
+    private View gameCountSelection;
+    private View chip50Games;
 
     public PlayerParticipationFragment() {
         super(R.layout.layout_participation_fragment);
@@ -79,6 +82,8 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
         titles = root.findViewById(R.id.titles);
         name = root.findViewById(R.id.player_name);
+        gameCountSelection = root.findViewById(R.id.participation_chip_games);
+        chip50Games = root.findViewById(R.id.participation_chip_50_games);
 
         setTeamIcon(root);
 
@@ -86,9 +91,27 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
         refreshPlayers();
 
+        setGamesCountSelection(root);
+
         setHasOptionsMenu(true);
 
         return root;
+    }
+
+    private void setGamesCountSelection(View root) {
+        ((ChipGroup) root.findViewById(R.id.participation_chip_group_games)).setOnCheckedChangeListener(
+                (group, checkedChip) -> {
+                    if (checkedChip == R.id.participation_chip_10_games) {
+                        games = 10;
+                        refreshPlayers();
+                    } else if (checkedChip == R.id.participation_chip_50_games) {
+                        games = 50;
+                        refreshPlayers();
+                    } else {
+                        games = -1;
+                        refreshPlayers();
+                    }
+                });
     }
 
     @Override
@@ -126,7 +149,7 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
     private void setHeadlines(View root) {
         sorting.setHeadlineSorting(root, R.id.player_name, null, SortType.name);
-        sorting.setHeadlineSorting(root, R.id.part_games_count_with, this.getString(R.string.games_with) , SortType.gamesWith);
+        sorting.setHeadlineSorting(root, R.id.part_games_count_with, this.getString(R.string.games_with), SortType.gamesWith);
         sorting.setHeadlineSorting(root, R.id.part_wins_percentage_with, this.getString(R.string.success_with), SortType.successWith);
         sorting.setHeadlineSorting(root, R.id.part_games_count_against, this.getString(R.string.games_vs), SortType.gamesVs);
         sorting.setHeadlineSorting(root, R.id.part_wins_percentage_against, this.getString(R.string.success_vs), SortType.successVs);
@@ -159,24 +182,10 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_send_statistics:
-                final Runnable r = () -> ScreenshotHelper.takeListScreenshot(getActivity(),
-                        playersList, titles, playersAdapter);
-                new Handler().postDelayed(r, 200);
-                break;
-            case R.id.action_last_10_games:
-                games = 10;
-                refreshPlayers();
-                break;
-            case R.id.action_last_50_games:
-                games = 50;
-                refreshPlayers();
-                break;
-            case R.id.action_no_limit:
-                games = -1;
-                refreshPlayers();
-                break;
+        if (item.getItemId() == R.id.action_send_statistics) {
+            final Runnable r = () -> ScreenshotHelper.takeListScreenshot(getActivity(),
+                    playersList, titles, playersAdapter);
+            new Handler().postDelayed(r, 200);
         }
 
         return super.onOptionsItemSelected(item);
@@ -203,14 +212,21 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
         playersAdapter = new PlayerParticipationAdapter(context, players, blue, orange);
         playersList.setAdapter(playersAdapter);
+
+        setGameCountValues();
+    }
+
+    private void setGameCountValues() {
+        int totalGames = DbHelper.getGames(getContext(), pPlayer.mName).size();
+        chip50Games.setVisibility(totalGames > 50 ? View.VISIBLE : View.GONE);
     }
 
     private void setTitle(Context context) {
         Player player = DbHelper.getPlayer(context, pPlayer.mName, games);
         name.setText(getString(R.string.player_participation_statistics,
-                    player.mName,
-                    player.statistics.gamesCount,
-                    player.statistics.getWinRate()));
+                player.mName,
+                player.statistics.gamesCount,
+                player.statistics.getWinRate()));
     }
 
     //region sort

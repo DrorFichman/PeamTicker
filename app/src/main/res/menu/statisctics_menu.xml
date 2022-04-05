@@ -8,18 +8,7 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/action_send_statistics"
+        android:icon="@drawable/share"
         android:title="@string/action_send_statistics"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_last_10_games"
-        android:title="@string/action_10_games"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_last_50_games"
-        android:title="@string/action_50_games"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_no_limit"
-        android:title="@string/action_all_games"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 </menu>
