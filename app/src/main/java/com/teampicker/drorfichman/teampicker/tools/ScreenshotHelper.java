@@ -105,7 +105,7 @@ public class ScreenshotHelper {
         images.add(bitmap);
         totalHeight += titles.getMeasuredHeight();
 
-        for (int i = 0; i < itemCount; i++) {
+        for (int i = 0; i < itemCount && i < 50; i++) {
 
             View childView = adapter.getView(i, null, listview);
             childView.measure(View.MeasureSpec.makeMeasureSpec(listview.getWidth(), View.MeasureSpec.EXACTLY),
