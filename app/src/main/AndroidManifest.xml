@@ -11,6 +11,7 @@
 
         <activity
             android:name=".View.MainActivity"
+            android:exported="true"
             android:label="@string/main_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
@@ -22,31 +23,35 @@
 
         <activity
             android:name=".View.GamesActivity"
+            android:exported="true"
             android:label="Games history"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <activity
             android:name=".View.SettingsActivity"
+            android:exported="true"
             android:label="Settings"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-        </activity>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <activity
             android:name=".View.PlayerDetailsActivity"
+            android:exported="true"
             android:label="Player details"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <activity
             android:name=".View.MakeTeamsActivity"
+            android:exported="true"
             android:label="Pick Teams"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <activity
             android:name=".View.PlayerParticipationActivity"
+            android:exported="true"
             android:label="Player's success with/vs teammates"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
