@@ -109,7 +109,6 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         progress = root.findViewById(R.id.tutorial_progress);
         progressText = root.findViewById(R.id.tutorial_progress_text);
 
-        p.setVisibility(progress.getProgress() == 100 ? View.GONE : View.VISIBLE);
         p.setOnClickListener(view -> onTutorialClicked(progress.getProgress()));
 
         showTutorials();
@@ -150,6 +149,13 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void showTutorials() {
+        if (TutorialManager.isSkipAllTutorials(getContext())) {
+            p.setVisibility(View.GONE);
+            return;
+        }
+
+        p.setVisibility(progress.getProgress() == 100 ? View.GONE : View.VISIBLE);
+
         updateTutorialProgress();
 
         TutorialManager.TutorialDisplayState show = TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.players, false);
