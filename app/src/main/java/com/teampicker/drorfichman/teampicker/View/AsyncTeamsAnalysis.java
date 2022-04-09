@@ -1,7 +1,6 @@
 package com.teampicker.drorfichman.teampicker.View;
 
 import android.os.AsyncTask;
-import android.view.View;
 
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper;
 
@@ -37,8 +36,7 @@ class AsyncTeamsAnalysis extends AsyncTask<Void, Void, String> {
         MakeTeamsActivity activity = ref.get();
         if (activity == null || activity.isFinishing()) return;
 
-        activity.teamStatsLayout.setVisibility(View.INVISIBLE);
-        activity.analysisAsyncInProgress = true;
+        activity.enterAnalysisAsync();
     }
 
     @Override
@@ -49,7 +47,6 @@ class AsyncTeamsAnalysis extends AsyncTask<Void, Void, String> {
 
         doneHandler.execute();
 
-        activity.enterAnalysis();
-        activity.analysisAsyncInProgress = false;
+        activity.exitAnalysisAsync();
     }
 }

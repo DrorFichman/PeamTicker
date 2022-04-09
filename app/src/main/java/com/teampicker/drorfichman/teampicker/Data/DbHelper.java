@@ -7,14 +7,14 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-
-import androidx.annotation.NonNull;
 
 /**
  * Created by drorfichman on 7/30/16.
@@ -36,7 +36,10 @@ public class DbHelper extends SQLiteOpenHelper {
         playersHistory.clear();
     }
 
-    public static void saveTeams(Context ctx, ArrayList<Player> firstTeam, ArrayList<Player> secondTeam) {
+    public static void saveTeams(Context ctx, ArrayList<Player> firstTeam,
+                                 ArrayList<Player> secondTeam,
+                                 ArrayList<Player> benchedPlayers,
+                                 ArrayList<Player> missedPlayers) {
         DbHelper.clearOldGameTeams(ctx);
 
         int currGame = DbHelper.getMaxGame(ctx) + 1;
@@ -48,6 +51,17 @@ public class DbHelper extends SQLiteOpenHelper {
         for (Player b : secondTeam) {
             PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Team2, b.getAge(), b.getAttributes());
             DbHelper.insertPlayerGame(ctx, pg);
+        }
+        if (benchedPlayers != null) {
+            for (Player b : benchedPlayers) {
+                PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Bench, b.getAge(), b.getAttributes());
+                DbHelper.insertPlayerGame(ctx, pg);
+            }
+        }
+        if (missedPlayers != null) {
+            for (Player m : missedPlayers) {
+                DbHelper.setPlayerResult(ctx, currGame, m.mName, ResultEnum.Missed);
+            }
         }
     }
 

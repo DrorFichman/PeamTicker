@@ -100,6 +100,48 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/players_bench"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:padding="5dp"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:text="@string/teams_bench_title" />
+
+            <ImageView
+                android:id="@+id/empty_bench"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:padding="5dp"
+                android:src="@drawable/reverse" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/players_bench_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/darker_gray"
+            android:divider="@null"
+            android:padding="5dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/internal_stats_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -173,7 +215,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp">
 
@@ -218,12 +260,12 @@
             android:id="@+id/save_results"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:layout_weight="1"
             android:background="@color/fui_transparent"
             android:drawableTop="@drawable/save"
             android:text="@string/action_button_results"
             android:textAllCaps="false"
-            android:layout_marginBottom="20dp"
             android:visibility="visible" />
 
     </LinearLayout>

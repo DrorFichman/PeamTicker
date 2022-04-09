@@ -17,4 +17,6 @@
     <color name="low">#CC0000</color>
     <color name="high">#05c880</color>
 
+    <color name="moved_highlight">#2ECC71</color>
+
 </resources>

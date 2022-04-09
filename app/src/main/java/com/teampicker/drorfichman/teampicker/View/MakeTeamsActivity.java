@@ -35,7 +35,6 @@ import com.teampicker.drorfichman.teampicker.Controller.TeamDivision.TeamDivisio
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
 import com.teampicker.drorfichman.teampicker.Data.TeamData;
 import com.teampicker.drorfichman.teampicker.Data.TeamEnum;
 import com.teampicker.drorfichman.teampicker.R;
@@ -61,6 +60,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
     public ArrayList<Player> players1 = new ArrayList<>();
     public ArrayList<Player> players2 = new ArrayList<>();
     ArrayList<Player> movedPlayers = new ArrayList<>();
+    ArrayList<Player> benchedPlayers = new ArrayList<>();
+    ArrayList<Player> returnFromBenchPlayers = new ArrayList<>();
     ArrayList<Player> missedPlayers = new ArrayList<>();
 
     public Collaboration analysisResult;
@@ -70,27 +71,31 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private boolean mSetResult;
     private TeamDivision.DivisionStrategy selectedDivision = TeamDivision.DivisionStrategy.Grade;
 
+    private boolean mMoveMode;
+
     private ListView list2;
     private ListView list1;
+    private ListView benchList;
     private TextView teamData2;
     private TextView teamData1;
     private TextView headlines;
 
+    private View benchListLayout;
     private View teamsScreenArea;
-    View progressBarTeamDivision;
+    private View progressBarTeamDivision;
     TextView progressBarTeamDivisionStatus;
-    protected View teamStatsLayout;
-    protected View buttonsLayout;
-    protected View shuffleLayout;
+    private View teamStatsLayout;
+    private View buttonsLayout;
+    private View shuffleLayout;
 
-    private View moveView;
+    private Button moveView;
     private Button shuffleView;
     private Button shuffleOptions;
+    private Button saveView;
 
     private View resultViews;
     private NumberPicker team1Score;
     private NumberPicker team2Score;
-    private Button saveView;
     private Button setGameDate;
 
     protected View analysisHeaders1;
@@ -125,15 +130,22 @@ public class MakeTeamsActivity extends AppCompatActivity {
         list1 = findViewById(R.id.team_1);
         list2 = findViewById(R.id.team_2);
         list1.setOnItemClickListener(playerClicked);
+        list1.setOnItemLongClickListener(playerBenched);
         list2.setOnItemClickListener(playerClicked);
+        list2.setOnItemLongClickListener(playerBenched);
         setDefaultTeamColors();
+
+        benchListLayout = findViewById(R.id.players_bench);
+        benchList = findViewById(R.id.players_bench_list);
+        benchList.setOnItemLongClickListener(playerBenched);
+        findViewById(R.id.empty_bench).setOnClickListener(emptyBenchClick);
 
         moveView = findViewById(R.id.move);
         moveView.setOnClickListener(onMoveClicked);
         moveView.setOnLongClickListener(switchTeamsColors);
 
         saveView = findViewById(R.id.save_results);
-        saveView.setOnClickListener(view -> resultsClicked());
+        saveView.setOnClickListener(view -> saveResultsClicked());
 
         shuffleView = findViewById(R.id.shuffle);
         shuffleView.setOnClickListener(v -> shuffleClicked());
@@ -152,8 +164,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private void showTutorials() {
         TutorialManager.TutorialDisplayState show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.pick_teams, false);
-        if (show == NotDisplayed) show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_shuffle_stats, false);
-        if (show == NotDisplayed) show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_analysis, false);
+        if (show == NotDisplayed)
+            show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_shuffle_stats, false);
+        if (show == NotDisplayed)
+            show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_analysis, false);
     }
 
     private void shuffleClicked() {
@@ -240,10 +254,13 @@ public class MakeTeamsActivity extends AppCompatActivity {
         return DbHelper.getComingPlayers(this, RECENT_GAMES);
     }
 
-    private void resultsClicked() {
+    private void saveResultsClicked() {
         if (!mSetResult) {
             initSetResults();
         } else {
+            // Remove bench players before persisting the
+            saveCurrentTeams(false);
+
             int currGame = DbHelper.getActiveGame(this);
             Game game = new Game(currGame, getGameDateString(), team1Score.getValue(), team2Score.getValue());
 
@@ -274,7 +291,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         displayResultsViews(true);
 
-        DbHelper.saveTeams(this, players1, players2); // save teams when switching to results
+        // save teams when switching to results
+        saveCurrentTeams();
     }
 
     private void cancelSetResults() {
@@ -333,26 +351,23 @@ public class MakeTeamsActivity extends AppCompatActivity {
             Toast.makeText(this, "Initial teams", Toast.LENGTH_SHORT).show();
             divideComingPlayers(selectedDivision);
         } else {
-            Log.d("teams", "Initial data curr game > 0 - so getting from DB");
             players1 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team1, RECENT_GAMES);
             players2 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team2, RECENT_GAMES);
 
-            ArrayList<Player> comingPlayers = getPlayers();
+            benchedPlayers = DbHelper.getCurrTeam(this, currGame, TeamEnum.Bench, RECENT_GAMES);
 
-            if (players1 != null && players1.size() > 0 && players2 != null && players2.size() > 0) {
-                boolean changed = handleComingChanges(comingPlayers, players1, players2);
-                refreshPlayers();
+            boolean changed = handleComingChanges(getPlayers());
+            if (benchedPlayers.size() > 0) {
+                enterMoveMode();
                 if (changed)
-                    Toast.makeText(this, "Changes in coming players applied", Toast.LENGTH_SHORT).show();
-            } else {
-                Log.e("TEAMS", "Unable to find teams for curr game " + currGame);
-                divideComingPlayers(selectedDivision);
+                    Snackbar.make(this, benchListLayout, "Notice: some players are benched", Snackbar.LENGTH_SHORT).show();
             }
+
+            refreshPlayers();
         }
     }
 
-    private boolean handleComingChanges(ArrayList<Player> comingPlayers,
-                                        ArrayList<Player> players1, ArrayList<Player> players2) {
+    private boolean handleComingChanges(ArrayList<Player> comingPlayers) {
         boolean isChanged = false;
 
         HashMap<String, Player> all = new HashMap<>();
@@ -362,8 +377,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         isChanged = removeNonComingPlayers(players1, all) || isChanged;
         isChanged = removeNonComingPlayers(players2, all) || isChanged;
+        isChanged = removeNonComingPlayers(benchedPlayers, all) || isChanged;
         isChanged = isChanged || all.values().size() > 0;
-        players1.addAll(all.values());
+
+        benchedPlayers.addAll(all.values());
 
         return isChanged;
     }
@@ -384,8 +401,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void onSendClicked() {
-        Log.d("teams", "Enter send mode");
-        DbHelper.saveTeams(MakeTeamsActivity.this, players1, players2);
+        saveCurrentTeams();
         enterSendMode();
 
         final Runnable r = () -> {
@@ -398,8 +414,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void enterSendMode() {
-
-        clearMovedPlayers();
+        exitMovedPlayersMode();
         teamStatsLayout.setVisibility(View.INVISIBLE);
 
         refreshPlayers(false);
@@ -416,21 +431,20 @@ public class MakeTeamsActivity extends AppCompatActivity {
         selectedDivision = division;
 
         if (division == TeamDivision.DivisionStrategy.Optimize) {
-            Toast.makeText(this, R.string.operation_divide_by_collaboration, Toast.LENGTH_SHORT).show();
+            Snackbar.make(list1, R.string.operation_divide_by_collaboration, Snackbar.LENGTH_SHORT).show();
 
             TutorialManager.userActionTaken(this, TutorialManager.TutorialUserAction.clicked_shuffle_stats);
             dividePlayersAsync();
         } else {
-            if (division == TeamDivision.DivisionStrategy.Age)
-                Toast.makeText(this, R.string.operation_divide_by_age, Toast.LENGTH_SHORT).show();
-
             divideComingPlayers(division, true);
         }
     }
 
     protected void divideComingPlayers(TeamDivision.DivisionStrategy selectedDivision, boolean refreshPlayersView) {
 
+        // Divide only the players that are not on the bench
         ArrayList<Player> comingPlayers = getPlayers();
+        comingPlayers.removeAll(benchedPlayers);
 
         int totalPlayers = comingPlayers.size();
         int teamSize = totalPlayers / 2;
@@ -456,7 +470,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
             initCollaboration();
         }
 
-        clearMovedPlayers();
+        exitMovedPlayersMode();
         refreshPlayers();
     }
 
@@ -475,13 +489,26 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        DbHelper.saveTeams(this, players1, players2); // save teams when leaving activity
+        // Applies the changes made (shuffle/manual) when leaving activity
+        // It also copies the latest game teams after a game result is saved
+        saveCurrentTeams();
         super.onPause();
     }
 
-    private void clearMovedPlayers() {
+    private void saveCurrentTeams() {
+        saveCurrentTeams(true);
+    }
+
+    private void saveCurrentTeams(boolean saveBench) {
+        DbHelper.saveTeams(this, players1, players2, saveBench ? benchedPlayers : null, missedPlayers);
+    }
+
+    private void exitMovedPlayersMode() {
         movedPlayers.clear();
-        moveView.setAlpha(1F);
+        returnFromBenchPlayers.clear();
+        moveView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.move, 0, 0);
+        mMoveMode = false;
+        exitBenchMode();
     }
 
     public void onRequestPermissionsResult(int requestCode,
@@ -492,33 +519,59 @@ public class MakeTeamsActivity extends AppCompatActivity {
             if (grantResults.length > 0 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 exitSendMode();
-                Toast.makeText(this, "We're ready! you can now share your screenshot :)", Toast.LENGTH_LONG).show();
+                Snackbar.make(list1, "We're ready! you can now share your screenshot :)", Snackbar.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void refreshPlayers() {
+        refreshPlayers(true);
     }
 
     private void refreshPlayers(boolean showInternalData) {
         sortPlayerNames(players1);
         sortPlayerNames(players2);
 
+        ArrayList<Player> moved = getMovedPlayers();
+
         if (analysisResult != null) {
-            list1.setAdapter(new PlayerTeamAnalysisAdapter(this, players1, movedPlayers, missedPlayers, analysisResult, analysisSelectedPlayer));
-            list2.setAdapter(new PlayerTeamAnalysisAdapter(this, players2, movedPlayers, missedPlayers, analysisResult, analysisSelectedPlayer));
+            list1.setAdapter(new PlayerTeamAnalysisAdapter(this, players1, moved, missedPlayers, analysisResult, analysisSelectedPlayer));
+            list2.setAdapter(new PlayerTeamAnalysisAdapter(this, players2, moved, missedPlayers, analysisResult, analysisSelectedPlayer));
         } else {
-            list1.setAdapter(new PlayerTeamAdapter(this, players1, movedPlayers, missedPlayers, showInternalData));
-            list2.setAdapter(new PlayerTeamAdapter(this, players2, movedPlayers, missedPlayers, showInternalData));
+            list1.setAdapter(new PlayerTeamAdapter(this, players1, moved, missedPlayers, showInternalData));
+            list2.setAdapter(new PlayerTeamAdapter(this, players2, moved, missedPlayers, showInternalData));
+            benchList.setAdapter(new PlayerTeamAdapter(this, benchedPlayers, benchedPlayers, null, false));
         }
 
         updateStats();
+
+        moveView.setText(benchedPlayers.size() == 0 ?
+                getString(R.string.move_players) :
+                getString(R.string.move_players_bench, benchedPlayers.size()));
     }
 
-    public void clearLists() {
+    private ArrayList<Player> getMovedPlayers() {
+        ArrayList<Player> list = new ArrayList<Player>();
+        list.addAll(movedPlayers);
+        list.addAll(returnFromBenchPlayers);
+        return list;
+    }
+
+    public void preDivideAsyncHideLists() {
+        progressBarTeamDivision.setVisibility(View.VISIBLE);
+        teamStatsLayout.setVisibility(View.INVISIBLE);
+        buttonsLayout.setVisibility(View.INVISIBLE);
+        benchListLayout.setVisibility(View.INVISIBLE);
+
         list1.setAdapter(null);
         list2.setAdapter(null);
     }
 
-    private void refreshPlayers() {
-        refreshPlayers(true);
+    public void postDivideAsyncShowTeams() {
+        progressBarTeamDivisionStatus.setText("");
+        progressBarTeamDivision.setVisibility(View.GONE);
+        teamStatsLayout.setVisibility(View.VISIBLE);
+        buttonsLayout.setVisibility(View.VISIBLE);
     }
 
     private void updateStats() {
@@ -589,24 +642,49 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private boolean isMoveMode() {
-        return moveView != null && moveView.getAlpha() < 1F;
+        return mMoveMode;
     }
 
     private View.OnClickListener onMoveClicked = view -> {
         if (!backFromMove()) { // enter move mode
-            Toast.makeText(this, R.string.operation_move, Toast.LENGTH_SHORT).show();
-            moveView.setAlpha(0.5F);
+            // TODO tutorial? Snackbar.make(list1, R.string.operation_move, Snackbar.LENGTH_SHORT).show();
+            enterMoveMode();
         }
+    };
+
+    private void enterMoveMode() {
+        moveView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.move_green, 0, 0);
+        mMoveMode = true;
+        enterBenchMode();
+    }
+
+    private View.OnClickListener emptyBenchClick = view -> {
+        players1.addAll(benchedPlayers);
+        returnFromBenchPlayers.addAll(benchedPlayers);
+        benchedPlayers.clear();
+        exitBenchMode();
+        refreshPlayers();
     };
 
     private boolean backFromMove() {
         if (isMoveMode()) { // exit move mode
-            clearMovedPlayers();
+            exitMovedPlayersMode();
+            exitBenchMode();
             setActivityTitle(null);
             refreshPlayers();
             return true;
         }
         return false;
+    }
+
+    private void enterBenchMode() {
+        benchListLayout.setVisibility(View.VISIBLE);
+        teamStatsLayout.setVisibility(View.GONE);
+    }
+
+    private void exitBenchMode() {
+        benchListLayout.setVisibility(View.GONE);
+        teamStatsLayout.setVisibility(View.VISIBLE);
     }
 
     View.OnLongClickListener switchTeamsColors = v -> {
@@ -618,6 +696,13 @@ public class MakeTeamsActivity extends AppCompatActivity {
                     players2 = temp;
                     refreshPlayers();
                 });
+        return true;
+    };
+
+    private AdapterView.OnItemLongClickListener playerBenched = (adapterView, view, i, l) -> {
+        if (!isMoveMode()) enterMoveMode();
+        Player player = (Player) adapterView.getItemAtPosition(i);
+        benchPlayer(player);
         return true;
     };
 
@@ -651,16 +736,11 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 // Switch player NA/Missed status
                 if (missedPlayers.contains(player)) {
                     missedPlayers.remove(player);
-                    DbHelper.setPlayerResult(MakeTeamsActivity.this,
-                            DbHelper.getActiveGame(MakeTeamsActivity.this), player.mName, ResultEnum.NA);
                 } else {
                     missedPlayers.add(player);
-                    DbHelper.setPlayerResult(MakeTeamsActivity.this,
-                            DbHelper.getActiveGame(MakeTeamsActivity.this), player.mName, ResultEnum.Missed);
                 }
 
                 refreshPlayers();
-
             } else {
 
                 Intent intent = PlayerParticipationActivity.getPlayerParticipationActivity(
@@ -684,6 +764,22 @@ public class MakeTeamsActivity extends AppCompatActivity {
         } else if (players2.contains(movedPlayer)) {
             players1.add(movedPlayer);
             players2.remove(movedPlayer);
+        }
+
+        refreshPlayers();
+    }
+
+    private void benchPlayer(Player benchedPlayer) {
+        if (players1.contains(benchedPlayer)) {
+            players1.remove(benchedPlayer);
+            benchedPlayers.add(benchedPlayer);
+        } else if (players2.contains(benchedPlayer)) {
+            players2.remove(benchedPlayer);
+            benchedPlayers.add(benchedPlayer);
+        } else if (benchedPlayers.contains(benchedPlayer)) {
+            benchedPlayers.remove(benchedPlayer);
+            returnFromBenchPlayers.add(benchedPlayer);
+            players1.add(benchedPlayer);
         }
 
         refreshPlayers();
@@ -714,7 +810,14 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
     }
 
-    public void enterAnalysis() {
+    public void enterAnalysisAsync() {
+        analysisAsyncInProgress = true;
+        teamStatsLayout.setVisibility(View.INVISIBLE);
+        exitMovedPlayersMode();
+    }
+
+    public void exitAnalysisAsync() {
+        analysisAsyncInProgress = false;
         teamStatsLayout.setVisibility(View.VISIBLE);
         analysisHeaders1.setVisibility(View.VISIBLE);
         analysisHeaders2.setVisibility(View.VISIBLE);

@@ -1,7 +1,6 @@
 package com.teampicker.drorfichman.teampicker.View;
 
 import android.os.AsyncTask;
-import android.view.View;
 
 import com.teampicker.drorfichman.teampicker.Controller.TeamDivision.TeamDivision;
 
@@ -37,11 +36,7 @@ class AsyncDivideCollaboration extends AsyncTask<Void, Void, String> {
         MakeTeamsActivity activity = ref.get();
         if (activity == null || activity.isFinishing()) return;
 
-        activity.progressBarTeamDivision.setVisibility(View.VISIBLE);
-        activity.teamStatsLayout.setVisibility(View.INVISIBLE);
-        activity.buttonsLayout.setVisibility(View.INVISIBLE);
-
-        activity.clearLists();
+        activity.preDivideAsyncHideLists();
     }
 
     @Override
@@ -52,9 +47,6 @@ class AsyncDivideCollaboration extends AsyncTask<Void, Void, String> {
 
         doneHandler.execute();
 
-        activity.progressBarTeamDivisionStatus.setText("");
-        activity.progressBarTeamDivision.setVisibility(View.GONE);
-        activity.teamStatsLayout.setVisibility(View.VISIBLE);
-        activity.buttonsLayout.setVisibility(View.VISIBLE);
+        activity.postDivideAsyncShowTeams();
     }
 }

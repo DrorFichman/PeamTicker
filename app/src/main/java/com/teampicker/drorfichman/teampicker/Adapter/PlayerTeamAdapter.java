@@ -1,6 +1,7 @@
 package com.teampicker.drorfichman.teampicker.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class PlayerTeamAdapter extends ArrayAdapter<Player> {
 
     private boolean isAttributesVisible;
     private boolean isGradeVisible;
+    private final boolean isRecentGamesVisible;
 
     public PlayerTeamAdapter(Context ctx, List<Player> players,
                              List<Player> coloredPlayers, List<Player> markedPlayers,
@@ -38,6 +40,7 @@ public class PlayerTeamAdapter extends ArrayAdapter<Player> {
 
         isGradeVisible = showInternalData;
         isAttributesVisible = showInternalData;
+        isRecentGamesVisible = showInternalData;
     }
 
     @Override
@@ -64,10 +67,12 @@ public class PlayerTeamAdapter extends ArrayAdapter<Player> {
 
         if (mMarkedPlayers.contains(player)) {
             rowView.setAlpha(0.4F);
+            rowView.setBackgroundColor(Color.TRANSPARENT);
         } else if (mMovedPlayers.contains(player)) {
-            rowView.setAlpha(0.4F);
+            rowView.setBackgroundColor(Color.parseColor("#2ECC71"));
         } else {
             rowView.setAlpha(1F);
+            rowView.setBackgroundColor(Color.TRANSPARENT);
         }
     }
 
@@ -100,18 +105,20 @@ public class PlayerTeamAdapter extends ArrayAdapter<Player> {
             im.setVisibility(View.INVISIBLE);
         }
 
-        for (int r = 0; r < player.results.size() && r < starView.size(); ++r) {
-            ResultEnum res = player.results.get(r).result;
-            if (res == ResultEnum.Win) {
-                starView.get(r).setImageResource(R.drawable.circle_win);
-            } else if (res == ResultEnum.Lose) {
-                starView.get(r).setImageResource(R.drawable.circle_lose);
-            } else if (res == ResultEnum.Tie) {
-                starView.get(r).setImageResource(R.drawable.circle_draw);
-            } else if (res == ResultEnum.Missed) {
-                starView.get(r).setImageResource(R.drawable.circle_na);
+        if (isRecentGamesVisible) {
+            for (int r = 0; r < player.results.size() && r < starView.size(); ++r) {
+                ResultEnum res = player.results.get(r).result;
+                if (res == ResultEnum.Win) {
+                    starView.get(r).setImageResource(R.drawable.circle_win);
+                } else if (res == ResultEnum.Lose) {
+                    starView.get(r).setImageResource(R.drawable.circle_lose);
+                } else if (res == ResultEnum.Tie) {
+                    starView.get(r).setImageResource(R.drawable.circle_draw);
+                } else if (res == ResultEnum.Missed) {
+                    starView.get(r).setImageResource(R.drawable.circle_na);
+                }
+                starView.get(r).setVisibility(View.VISIBLE);
             }
-            starView.get(r).setVisibility(View.VISIBLE);
         }
     }
 }

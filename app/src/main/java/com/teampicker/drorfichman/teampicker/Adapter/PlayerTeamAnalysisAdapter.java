@@ -124,7 +124,7 @@ public class PlayerTeamAnalysisAdapter extends ArrayAdapter<Player> {
                 collaboration.setText(data.getExpectedWinRateString());
 
                 setColorAlpha(getContext(), winRate, data.winRate - 50, MAX_DELTA_WIN_RATE_ALPHA);
-                setColorAlpha(getContext(), collaboration,  data.getExpectedWinRate() - data.winRate, MAX_DELTA_ALPHA);
+                setColorAlpha(getContext(), collaboration, data.getExpectedWinRate() - data.winRate, MAX_DELTA_ALPHA);
             } else {
                 setEmptyData(winRate, games, collaboration);
             }

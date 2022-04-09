@@ -13,19 +13,20 @@ import androidx.annotation.DrawableRes;
 public enum TeamEnum {
     Team1(0, -1),
     Team2(1, -1),
-    Tie(-1, R.drawable.circle_draw);
+    Tie(-1, R.drawable.circle_draw),
+    Bench(-1, -1);
 
     private int drawable;
-    private int drawableIndex;
+    private int teamColorIndex;
 
     TeamEnum(int drawableIndex, int drawableResource) {
-        this.drawableIndex = drawableIndex;
+        this.teamColorIndex = drawableIndex;
         drawable = drawableResource;
     }
 
     public static TeamEnum getResultFromOrdinal(int res) {
         for (TeamEnum r : TeamEnum.values()) {
-            if (r.drawableIndex == res) {
+            if (r.teamColorIndex == res) {
                 return r;
             }
         }
@@ -34,9 +35,9 @@ public enum TeamEnum {
 
     @DrawableRes
     public int getDrawable(Context ctx) {
-        if (drawableIndex == 0 || drawableIndex == 1) {
+        if (teamColorIndex == 0 || teamColorIndex == 1) {
             int[] colors = ColorHelper.getTeamsIcons(ctx);
-            return colors[drawableIndex];
+            return colors[teamColorIndex];
         } else {
             return drawable;
         }

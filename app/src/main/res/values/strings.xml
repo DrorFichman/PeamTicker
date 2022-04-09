@@ -39,7 +39,9 @@
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>
     <string name="new_player">New Player</string>
-    <string name="move_players">Transfer</string>
+    <string name="move_players">Transfers</string>
+    <string name="move_players_bench">"Transfers\n(%1$d benched)"</string>
+    <string name="bench_players">Bench</string>
     <string name="shuffle_age">By Age</string>
     <string name="shuffle_grade">By Grade</string>
     <string name="shuffle_stats">By Stats</string>
@@ -49,6 +51,7 @@
     <string name="action_share">Share</string>
     <string name="action_enter_results">Enter Results</string>
     <string name="action_button_results">Results</string>
+    <string name="teams_bench_title">Bench</string>
 
     <!--    Navigation-->
     <string name="nav_players">Players</string>
@@ -102,10 +105,9 @@
     <string name="player_analysis_selected">"(W:%1$02d%% G:%2$02d) [%3$s]"</string>
     <string name="player_analysis_selected_win_rate">"%1$02d%%"</string>
     <string name="player_analysis_selected_games">"%1$02d</string>
-    <string name="operation_move">* Click players to change teams \n* Exit mode using the same icon</string>
+    <string name="operation_move">* Click players to change teams * Long press to bench</string>
     <string name="operation_divide_by_collaboration">* AI in progress :)</string>
     <string name="analysis_progress_update">"%1$d%% (%2$s)"</string>
-    <string name="operation_divide_by_age">* Divide by age :)</string>
     <string name="operation_analysis">* Click the players for deeper analysis \n* Click icon to exit analysis mode</string>
     <string name="copy_players_success">Teams division applied</string>
     <string name="main_make_teams">"Teams (%1$d)"</string>

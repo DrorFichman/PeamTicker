@@ -274,7 +274,7 @@ public class GamesFragment extends Fragment {
         DbHelper.clearComingPlayers(activity);
         DbHelper.setPlayerComing(activity, mTeam1);
         DbHelper.setPlayerComing(activity, mTeam2);
-        DbHelper.saveTeams(activity, mTeam1, mTeam2);
+        DbHelper.saveTeams(activity, mTeam1, mTeam2, null, null);
         Toast.makeText(activity, R.string.copy_players_success, Toast.LENGTH_SHORT).show();
 
         LocalNotifications.sendNotification(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION);
