@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class PlayerTeamAdapter extends ArrayAdapter<Player> {
 
     public PlayerTeamAdapter(Context ctx, List<Player> players,
                              List<Player> coloredPlayers, List<Player> markedPlayers,
-                             boolean showInternalData) {
+                             boolean showInternalData, boolean showRecentGames) {
         super(ctx, -1, players);
         context = ctx;
         mPlayers = players;
@@ -40,7 +41,7 @@ public class PlayerTeamAdapter extends ArrayAdapter<Player> {
 
         isGradeVisible = showInternalData;
         isAttributesVisible = showInternalData;
-        isRecentGamesVisible = showInternalData;
+        isRecentGamesVisible = showRecentGames;
     }
 
     @Override
@@ -85,7 +86,7 @@ public class PlayerTeamAdapter extends ArrayAdapter<Player> {
     }
 
     private void setGrade(Player player, TextView grade) {
-        if (isGradeVisible) {
+        if (isGradeVisible && SettingsHelper.getShowGrades(context)) {
             grade.setText(String.valueOf(player.mGrade));
             grade.setVisibility(View.VISIBLE);
         } else {

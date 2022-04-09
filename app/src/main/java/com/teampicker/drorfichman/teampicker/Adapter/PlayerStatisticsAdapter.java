@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
         nameView.setText(p.mName);
         view.setBackgroundColor(FilterView.match(p.mName, filterName) ? Color.GRAY : Color.TRANSPARENT);
 
-        if (isGradeVisible) {
+        if (isGradeVisible && SettingsHelper.getShowGrades(context)) {
             gradeView.setText(String.valueOf(p.mGrade));
         } else {
             gradeView.setVisibility(View.INVISIBLE);

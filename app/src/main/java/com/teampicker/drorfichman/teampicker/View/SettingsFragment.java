@@ -22,6 +22,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setDivisionAttemptsPreference();
         setDivisionGradePercentage();
         setTutorialsReset();
+        setShowGrade();
+    }
+
+    private void setShowGrade() {
+        Preference showGrade = findPreference(SettingsHelper.SETTING_SHOW_GRADES);
+        showGrade.setOnPreferenceChangeListener((preference, newValue) -> {
+            LocalNotifications.sendNotification(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION);
+            return true;
+        });
     }
 
     private void setTutorialsReset() {

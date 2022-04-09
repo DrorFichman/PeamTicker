@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory android:title="Pick Teams">
 
@@ -17,6 +18,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Appearance">
+        <CheckBoxPreference
+            android:icon="@drawable/nav_setting"
+            android:key="show_grades"
+            android:defaultValue="true"
+            android:summary="@string/setting_title_show_grades"
+            app:title="Show Grades" />
+
         <DropDownPreference
             android:entries="@array/settings_team_color_scheme"
             android:entryValues="@array/settings_team_color_scheme"

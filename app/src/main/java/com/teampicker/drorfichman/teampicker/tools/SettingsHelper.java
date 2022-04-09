@@ -13,6 +13,7 @@ public class SettingsHelper {
     public static final String SETTING_DIVIDE_GRADE = "divide_grade_percentage";
     public static final String SETTING_TEAM_COLOR_SCHEME = "teams_color_scheme";
     public static final String SETTING_RESET_TUTORIALS = "setting_clear_tutorial";
+    public static final String SETTING_SHOW_GRADES = "show_grades";
 
     private static int getPreferenceValue(Context ctx, String preferenceKey, int defaultValue) {
         try {
@@ -49,5 +50,9 @@ public class SettingsHelper {
     public static String getColorScheme(Context ctx) {
         return getPreferenceValue(ctx, SETTING_TEAM_COLOR_SCHEME,
                 ctx.getString(ColorHelper.ColorScheme.OrangeBlue.stringRes));
+    }
+
+    public static boolean getShowGrades(Context ctx) {
+        return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_SHOW_GRADES, true);
     }
 }

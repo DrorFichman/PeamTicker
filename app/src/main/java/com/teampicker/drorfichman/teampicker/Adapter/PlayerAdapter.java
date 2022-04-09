@@ -14,6 +14,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 
 import java.util.List;
 
@@ -63,6 +64,11 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     }
 
     private void setGrade(TextView grade, Player player) {
+        if (!SettingsHelper.getShowGrades(context)) {
+            grade.setVisibility(View.INVISIBLE);
+            return;
+        }
+
         if (isMsgIdentifier(player)) {
             grade.setVisibility(View.GONE);
         } else {
@@ -125,6 +131,11 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     }
 
     private void setPlayerRecentPerformance(TextView recentPerformance, Player player) {
+        if (!SettingsHelper.getShowGrades(context)) {
+            recentPerformance.setVisibility(View.INVISIBLE);
+            return;
+        }
+
         int suggestedGrade = player.getSuggestedGrade();
 
         if (suggestedGrade > player.mGrade) {

@@ -538,9 +538,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
             list1.setAdapter(new PlayerTeamAnalysisAdapter(this, players1, moved, missedPlayers, analysisResult, analysisSelectedPlayer));
             list2.setAdapter(new PlayerTeamAnalysisAdapter(this, players2, moved, missedPlayers, analysisResult, analysisSelectedPlayer));
         } else {
-            list1.setAdapter(new PlayerTeamAdapter(this, players1, moved, missedPlayers, showInternalData));
-            list2.setAdapter(new PlayerTeamAdapter(this, players2, moved, missedPlayers, showInternalData));
-            benchList.setAdapter(new PlayerTeamAdapter(this, benchedPlayers, benchedPlayers, null, false));
+            list1.setAdapter(new PlayerTeamAdapter(this, players1, moved, missedPlayers, showInternalData, true));
+            list2.setAdapter(new PlayerTeamAdapter(this, players2, moved, missedPlayers, showInternalData, true));
+            benchList.setAdapter(new PlayerTeamAdapter(this, benchedPlayers, benchedPlayers, null, false, false));
         }
 
         updateStats();
