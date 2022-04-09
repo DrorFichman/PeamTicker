@@ -1,6 +1,7 @@
 package com.teampicker.drorfichman.teampicker.tools.cloud.queries;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +29,8 @@ public class GetUsers {
                 ArrayList<AccountData> users = new ArrayList<>();
                 for (DataSnapshot snapshotNode : snapshot.getChildren()) {
                     AccountData a = snapshotNode.child(FirebaseHelper.Node.account.name()).getValue(AccountData.class);
-                    users.add(a);
+                    if (a != null && !TextUtils.isEmpty(a.displayName) && !TextUtils.isEmpty(a.uid))
+                        users.add(a);
                     Log.i("getUsers", "Account " + a);
                 }
 
