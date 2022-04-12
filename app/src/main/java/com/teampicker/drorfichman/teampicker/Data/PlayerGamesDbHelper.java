@@ -135,10 +135,10 @@ public class PlayerGamesDbHelper {
     public static void clearOldGameTeams(SQLiteDatabase db) {
         Log.d("teams", "Clear old Game teams ");
 
+        // Delete only rows with EMPTY_RESULT = -10 value
         int n = db.delete(PlayerContract.PlayerGameEntry.TABLE_NAME,
-                PlayerContract.PlayerGameEntry.GAME + " NOT IN " +
-                        " ( SELECT " + PlayerContract.GameEntry.GAME +
-                        " FROM " + PlayerContract.GameEntry.TABLE_NAME + " )", null);
+                PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ? ",
+                new String[]{String.valueOf(PlayerGamesDbHelper.EMPTY_RESULT)});
 
         Log.d("teams", "deleted games players " + n);
     }
@@ -258,7 +258,11 @@ public class PlayerGamesDbHelper {
     static class PlayerGameResult {
         int team;
         ResultEnum result;
-        PlayerGameResult(int t, ResultEnum r) {team = t; result = r;}
+
+        PlayerGameResult(int t, ResultEnum r) {
+            team = t;
+            result = r;
+        }
     }
 
     public static PlayerGameResult getPlayerResult(SQLiteDatabase db, int gameId, String name) {
