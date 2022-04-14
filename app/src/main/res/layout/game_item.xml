@@ -61,6 +61,16 @@
         android:visibility="gone" />
 
     <TextView
+        android:id="@+id/game_player_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="end|center_vertical"
+        android:paddingEnd="5dp"
+        android:textAppearance="@style/regularText"
+        android:textSize="13sp" />
+
+    <TextView
         android:id="@+id/game_date"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

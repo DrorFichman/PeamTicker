@@ -100,6 +100,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
 
         final Game g = getGroup(position);
         TextView dateView = view.findViewById(R.id.game_date);
+        TextView playerCountView = view.findViewById(R.id.game_player_count);
         TextView resultSet1 = view.findViewById(R.id.game_result_set1);
         TextView resultSet2 = view.findViewById(R.id.game_result_set2);
         TextView resultDivider = view.findViewById(R.id.game_result_set_divider);
@@ -108,7 +109,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
 
         dateView.setText(DateHelper.getDisplayDate(context, g.dateString));
         setResults(g, resultSet1, resultSet2, resultDivider);
-
+        setPlayerCount(g, playerCountView);
         setPlayerResult(res, g);
         setPlayerGrade(playerGrade, g);
 
@@ -117,6 +118,12 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
 
         view.setBackgroundColor(expanded ? Color.GRAY : Color.TRANSPARENT);
         return view;
+    }
+
+    private void setPlayerCount(Game g, TextView playerCountView) {
+        ArrayList<Player> team1 = DbHelper.getCurrTeam(context, g.gameId, TeamEnum.Team1, 0);
+        ArrayList<Player> team2 = DbHelper.getCurrTeam(context, g.gameId, TeamEnum.Team2, 0);
+        playerCountView.setText(context.getString(R.string.games_player_count, team1.size() + team2.size()));
     }
 
     @Override
