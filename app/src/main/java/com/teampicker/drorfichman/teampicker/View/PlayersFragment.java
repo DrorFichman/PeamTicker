@@ -58,6 +58,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private static final int RECENT_GAMES_COUNT = 10; // for +/- grade suggestion
 
     Sorting sorting = new Sorting(this::sortingChanged, SortType.coming);
+    boolean playerComingChanged = false;
 
     private boolean showArchivedPlayers = false;
     private boolean showPastedPlayers = false;
@@ -229,6 +230,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         super.onResume();
         backPress.setEnabled(handleBackPress());
         showTutorials();
+
+        if (playerComingChanged) {
+            playerComingChanged = false;
+            refreshPlayers();
+        }
     }
 
     @Override
@@ -280,6 +286,12 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         return super.onOptionsItemSelected(item);
     }
 
+    private void onPlayerComingChanged(boolean coming) {
+        playerComingChanged = coming || playerComingChanged;
+
+        setComingPlayersCount();
+    }
+
     private void setComingPlayersCount() {
         ((Button) rootView.findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, DbHelper.getComingPlayersCount(getContext())));
         // TODO ugly
@@ -307,7 +319,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         playersList.setVisibility(hasPlayers ? View.VISIBLE : View.GONE);
 
         setHeadlines(true);
-        playersAdapter = new PlayerAdapter(getContext(), players, this::setComingPlayersCount);
+        playersAdapter = new PlayerAdapter(getContext(), players, this::onPlayerComingChanged);
 
         if (clickHandler != null) {
             playersList.setOnItemClickListener(clickHandler);

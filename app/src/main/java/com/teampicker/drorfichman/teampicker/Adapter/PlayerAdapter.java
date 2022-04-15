@@ -24,7 +24,7 @@ import java.util.List;
 public class PlayerAdapter extends ArrayAdapter<Player> {
 
     public interface onPlayerComingChange {
-        void playerComingChanged();
+        void playerComingChanged(boolean coming);
     }
 
     private final Context context;
@@ -88,7 +88,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
             DbHelper.updatePlayerComing(context, player.mName, vComing.isChecked());
 
             if (handler != null) {
-                handler.playerComingChanged();
+                handler.playerComingChanged(vComing.isChecked());
             }
         });
     }
