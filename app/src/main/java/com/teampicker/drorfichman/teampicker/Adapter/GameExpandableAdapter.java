@@ -206,6 +206,14 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         mTeam1.sort(Comparator.comparing(Player::name));
         mTeam2.sort(Comparator.comparing(Player::name));
 
+        // Cheat to equalize the height of both lists
+        while (mTeam1.size() < mTeam2.size()) {
+            mTeam1.add(new Player("", 0));
+        }
+        while (mTeam2.size() < mTeam1.size()) {
+            mTeam2.add(new Player("", 0));
+        }
+
         team1List.setAdapter(new PlayerTeamGameHistoryAdapter(context, mTeam1, mPlayerName, mPlayerCollaborator));
         team2List.setAdapter(new PlayerTeamGameHistoryAdapter(context, mTeam2, mPlayerName, mPlayerCollaborator));
     }
