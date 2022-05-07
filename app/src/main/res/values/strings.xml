@@ -136,7 +136,7 @@
     <string name="tutorial_save_results_title">Save game result</string>
     <string name="tutorial_save_results_message">"Entering the result of the game once it's over opens the way for game history, personal statistics, and the ability to pick teams based on win rate and players' chemistry.\n\nEnter \"Results\" in the \"Teams\" screen."</string>
     <string name="tutorial_game_history_title">Games History</string>
-    <string name="tutorial_game_history_message">"Select any game in the "Games" tab to view its teams.\n\nLong click to copy the teams."</string>
+    <string name="tutorial_game_history_message">"Select any game in the "Games" tab to view its teams and actions."</string>
     <string name="tutorial_cloud_title">Cloud Features</string>
     <string name="tutorial_cloud_message">"Sync your players and games to the cloud, as backup, or when you plan to pull the data in another device.\n\nFirst, sign in with your Google account through the side menu.\nThen \"Sync\" in the side menu."</string>
     <string name="tutorial_team_analysis_title">Teams Analysis</string>

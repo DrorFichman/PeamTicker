@@ -13,7 +13,7 @@ public class EffectMargin {
     int gamesWith;
     int winRateWith;
     int winRateMarginWith;
-    int winsAndLosesWith; // TODO improve logic copy win rate from statistics
+    int winsAndLosesWith;
     int winsWith;
     int successWith;
     int successMarginWith;

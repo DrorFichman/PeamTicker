@@ -1,6 +1,5 @@
 package com.teampicker.drorfichman.teampicker.View;
 
-import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,34 +11,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
-import com.teampicker.drorfichman.teampicker.Adapter.GameAdapter;
 import com.teampicker.drorfichman.teampicker.Adapter.GameExpandableAdapter;
-import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamGameHistoryAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
-import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.Data.TeamEnum;
 import com.teampicker.drorfichman.teampicker.R;
-import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
-import com.teampicker.drorfichman.teampicker.tools.DateHelper;
-import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
-import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
 
 public class GamesFragment extends Fragment {
 
