@@ -39,7 +39,7 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
     @Exclude
     public StatisticsData statistics;
 
-    private static final int RECENT_GAMES_COUNT = 10;
+    private static final int MAX_RECENT_GAMES_COUNT = 10;
 
     @Exclude
     public int gameResult;
@@ -80,7 +80,7 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
                     historicGrade += r.grade;
                     gameCount++;
                 }
-                if (gameCount > RECENT_GAMES_COUNT) {
+                if (gameCount > MAX_RECENT_GAMES_COUNT) {
                     break;
                 }
             }
@@ -102,7 +102,7 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
                     gameCount++;
                 }
             }
-            if (gameCount > RECENT_GAMES_COUNT) {
+            if (gameCount > MAX_RECENT_GAMES_COUNT) {
                 break;
             }
         }

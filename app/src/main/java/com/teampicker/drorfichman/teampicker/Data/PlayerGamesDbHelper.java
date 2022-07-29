@@ -18,6 +18,7 @@ import java.util.HashMap;
  */
 public class PlayerGamesDbHelper {
 
+    // TODO move ResultEnum, check getValue
     public static final int EMPTY_RESULT = -10;
     public static final int MISSED_GAME = -9;
     public static final int TIE = 0;

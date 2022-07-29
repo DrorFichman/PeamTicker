@@ -358,7 +358,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         showArchivedPlayers = !showArchivedPlayers;
         if (showArchivedPlayers) {
             showPastedPlayers = false;
-            ArrayList<Player> players = DbHelper.getPlayers(getContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
+            ArrayList<Player> players = DbHelper.getPlayers(getContext(), 0, showArchivedPlayers);
             if (players.size() == 0) {
                 Toast.makeText(getContext(), "No archived players found", Toast.LENGTH_SHORT).show();
                 showArchivedPlayers = false;
