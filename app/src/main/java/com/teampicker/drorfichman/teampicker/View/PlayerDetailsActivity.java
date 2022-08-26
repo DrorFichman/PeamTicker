@@ -61,7 +61,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
     private void refreshData(String name) {
         if (!TextUtils.isEmpty(name)) {
             pPlayer = DbHelper.getPlayer(this, name);
-            setTitle("Player : " + pPlayer.mName);
+            setTitle(pPlayer.mName);
         } else {
             setTitle("New Player");
         }

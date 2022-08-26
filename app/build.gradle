@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.teampicker.drorfichman.teampicker"
-        minSdkVersion 26
+        minSdkVersion 29
         targetSdkVersion 32
         versionCode 25
         versionName "0.9.4.1.3"

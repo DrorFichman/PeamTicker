@@ -43,7 +43,7 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="start|center_vertical"
                 android:text="@string/grade_description"
@@ -57,7 +57,17 @@
                 android:hint="@string/grade"
                 android:inputType="number"
                 android:minHeight="48dp"
+                android:visibility="gone"
                 android:singleLine="true" />
+
+            <NumberPicker
+                android:id="@+id/edit_player_grade_picker"
+                android:layout_width="80dp"
+                android:layout_height="90dp"
+                android:gravity="center"
+                android:selectionDividerHeight="5dp"
+                android:theme="@style/NumberPickerText"
+                android:visibility="visible" />
         </LinearLayout>
 
         <LinearLayout
