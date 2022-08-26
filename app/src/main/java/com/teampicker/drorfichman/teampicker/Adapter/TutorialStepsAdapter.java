@@ -1,6 +1,6 @@
 package com.teampicker.drorfichman.teampicker.Adapter;
 
-import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialStepStatus.Done;
+import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.Done;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.teampicker.drorfichman.teampicker.R;
-import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
+import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.List;
 

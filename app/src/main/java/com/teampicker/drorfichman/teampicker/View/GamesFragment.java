@@ -44,7 +44,7 @@ public class GamesFragment extends Fragment {
     }
 
     public GamesFragment() {
-        super(R.layout.layout_games_activity_fragment);
+        super(R.layout.layout_games_fragment);
     }
 
     public static GamesFragment newInstance(String playerName, String collaborator, boolean editable, gamesCountHandler handler) {

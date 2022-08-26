@@ -6,9 +6,8 @@ import android.util.Log;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.teampicker.drorfichman.teampicker.Data.AccountData;
+import com.teampicker.drorfichman.teampicker.tools.cloud.AccountData;
 import com.teampicker.drorfichman.teampicker.R;
-import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.Arrays;
 import java.util.List;

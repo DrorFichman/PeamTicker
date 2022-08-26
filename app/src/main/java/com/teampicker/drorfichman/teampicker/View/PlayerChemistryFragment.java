@@ -23,14 +23,14 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
-import com.teampicker.drorfichman.teampicker.Adapter.PlayerParticipationAdapter;
+import com.teampicker.drorfichman.teampicker.Adapter.PlayerChemistryAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.BuilderPlayerCollaborationStatistics;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.Data.PlayerParticipation;
+import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
@@ -38,10 +38,10 @@ import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PlayerParticipationFragment extends Fragment implements Sorting.sortingCallbacks {
+public class PlayerChemistryFragment extends Fragment implements Sorting.sortingCallbacks {
 
-    private ArrayList<PlayerParticipation> players = new ArrayList<>();
-    private PlayerParticipationAdapter playersAdapter;
+    private ArrayList<PlayerChemistry> players = new ArrayList<>();
+    private PlayerChemistryAdapter playersAdapter;
     private Player pPlayer;
 
     private ArrayList<Player> blue;
@@ -58,13 +58,13 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
     private View gameCountSelection;
     private View chip50Games;
 
-    public PlayerParticipationFragment() {
-        super(R.layout.layout_participation_fragment);
+    public PlayerChemistryFragment() {
+        super(R.layout.layout_chemistry_fragment);
     }
 
-    public static PlayerParticipationFragment newInstance(Player p,
-                                                          ArrayList<Player> blueTeam, ArrayList<Player> orangeTeam) {
-        PlayerParticipationFragment fragment = new PlayerParticipationFragment();
+    public static PlayerChemistryFragment newInstance(Player p,
+                                                      ArrayList<Player> blueTeam, ArrayList<Player> orangeTeam) {
+        PlayerChemistryFragment fragment = new PlayerChemistryFragment();
         fragment.pPlayer = p;
         fragment.orange = orangeTeam;
         fragment.blue = blueTeam;
@@ -192,7 +192,7 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
     }
 
     private AdapterView.OnItemClickListener onPlayerClick = (parent, view, position, id) -> {
-        String selected = ((PlayerParticipation) parent.getItemAtPosition(position)).mName;
+        String selected = ((PlayerChemistry) parent.getItemAtPosition(position)).mName;
         Intent gameActivityIntent = GamesActivity.getGameActivityIntent(getContext(), pPlayer.mName, selected, false);
         startActivity(gameActivityIntent);
     };
@@ -201,7 +201,7 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
         Context context = getContext();
         if (context == null) return;
 
-        HashMap<String, PlayerParticipation> result = DbHelper.getPlayersParticipationStatistics(context, pPlayer.mName,
+        HashMap<String, PlayerChemistry> result = DbHelper.getPlayersParticipationStatistics(context, pPlayer.mName,
                 new BuilderPlayerCollaborationStatistics().setGames(games));
         players.clear();
         players.addAll(result.values());
@@ -210,7 +210,7 @@ public class PlayerParticipationFragment extends Fragment implements Sorting.sor
 
         sorting.sort(players);
 
-        playersAdapter = new PlayerParticipationAdapter(context, players, blue, orange);
+        playersAdapter = new PlayerChemistryAdapter(context, players, blue, orange);
         playersList.setAdapter(playersAdapter);
 
         setGameCountValues();

@@ -210,11 +210,11 @@ public class DbHelper extends SQLiteOpenHelper {
         return PlayerGamesDbHelper.getPlayersStatistics(getSqLiteDatabase(context), games);
     }
 
-    public static HashMap<String, PlayerParticipation> getPlayersParticipationStatistics(Context context, String name, BuilderPlayerCollaborationStatistics params) {
+    public static HashMap<String, PlayerChemistry> getPlayersParticipationStatistics(Context context, String name, BuilderPlayerCollaborationStatistics params) {
         return getPlayersParticipationStatistics(context, params.games, params.upTo, params.cache, name);
     }
 
-    public static HashMap<String, PlayerParticipation> getPlayersParticipationStatistics(Context context, int games, Date upTo, GamesPlayersCache cache, String name) {
+    public static HashMap<String, PlayerChemistry> getPlayersParticipationStatistics(Context context, int games, Date upTo, GamesPlayersCache cache, String name) {
         return PlayerGamesDbHelper.getParticipationStatistics(getSqLiteDatabase(context), games, cache, upTo, name);
     }
 

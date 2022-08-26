@@ -7,7 +7,7 @@ import android.widget.Toast;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
-import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
+import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;

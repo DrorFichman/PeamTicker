@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-public class PlayerParticipationActivity extends AppCompatActivity {
+public class PlayerChemistryActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYER = "EXTRA_PLAYER";
     private static final String EXTRA_BLUE_PLAYERS = "EXTRA_BLUE_PLAYERS";
     private static final String EXTRA_ORANGE_PLAYERS = "EXTRA_ORANGE_PLAYERS";
@@ -26,17 +26,17 @@ public class PlayerParticipationActivity extends AppCompatActivity {
     @NonNull
     public static Intent getPlayerParticipationActivity(Context context, String playerName,
                                                         ArrayList<Player> blue, ArrayList<Player> orange) {
-        Intent intent = new Intent(context, PlayerParticipationActivity.class);
-        intent.putExtra(PlayerParticipationActivity.EXTRA_PLAYER, playerName);
-        intent.putExtra(PlayerParticipationActivity.EXTRA_BLUE_PLAYERS, blue);
-        intent.putExtra(PlayerParticipationActivity.EXTRA_ORANGE_PLAYERS, orange);
+        Intent intent = new Intent(context, PlayerChemistryActivity.class);
+        intent.putExtra(PlayerChemistryActivity.EXTRA_PLAYER, playerName);
+        intent.putExtra(PlayerChemistryActivity.EXTRA_BLUE_PLAYERS, blue);
+        intent.putExtra(PlayerChemistryActivity.EXTRA_ORANGE_PLAYERS, orange);
         return intent;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_participation_activity);
+        setContentView(R.layout.layout_chemistry_activity);
 
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_PLAYER)) {
@@ -45,11 +45,11 @@ public class PlayerParticipationActivity extends AppCompatActivity {
             blue = (ArrayList<Player>) intent.getSerializableExtra(EXTRA_BLUE_PLAYERS);
         }
 
-        PlayerParticipationFragment participationFragment =
-                (PlayerParticipationFragment) getSupportFragmentManager().findFragmentById(R.id.collaboration_container);
+        PlayerChemistryFragment participationFragment =
+                (PlayerChemistryFragment) getSupportFragmentManager().findFragmentById(R.id.collaboration_container);
 
         if (participationFragment == null) {
-            participationFragment = PlayerParticipationFragment.newInstance(DbHelper.getPlayer(this, pPlayer.mName), blue, orange);
+            participationFragment = PlayerChemistryFragment.newInstance(DbHelper.getPlayer(this, pPlayer.mName), blue, orange);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.collaboration_container, participationFragment);
             transaction.commit();

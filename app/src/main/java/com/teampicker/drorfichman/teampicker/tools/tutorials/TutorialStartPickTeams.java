@@ -1,17 +1,15 @@
 package com.teampicker.drorfichman.teampicker.tools.tutorials;
 
-import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialStepStatus.Done;
-import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialStepStatus.NotApplicable;
-import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialStepStatus.ToDo;
+import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.Done;
+import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.NotApplicable;
+import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.ToDo;
 
 import android.content.Context;
 import android.view.Gravity;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
-import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
 
 public class TutorialStartPickTeams extends AbstractTutorialStep {
 

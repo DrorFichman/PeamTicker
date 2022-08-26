@@ -53,7 +53,7 @@
 
     <include
         android:id="@+id/titles"
-        layout="@layout/player_participation_item"
+        layout="@layout/player_chemistry_item"
         android:layout_below="@+id/participation_chip_games"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -23,13 +23,12 @@ import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
-import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
+import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Handler;
 
 public class GameExpandableAdapter extends BaseExpandableListAdapter {
     private final Context context;

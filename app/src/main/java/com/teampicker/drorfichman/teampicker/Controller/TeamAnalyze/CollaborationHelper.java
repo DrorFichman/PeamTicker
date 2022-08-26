@@ -5,7 +5,7 @@ import android.content.Context;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.BuilderPlayerCollaborationStatistics;
-import com.teampicker.drorfichman.teampicker.Data.PlayerParticipation;
+import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +39,7 @@ public class CollaborationHelper {
 
         for (Player currPlayer : team) {
 
-            HashMap<String, PlayerParticipation> collaborationMap =
+            HashMap<String, PlayerChemistry> collaborationMap =
                     DbHelper.getPlayersParticipationStatistics(context, currPlayer.mName, params);
 
             PlayerCollaboration playerCollaboration = new PlayerCollaboration(currPlayer);
@@ -52,9 +52,9 @@ public class CollaborationHelper {
     }
 
     private static void processAgainstPlayers(List<Player> other, Player currPlayer, HashMap<String,
-            PlayerParticipation> collaborationMap, PlayerCollaboration playerCollaboration) {
+            PlayerChemistry> collaborationMap, PlayerCollaboration playerCollaboration) {
         for (Player against : other) {
-            PlayerParticipation collaborationWith = collaborationMap.get(against.mName);
+            PlayerChemistry collaborationWith = collaborationMap.get(against.mName);
             if (collaborationWith != null) {
                 EffectMargin collaboratorEffect = new EffectMargin(currPlayer, collaborationWith);
                 playerCollaboration.addOpponent(against.mName, collaboratorEffect);
@@ -63,9 +63,9 @@ public class CollaborationHelper {
     }
 
     private static void processWithPlayers(List<Player> team, Player currPlayer, HashMap<String,
-            PlayerParticipation> collaborationMap, PlayerCollaboration playerCollaboration) {
+            PlayerChemistry> collaborationMap, PlayerCollaboration playerCollaboration) {
         for (Player with : team) {
-            PlayerParticipation collaborationWith = collaborationMap.get(with.mName);
+            PlayerChemistry collaborationWith = collaborationMap.get(with.mName);
             if (collaborationWith != null) {
                 EffectMargin collaboratorEffect = new EffectMargin(currPlayer, collaborationWith);
                 playerCollaboration.addCollaborator(with.mName, collaboratorEffect);

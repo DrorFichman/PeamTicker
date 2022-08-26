@@ -11,12 +11,17 @@
         <entry key="app/src/main/res/layout/game_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/layout_games_activity.xml" value="0.18645833333333334" />
         <entry key="app/src/main/res/layout/layout_games_activity_fragment.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/layout/layout_participation_activity.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/layout_participation_fragment.xml" value="0.13858695652173914" />
-        <entry key="app/src/main/res/layout/layout_players_main.xml" value="0.5197255574614065" />
+        <entry key="app/src/main/res/layout/layout_players_main.xml" value="0.4766558089033659" />
+        <entry key="app/src/main/res/layout/layout_preferences.xml" value="0.21784420289855072" />
         <entry key="app/src/main/res/layout/layout_statistics_activity.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/layout/layout_statistics_fragment.xml" value="0.4010416666666667" />
+        <entry key="app/src/main/res/layout/layout_tutorial_dialog_view.xml" value="0.21784420289855072" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.335" />
         <entry key="app/src/main/res/layout/player_details_activity.xml" value="0.335" />
         <entry key="app/src/main/res/layout/player_item.xml" value="0.45" />
+        <entry key="app/src/main/res/layout/player_participation_item.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/player_statistics_item.xml" value="0.55" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.203125" />
         <entry key="app/src/main/res/menu/games_menu.xml" value="0.1" />

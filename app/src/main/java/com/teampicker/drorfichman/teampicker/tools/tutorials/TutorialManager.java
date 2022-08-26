@@ -1,7 +1,7 @@
-package com.teampicker.drorfichman.teampicker.tools;
+package com.teampicker.drorfichman.teampicker.tools.tutorials;
 
-import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialStepStatus.Done;
-import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialStepStatus.ToDo;
+import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.Done;
+import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.ToDo;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -14,16 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.teampicker.drorfichman.teampicker.Adapter.TutorialStepsAdapter;
 import com.teampicker.drorfichman.teampicker.R;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.AbstractTutorialStep;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialAttendance;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialCloud;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialGameHistory;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialNewPlayer;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialPickTeams;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialSaveResults;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialShuffleAI;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialStartPickTeams;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialTeamAnalysis;
+import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;

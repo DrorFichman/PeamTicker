@@ -5,7 +5,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Sort.Sortable;
 
 import java.io.Serializable;
 
-public class PlayerParticipation extends Sortable implements Serializable, FilterView.Filterable {
+public class PlayerChemistry extends Sortable implements Serializable, FilterView.Filterable {
 
     public String mName;
     public String mParticipatedWith;

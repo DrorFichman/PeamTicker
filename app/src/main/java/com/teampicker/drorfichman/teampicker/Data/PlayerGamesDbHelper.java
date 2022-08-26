@@ -256,52 +256,6 @@ public class PlayerGamesDbHelper {
         updateTeamGameResult(db, gameId, date, TeamEnum.Team2, TeamEnum.getTeam2Result(winningTeam));
     }
 
-    static class PlayerGameResult {
-        int team;
-        ResultEnum result;
-
-        PlayerGameResult(int t, ResultEnum r) {
-            team = t;
-            result = r;
-        }
-    }
-
-    public static PlayerGameResult getPlayerResult(SQLiteDatabase db, int gameId, String name) {
-
-        String[] projection = {
-                PlayerContract.PlayerGameEntry.PLAYER_RESULT,
-                PlayerContract.PlayerGameEntry.TEAM
-        };
-
-        String where = PlayerContract.PlayerGameEntry.NAME + " = ? AND "
-                + PlayerContract.PlayerGameEntry.GAME + " = ? ";
-        String[] whereArgs = new String[]{name, String.valueOf(gameId)};
-
-        Cursor c = db.query(
-                PlayerContract.PlayerGameEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                whereArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-
-        try {
-            if (c.moveToFirst()) {
-                int team = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.TEAM));
-                int res = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
-                ResultEnum r = ResultEnum.getResultFromOrdinal(res);
-                PlayerGameResult pg = new PlayerGameResult(team, r);
-                return pg;
-            }
-        } finally {
-            c.close();
-        }
-
-        return null;
-    }
-
     public static void updatePlayerResult(SQLiteDatabase db, int gameId, String name, ResultEnum res, int newTeam) {
         ContentValues values = new ContentValues();
         values.put(PlayerContract.PlayerGameEntry.PLAYER_RESULT, res.getValue());
@@ -432,12 +386,12 @@ public class PlayerGamesDbHelper {
         Log.d("TEAMS", delete + " game players were deleted");
     }
 
-    private static PlayerParticipation getPlayer(HashMap<String, PlayerParticipation> result,
-                                                 String currName, String collaborator) {
+    private static PlayerChemistry getPlayer(HashMap<String, PlayerChemistry> result,
+                                             String currName, String collaborator) {
 
-        PlayerParticipation p = result.get(currName);
+        PlayerChemistry p = result.get(currName);
         if (p == null) {
-            p = new PlayerParticipation();
+            p = new PlayerChemistry();
             p.mName = currName;
             p.mParticipatedWith = collaborator;
             result.put(currName, p);
@@ -446,7 +400,7 @@ public class PlayerGamesDbHelper {
         return p;
     }
 
-    public static HashMap<String, PlayerParticipation> getParticipationStatistics(SQLiteDatabase db, int gameCount, GamesPlayersCache cache, Date upTo, String name) {
+    public static HashMap<String, PlayerChemistry> getParticipationStatistics(SQLiteDatabase db, int gameCount, GamesPlayersCache cache, Date upTo, String name) {
 
         String limitGamesCount = "";
         if (gameCount > 0) {
@@ -470,7 +424,7 @@ public class PlayerGamesDbHelper {
                         limitGamesCount,
                 new String[]{name}, null);
 
-        HashMap<String, PlayerParticipation> result = new HashMap();
+        HashMap<String, PlayerChemistry> result = new HashMap();
 
         // Get teams based on player active games, aggregate player wins with and against teammates
         try {
@@ -500,22 +454,22 @@ public class PlayerGamesDbHelper {
 
                     if (TeamEnum.Team1.ordinal() == collaboratorTeam) {
                         for (Player p1 : team1) { // same team
-                            PlayerParticipation player = getPlayer(result, p1.mName, name);
+                            PlayerChemistry player = getPlayer(result, p1.mName, name);
                             addResult(player.statisticsWith, gameResult, ResultEnum.getResultFromOrdinal(p1.gameResult));
                         }
                         for (Player p2 : team2) { // opposite team
-                            PlayerParticipation player = getPlayer(result, p2.mName, name);
+                            PlayerChemistry player = getPlayer(result, p2.mName, name);
                             addResult(player.statisticsVs, gameResult, ResultEnum.getResultFromOrdinal(p2.gameResult));
                         }
                     }
 
                     if (TeamEnum.Team2.ordinal() == collaboratorTeam) {
                         for (Player p2 : team2) { // same team
-                            PlayerParticipation player = getPlayer(result, p2.mName, name);
+                            PlayerChemistry player = getPlayer(result, p2.mName, name);
                             addResult(player.statisticsWith, gameResult, ResultEnum.getResultFromOrdinal(p2.gameResult));
                         }
                         for (Player p1 : team1) { // opposite team
-                            PlayerParticipation player = getPlayer(result, p1.mName, name);
+                            PlayerChemistry player = getPlayer(result, p1.mName, name);
                             addResult(player.statisticsVs, gameResult, ResultEnum.getResultFromOrdinal(p1.gameResult));
                         }
                     }

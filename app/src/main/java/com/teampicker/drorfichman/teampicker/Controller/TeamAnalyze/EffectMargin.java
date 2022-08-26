@@ -1,10 +1,7 @@
 package com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze;
 
 import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.Data.PlayerParticipation;
-
-import static com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper.MIN_GAMES_TOGETHER;
-import static com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper.WIN_RATE_MARGIN;
+import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 
 /**
  * The effect a collaborator has on a player, gathered from previous games together
@@ -18,7 +15,7 @@ public class EffectMargin {
     int successWith;
     int successMarginWith;
 
-    EffectMargin(Player player, PlayerParticipation with) {
+    EffectMargin(Player player, PlayerChemistry with) {
         gamesWith = with.statisticsWith.gamesCount;
         winsAndLosesWith = with.statisticsWith.getWinsAndLosesCount();
         winsWith = with.statisticsWith.wins;

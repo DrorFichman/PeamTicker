@@ -1,6 +1,6 @@
 package com.teampicker.drorfichman.teampicker.View;
 
-import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialDisplayState.NotDisplayed;
+import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialDisplayState.NotDisplayed;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -25,7 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamAdapter;
+import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamGameAdapter;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamAnalysisAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.Collaboration;
@@ -43,7 +43,7 @@ import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
-import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
+import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -538,9 +538,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
             list1.setAdapter(new PlayerTeamAnalysisAdapter(this, players1, moved, missedPlayers, analysisResult, analysisSelectedPlayer));
             list2.setAdapter(new PlayerTeamAnalysisAdapter(this, players2, moved, missedPlayers, analysisResult, analysisSelectedPlayer));
         } else {
-            list1.setAdapter(new PlayerTeamAdapter(this, players1, moved, missedPlayers, showInternalData, true));
-            list2.setAdapter(new PlayerTeamAdapter(this, players2, moved, missedPlayers, showInternalData, true));
-            benchList.setAdapter(new PlayerTeamAdapter(this, benchedPlayers, benchedPlayers, null, false, false));
+            list1.setAdapter(new PlayerTeamGameAdapter(this, players1, moved, missedPlayers, showInternalData, true));
+            list2.setAdapter(new PlayerTeamGameAdapter(this, players2, moved, missedPlayers, showInternalData, true));
+            benchList.setAdapter(new PlayerTeamGameAdapter(this, benchedPlayers, benchedPlayers, null, false, false));
         }
 
         updateStats();
@@ -743,7 +743,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 refreshPlayers();
             } else {
 
-                Intent intent = PlayerParticipationActivity.getPlayerParticipationActivity(
+                Intent intent = PlayerChemistryActivity.getPlayerParticipationActivity(
                         MakeTeamsActivity.this, player.mName, players2, players1);
                 startActivity(intent);
             }
@@ -829,7 +829,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         refreshPlayers();
     }
 
-    private boolean backFromAnalysis(boolean singleBack) {
+    private boolean backFromAnalysis(boolean backClicked) {
 
         // TODO Ugly
         boolean returnValue = false;
@@ -837,7 +837,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         if (isAnalysisPlayerSelectedMode()) { // cancel player analysis selection
             analysisSelectedPlayer = null;
 
-            if (singleBack) {
+            if (backClicked) {
                 refreshPlayers();
                 return true;
             } else {
@@ -853,7 +853,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
             setDefaultTeamColors();
 
-            if (singleBack) {
+            if (backClicked) {
                 hideAnalysis();
                 return true;
             } else {
@@ -862,7 +862,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
 
         // If not a single back - and if anything was cancelled
-        if (!singleBack && returnValue) {
+        if (!backClicked && returnValue) {
             hideAnalysis();
             return true;
         } else {

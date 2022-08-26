@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.Data.PlayerParticipation;
+import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 
@@ -23,10 +23,10 @@ import java.util.List;
 /**
  * Created by drorfichman on 7/30/16.
  */
-public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation> {
+public class PlayerChemistryAdapter extends ArrayAdapter<PlayerChemistry> {
 
     private final Context context;
-    private final List<PlayerParticipation> mPlayers;
+    private final List<PlayerChemistry> mPlayers;
     private final ArrayList<Player> mBlue;
     private final ArrayList<Player> mOrange;
     private final int[] teamsIcons;
@@ -35,8 +35,8 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
     int maxSuccess = 0;
     int maxGames = 0;
 
-    public PlayerParticipationAdapter(Context ctx, List<PlayerParticipation> players,
-                                      ArrayList<Player> blue, ArrayList<Player> orange) {
+    public PlayerChemistryAdapter(Context ctx, List<PlayerChemistry> players,
+                                  ArrayList<Player> blue, ArrayList<Player> orange) {
         super(ctx, -1, players);
         context = ctx;
         mPlayers = players;
@@ -45,7 +45,7 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
 
         teamsIcons = ColorHelper.getTeamsIcons(ctx);
 
-        for (PlayerParticipation p : players) {
+        for (PlayerChemistry p : players) {
             if (Math.max(Math.abs(p.successVs()), Math.abs(p.successWith())) > maxSuccess) {
                 maxSuccess = Math.max(Math.abs(p.successVs()), Math.abs(p.successWith()));
             }
@@ -57,7 +57,7 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.player_participation_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.player_chemistry_item, parent, false);
 
         TextView name = view.findViewById(R.id.player_name);
 
@@ -67,7 +67,7 @@ public class PlayerParticipationAdapter extends ArrayAdapter<PlayerParticipation
         TextView countVs = view.findViewById(R.id.part_games_count_against);
         TextView winRateVs = view.findViewById(R.id.part_wins_percentage_against);
 
-        PlayerParticipation p = mPlayers.get(position);
+        PlayerChemistry p = mPlayers.get(position);
 
         name.setText(p.mName);
         view.setBackgroundColor(FilterView.match(p.mName, filterName) ? Color.GRAY : Color.TRANSPARENT);

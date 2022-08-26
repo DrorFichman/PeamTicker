@@ -1,6 +1,6 @@
 package com.teampicker.drorfichman.teampicker.View;
 
-import static com.teampicker.drorfichman.teampicker.tools.TutorialManager.TutorialDisplayState.NotDisplayed;
+import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialDisplayState.NotDisplayed;
 
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -46,7 +46,7 @@ import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
-import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
+import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -77,7 +77,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private TextView progressText;
 
     public PlayersFragment() {
-        super(R.layout.layout_players_main);
+        super(R.layout.layout_players_fragment);
     }
 
     public static PlayersFragment newInstance() {
@@ -231,6 +231,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         backPress.setEnabled(handleBackPress());
         showTutorials();
 
+        Log.i("Coming", "resume " + playerComingChanged);
+
         if (playerComingChanged) {
             playerComingChanged = false;
             refreshPlayers();
@@ -288,6 +290,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void onPlayerComingChanged(boolean coming) {
         playerComingChanged = coming || playerComingChanged;
+        Log.i("Coming", "Player coming changed " + playerComingChanged + ", " + coming);
 
         setComingPlayersCount();
     }

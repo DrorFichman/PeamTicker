@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by drorfichman on 7/30/16.
  */
-public class PlayerTeamAdapter extends ArrayAdapter<Player> {
+public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
     private Context context;
     private List<Player> mPlayers;
     private List<Player> mMovedPlayers;
@@ -30,9 +30,9 @@ public class PlayerTeamAdapter extends ArrayAdapter<Player> {
     private boolean isGradeVisible;
     private final boolean isRecentGamesVisible;
 
-    public PlayerTeamAdapter(Context ctx, List<Player> players,
-                             List<Player> coloredPlayers, List<Player> markedPlayers,
-                             boolean showInternalData, boolean showRecentGames) {
+    public PlayerTeamGameAdapter(Context ctx, List<Player> players,
+                                 List<Player> coloredPlayers, List<Player> markedPlayers,
+                                 boolean showInternalData, boolean showRecentGames) {
         super(ctx, -1, players);
         context = ctx;
         mPlayers = players;

@@ -40,7 +40,7 @@ import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.FileHelper;
 import com.teampicker.drorfichman.teampicker.tools.PermissionTools;
 import com.teampicker.drorfichman.teampicker.tools.SnapshotHelper;
-import com.teampicker.drorfichman.teampicker.tools.TutorialManager;
+import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.SyncProgress;
 

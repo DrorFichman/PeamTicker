@@ -54,7 +54,7 @@
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <activity
-            android:name=".View.PlayerParticipationActivity"
+            android:name=".View.PlayerChemistryActivity"
             android:exported="true"
             android:label="Player's success with/vs teammates"
             android:screenOrientation="portrait"

@@ -123,7 +123,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             } else if (position == 1) {
                 return GamesFragment.newInstance(p.mName, null, false, null);
             } else {
-                return PlayerParticipationFragment.newInstance(p, null, null);
+                return PlayerChemistryFragment.newInstance(p, null, null);
             }
         }
     }
