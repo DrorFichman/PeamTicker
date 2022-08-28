@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +38,6 @@ public class PlayerDetailsFragment extends Fragment {
 
     private EditText vName;
     private EditText vGrade;
-    private NumberPicker gradePicker;
     private TextView vBirth;
     private CheckBox isGK;
     private CheckBox isDefender;
@@ -75,41 +73,21 @@ public class PlayerDetailsFragment extends Fragment {
         isPlaymaker = root.findViewById(R.id.player_is_playmaker);
         isUnbreakable = root.findViewById(R.id.player_is_unbreaking);
         isExtra = root.findViewById(R.id.player_is_extra);
-        gradePicker = root.findViewById(R.id.edit_player_grade_picker);
 
-        setDetails();
-        setGrade();
-
-        root.findViewById(R.id.save).setOnClickListener(saveClick);
-
-        return root;
-    }
-
-    private void setDetails() {
-        if (this.player != null) {
-            vName.setText(this.player.mName);
-            initBirthdayView(this.player);
+        if (player != null) {
+            vName.setText(player.mName);
+            vGrade.setText(String.valueOf(player.mGrade));
+            initBirthdayView(player);
             initPlayerAttributesView();
         } else if (createFromIdentifier != null) {
             vName.setText(createFromIdentifier);
         } else {
             vName.requestFocus();
         }
-    }
 
-    private void setGrade() {
-        if (player != null) {
-            gradePicker.setMinValue(0);
-            gradePicker.setMaxValue(99);
-            gradePicker.setValue(this.player.mGrade);
-            gradePicker.setWrapSelectorWheel(false);
-            gradePicker.setVisibility(View.VISIBLE);
-        } else {
-            vGrade.setText("0");
-        }
+        root.findViewById(R.id.save).setOnClickListener(saveClick);
 
-        vGrade.setVisibility(player == null ? View.VISIBLE : View.GONE);
-        gradePicker.setVisibility(player == null ? View.GONE : View.VISIBLE);
+        return root;
     }
 
     View.OnClickListener saveClick = view -> {
@@ -145,22 +123,19 @@ public class PlayerDetailsFragment extends Fragment {
     }
 
     private int verifyGrade() {
-        if (player != null) {
-            return gradePicker.getValue();
-        } else {
-            String stringGrade = vGrade.getText().toString();
-            if (TextUtils.isEmpty(stringGrade)) {
-                Toast.makeText(getContext(), "Fill player's grade", Toast.LENGTH_SHORT).show();
-                return -1;
-            }
-
-            int newGrade = Integer.parseInt(stringGrade);
-            if (newGrade > 99 || newGrade < 0) {
-                Toast.makeText(getContext(), "Grade must be between 0-99", Toast.LENGTH_SHORT).show();
-                return -1;
-            }
-            return newGrade;
+        String stringGrade = vGrade.getText().toString();
+        if (TextUtils.isEmpty(stringGrade)) {
+            Toast.makeText(getContext(), "Fill player's grade", Toast.LENGTH_SHORT).show();
+            return -1;
         }
+
+        int newGrade = Integer.parseInt(stringGrade);
+        if (newGrade > 99 || newGrade < 0) {
+            Toast.makeText(getContext(), "Grade must be between 0-99", Toast.LENGTH_SHORT).show();
+            return -1;
+        }
+
+        return newGrade;
     }
 
     private boolean setNameAndGrade(String name, int grade) {
