@@ -40,9 +40,9 @@ import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.FileHelper;
 import com.teampicker.drorfichman.teampicker.tools.PermissionTools;
 import com.teampicker.drorfichman.teampicker.tools.SnapshotHelper;
-import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.SyncProgress;
+import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.io.File;
 
@@ -250,6 +250,17 @@ public class MainActivity extends AppCompatActivity
                 .setMessage("VERSION_CODE " + BuildConfig.VERSION_CODE + "\n" +
                         "VERSION_NAME " + BuildConfig.VERSION_NAME + "\n")
                 .setCancelable(true)
+                .setNeutralButton("Contact Support", (dialogInterface, i1) -> {
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("message/rfc822");
+                    i.putExtra(Intent.EXTRA_EMAIL, new String[]{"drorfichman+teampickersupport@gmail.com"});
+                    i.putExtra(Intent.EXTRA_SUBJECT, "Team Picker App");
+                    i.putExtra(Intent.EXTRA_TEXT, "Suggestion, problems etc :)");
+                    try {
+                        startActivity(Intent.createChooser(i, "Send mail..."));
+                    } catch (android.content.ActivityNotFoundException ex) {
+                    }
+                })
                 .setPositiveButton("Got it", (dialog, id) -> {
                     dialog.dismiss();
                 });
