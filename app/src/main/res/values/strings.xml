@@ -133,7 +133,7 @@
     <string name="tutorial_start_pick_teams_title">Pick Teams</string>
     <string name="tutorial_start_pick_teams_message">"You can start picking the teams, just click the \"Teams\" button below"</string>
     <string name="tutorial_pick_teams_title">Pick Teams</string>
-    <string name="tutorial_pick_teams_message">"\"Shuffle\" teams based on grades.\n(you can select a different mode of shuffle by clicking on the 3 dots. It is not recommended to shuffle by stats before you have 10 games of data).\n\n\"Transfer\" players manually.\n\nShare an image of the teams (excluding grades) through any messaging app."</string>
+    <string name="tutorial_pick_teams_message">"\"Shuffle\" teams based on grades.\n(you can select a different mode of shuffle by clicking on the 3 dots. It is not recommended to shuffle by stats before you have 10 games of data).\n\n\"Transfer\" players by long pressing and drag. Use the bench for substitutions.\n\nShare an image of the teams (excluding grades) through any messaging app."</string>
     <string name="tutorial_save_results_title">Save game result</string>
     <string name="tutorial_save_results_message">"Entering the result of the game once it's over opens the way for game history, personal statistics, and the ability to pick teams based on win rate and players' chemistry.\n\nEnter \"Results\" in the \"Teams\" screen."</string>
     <string name="tutorial_game_history_title">Games History</string>
