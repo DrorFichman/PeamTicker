@@ -25,13 +25,23 @@
                 android:layout_marginStart="5dp"
                 android:visibility="gone" />
 
-            <ListView
-                android:id="@+id/team_1"
+            <LinearLayout
+                android:id="@+id/panel1"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:divider="@null"
-                android:padding="5dp" />
+                android:background="@android:color/background_light"
+                android:orientation="vertical">
+
+                <ListView
+                    android:id="@+id/team_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:divider="@null"
+                    android:padding="5dp" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/team1_public_stats"
@@ -57,13 +67,22 @@
                 android:layout_marginStart="5dp"
                 android:visibility="gone" />
 
-            <ListView
-                android:id="@+id/team_2"
+            <LinearLayout
+                android:id="@+id/panel2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:divider="@null"
-                android:padding="5dp" />
+                android:background="@android:color/background_light"
+                android:orientation="vertical">
+
+                <ListView
+                    android:id="@+id/team_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:divider="@null"
+                    android:padding="5dp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/team2_public_stats"
@@ -115,29 +134,31 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="start"
                 android:padding="5dp"
-                android:layout_weight="1"
-                android:textStyle="bold"
-                android:text="@string/teams_bench_title" />
-
-            <ImageView
-                android:id="@+id/empty_bench"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:padding="5dp"
-                android:src="@drawable/reverse" />
+                android:text="@string/teams_bench_title"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/players_bench_list"
+        <LinearLayout
+            android:id="@+id/panel_bench"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@android:color/darker_gray"
-            android:divider="@null"
-            android:padding="5dp" />
+            android:background="@android:color/background_light"
+            android:orientation="vertical">
+
+            <ListView
+                android:id="@+id/players_bench_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@android:color/darker_gray"
+                android:divider="@null"
+                android:padding="5dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
