@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/move_empty_bench_left"
+        android:title="@string/action_empty_bench_left"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/move_empty_bench_right"
+        android:title="@string/action_empty_bench_right"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/move_switch_teams"
+        android:title="@string/action_switch_team_colors"
+        app:showAsAction="never" />
+</menu>

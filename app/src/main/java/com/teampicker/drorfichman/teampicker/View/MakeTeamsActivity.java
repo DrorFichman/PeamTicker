@@ -28,8 +28,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamGameAdapter;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamAnalysisAdapter;
+import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamGameAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.Collaboration;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper;
@@ -87,9 +87,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
     TextView progressBarTeamDivisionStatus;
     private View teamStatsLayout;
     private View buttonsLayout;
-    private View shuffleLayout;
+    private View shuffleLayout, moveLayout, saveLayout;
 
-    private Button shuffleView, shuffleOptions, moveView, saveView;
+    private Button shuffleView, moveView, saveView;
+    private Button shuffleOptions, moveOptions;
 
     private View resultViews;
     private NumberPicker team1Score, team2Score;
@@ -120,6 +121,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
         teamsScreenArea = findViewById(R.id.teams_list_area);
         buttonsLayout = findViewById(R.id.buttons_layout);
         shuffleLayout = findViewById(R.id.shuffle_views);
+        moveLayout = findViewById(R.id.move_views);
+        saveLayout = findViewById(R.id.save_views);
         progressBarTeamDivision = findViewById(R.id.calculating_teams_progress);
         progressBarTeamDivisionStatus = findViewById(R.id.calculating_teams_progress_status);
 
@@ -135,7 +138,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         moveView = findViewById(R.id.move);
         moveView.setOnClickListener(onMoveClicked);
-        moveView.setOnLongClickListener(switchTeamsColors);
 
         saveView = findViewById(R.id.save_results);
         saveView.setOnClickListener(view -> saveResultsClicked());
@@ -146,6 +148,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
         shuffleOptions = findViewById(R.id.shuffle_options);
         shuffleOptions.setOnClickListener(view -> showShuffleOptions());
         setDefaultShuffleStrategy();
+
+        moveOptions = findViewById(R.id.move_options);
+        moveOptions.setOnClickListener(view -> showMoveOptions());
 
         analysisHeaders1 = findViewById(R.id.analysis_headers_1);
         analysisHeaders2 = findViewById(R.id.analysis_headers_2);
@@ -179,9 +184,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 break;
             case R.id.action_enter_results:
                 initSetResults();
-                break;
-            case R.id.action_empty_bench:
-                emptyBench();
                 break;
             case R.id.action_share:
                 onSendClicked();
@@ -240,8 +242,11 @@ public class MakeTeamsActivity extends AppCompatActivity {
             boolean changed = handleComingChanges(getPlayers());
             if (benchedPlayers.size() > 0) {
                 enterMoveMode();
-                if (changed)
+                if (changed) {
                     Snackbar.make(this, benchListLayout, "Notice: some players are benched", Snackbar.LENGTH_SHORT).show();
+
+                    new Handler().postDelayed((Runnable) this::showMoveOptions, 300);
+                }
             }
 
             refreshPlayers();
@@ -448,7 +453,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         saveView.setText(enterResults ? R.string.save : R.string.enter_results);
 
         teamStatsLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
-        moveView.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+        moveLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         shuffleLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
 
         resultViews.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
@@ -622,18 +627,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         Collections.sort(playersList, Comparator.comparing(p -> p.mName));
     }
 
-    View.OnLongClickListener switchTeamsColors = v -> {
-        DialogHelper.showApprovalDialog(MakeTeamsActivity.this,
-                "Switch colors?", null,
-                (dialog, which) -> {
-                    ArrayList<Player> temp = players1;
-                    players1 = players2;
-                    players2 = temp;
-                    refreshPlayers();
-                });
-        return true;
-    };
-
     AdapterView.OnItemClickListener playerClicked = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -692,13 +685,13 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private View.OnClickListener onMoveClicked = view -> {
         if (!backFromMove()) { // enter move mode
-            // TODO tutorial? Snackbar.make(list1, R.string.operation_move, Snackbar.LENGTH_SHORT).show();
+            // TODO Snackbar.make(list1, R.string.operation_move, Snackbar.LENGTH_SHORT).show();
             enterMoveMode();
         }
     };
 
     private void enterMoveMode() {
-        moveView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.move_green, 0, 0);
+        moveView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.move_green);
         mMoveMode = true;
         enterBenchMode();
     }
@@ -706,14 +699,17 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private void exitMoveMode() {
         movedPlayers.clear();
         returnFromBenchPlayers.clear();
-        moveView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.move, 0, 0);
+        moveView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.move);
         mMoveMode = false;
         exitBenchMode();
     }
 
-    private void emptyBench() {
+    private void clearBench(PlayerTeam team) {
         enterMoveMode();
-        players1.addAll(benchedPlayers);
+
+        if (team == PlayerTeam.Team1) players1.addAll(benchedPlayers);
+        else players2.addAll(benchedPlayers);
+
         returnFromBenchPlayers.addAll(benchedPlayers);
         benchedPlayers.clear();
         exitBenchMode();
@@ -747,6 +743,30 @@ public class MakeTeamsActivity extends AppCompatActivity {
         list.addAll(returnFromBenchPlayers);
         return list;
     }
+
+    private void showMoveOptions() {
+        PopupMenu popup = new PopupMenu(MakeTeamsActivity.this, moveOptions);
+        popup.getMenuInflater().inflate(R.menu.move_options, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.move_empty_bench_left:
+                    clearBench(PlayerTeam.Team1);
+                    return true;
+                case R.id.move_empty_bench_right:
+                    clearBench(PlayerTeam.Team2);
+                    return true;
+                case R.id.move_switch_teams:
+                    ArrayList<Player> temp = players1;
+                    players1 = players2;
+                    players2 = temp;
+                    refreshPlayers();
+                    return true;
+                default:
+                    return false;
+            }
+        });
+        popup.show();
+    }
     //endregion
 
     //region drag and drop
@@ -777,10 +797,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
             return false;
         } else {
             enterMoveMode();
-            Player selectedItem = (Player) parent.getItemAtPosition(position);
+            Player player = (Player) parent.getItemAtPosition(position);
             ClipData data = ClipData.newPlainText("", "");
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-            view.startDragAndDrop(data, shadowBuilder, new DragData(selectedItem, getTeamArea(parent)), 0);
+            view.startDragAndDrop(data, shadowBuilder, new DragData(player, getTeamArea(parent)), 0);
 
             return true;
         }

@@ -243,17 +243,18 @@
         <LinearLayout
             android:id="@+id/shuffle_views"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <Button
                 android:id="@+id/shuffle"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_gravity="center"
+                android:layout_weight="1"
                 android:background="@color/fui_transparent"
-                android:drawableTop="@drawable/shuffle"
+                android:drawableBottom="@drawable/shuffle"
                 android:text="@string/shuffle_grade"
                 android:textAllCaps="false" />
 
@@ -267,27 +268,62 @@
                 android:textAllCaps="false" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/move"
+        <LinearLayout
+            android:id="@+id/move_views"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/fui_transparent"
-            android:drawableTop="@drawable/move"
-            android:text="@string/move_players"
-            android:textAllCaps="false" />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/save_results"
+            <Button
+                android:id="@+id/move"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@color/fui_transparent"
+                android:drawableBottom="@drawable/move"
+                android:text="@string/move_players"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/move_options"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:background="@color/fui_transparent"
+                android:drawableStart="@drawable/more"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/save_views"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/fui_transparent"
-            android:drawableTop="@drawable/save"
-            android:text="@string/action_button_results"
-            android:textAllCaps="false"
-            android:visibility="visible" />
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/save_results"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@color/fui_transparent"
+                android:drawableBottom="@drawable/save"
+                android:text="@string/action_enter_results"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/save_options"
+                android:visibility="invisible"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:background="@color/fui_transparent"
+                android:drawableStart="@drawable/more"
+                android:textAllCaps="false" />
+        </LinearLayout>
 
     </LinearLayout>
 

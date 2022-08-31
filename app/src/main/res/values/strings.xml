@@ -51,7 +51,9 @@
     <string name="action_analysis">Analysis</string>
     <string name="action_share">Share</string>
     <string name="action_enter_results">Enter Results</string>
-    <string name="action_empty_bench">Empty Bench</string>
+    <string name="action_empty_bench_left">Clear Bench (left)</string>
+    <string name="action_empty_bench_right">Clear Bench (right)</string>
+    <string name="action_switch_team_colors">Switch Colors</string>
     <string name="action_button_results">Results</string>
     <string name="teams_bench_title">Bench (drop players here when they are not playing)</string>
 
@@ -108,7 +110,7 @@
     <string name="player_analysis_selected">"(W:%1$02d%% G:%2$02d) [%3$s]"</string>
     <string name="player_analysis_selected_win_rate">"%1$02d%%"</string>
     <string name="player_analysis_selected_games">"%1$02d</string>
-    <string name="operation_move">"Long press to drag and drop the player"</string>
+    <string name="operation_move">"Long press players row to start drag and drop"</string>
     <string name="operation_divide_by_collaboration">* AI in progress :)</string>
     <string name="analysis_progress_update">"%1$d%% (%2$s)"</string>
     <string name="operation_analysis">* Click the players for deeper analysis \n* Click icon to exit analysis mode</string>
