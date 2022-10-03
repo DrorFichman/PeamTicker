@@ -14,6 +14,7 @@ public class SettingsHelper {
     public static final String SETTING_TEAM_COLOR_SCHEME = "teams_color_scheme";
     public static final String SETTING_RESET_TUTORIALS = "setting_clear_tutorial";
     public static final String SETTING_SHOW_GRADES = "show_grades";
+    public static final String SETTING_AUTO_SYNC_CLOUD = "auto_sync_cloud";
 
     private static int getPreferenceValue(Context ctx, String preferenceKey, int defaultValue) {
         try {
@@ -54,5 +55,9 @@ public class SettingsHelper {
 
     public static boolean getShowGrades(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_SHOW_GRADES, true);
+    }
+
+    public static boolean getAutoSyncCloud(Context ctx) {
+        return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_AUTO_SYNC_CLOUD, false);
     }
 }

@@ -46,6 +46,8 @@ import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
+import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
+import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
@@ -414,8 +416,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
             DbHelper.insertGame(this, game);
 
-            // TODO FirebaseHelper.syncGame(this, game)
-            // TODO initCollaboration(); and print / keep expected winner?
+            if (SettingsHelper.getAutoSyncCloud(this)) {
+                // TODO FirebaseHelper.syncGame(this, game)
+                // TODO initCollaboration(); and print / keep expected winner?
+            }
 
             LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
 
