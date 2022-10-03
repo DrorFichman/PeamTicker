@@ -13,7 +13,7 @@ import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 
 public class TutorialShuffleAI extends AbstractTutorialStep {
 
-    public static TutorialShuffleAI instance = new TutorialShuffleAI();
+    static TutorialShuffleAI instance = new TutorialShuffleAI();
 
     @Override
     public TutorialManager.TutorialStepStatus shouldBeDisplayed(Context ctx) {

@@ -13,7 +13,7 @@ import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 
 public class TutorialGameHistory extends AbstractTutorialStep {
 
-    public static TutorialGameHistory instance = new TutorialGameHistory();
+    static TutorialGameHistory instance = new TutorialGameHistory();
 
     @Override
     public TutorialManager.TutorialStepStatus shouldBeDisplayed(Context ctx) {

@@ -15,7 +15,7 @@ import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 
 public class TutorialCloud extends AbstractTutorialStep {
 
-    public static TutorialCloud instance = new TutorialCloud();
+    static TutorialCloud instance = new TutorialCloud();
 
     @Override
     public TutorialManager.TutorialStepStatus shouldBeDisplayed(Context ctx) {

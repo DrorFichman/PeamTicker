@@ -7,13 +7,13 @@
         <EditTextPreference
             android:icon="@drawable/nav_setting"
             android:key="divide_attempts"
-            android:summary="Pick teams - number of teams division to consider (1-200)"
+            android:summary="@string/setting_summary_divide_attempts"
             android:title="@string/setting_title_divide_attempts" />
 
         <EditTextPreference
             android:icon="@drawable/nav_setting"
             android:key="divide_grade_percentage"
-            android:summary="Pick teams - grade weight % (0-100)"
+            android:summary="@string/setting_summary_grade_weight"
             android:title="@string/setting_title_grade_weight" />
     </PreferenceCategory>
 
@@ -22,16 +22,17 @@
             android:icon="@drawable/nav_setting"
             android:key="show_grades"
             android:defaultValue="true"
-            android:summary="@string/setting_title_show_grades"
-            app:title="Show Grades" />
+            android:summary="@string/setting_summary_show_grades"
+            app:title="@string/setting_title_show_grades" />
 
         <DropDownPreference
             android:entries="@array/settings_team_color_scheme"
             android:entryValues="@array/settings_team_color_scheme"
             android:icon="@drawable/nav_setting"
             android:key="teams_color_scheme"
-            android:summary="@string/setting_title_color_scheme"
-            android:title="Teams Colors" />
+            android:summary="@string/setting_summary_color_scheme"
+            android:title="@string/setting_title_color_scheme" />
+    </PreferenceCategory>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Tutorials">
@@ -39,7 +40,7 @@
         <Preference
             android:icon="@drawable/nav_setting"
             android:key="setting_clear_tutorial"
-            android:summary="Reset tutorials skipped steps"
+            android:summary="@string/setting_summary_clear_tutorial"
             android:title="@string/setting_title_clear_tutorial" />
     </PreferenceCategory>
 

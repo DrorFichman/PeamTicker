@@ -12,7 +12,7 @@ import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 
 public class TutorialNewPlayer extends AbstractTutorialStep {
 
-    public static TutorialNewPlayer instance = new TutorialNewPlayer();
+    static TutorialNewPlayer instance = new TutorialNewPlayer();
 
     public TutorialManager.TutorialStepStatus shouldBeDisplayed(Context ctx) {
         // true if no player currently exist

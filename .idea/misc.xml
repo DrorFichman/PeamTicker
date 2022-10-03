@@ -11,6 +11,7 @@
         <entry key="app/src/main/res/layout/game_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/layout_games_activity.xml" value="0.18645833333333334" />
         <entry key="app/src/main/res/layout/layout_games_activity_fragment.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/layout/layout_make_teams_activity.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/layout_participation_activity.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/layout_participation_fragment.xml" value="0.13858695652173914" />
         <entry key="app/src/main/res/layout/layout_players_main.xml" value="0.4766558089033659" />
@@ -19,6 +20,7 @@
         <entry key="app/src/main/res/layout/layout_statistics_fragment.xml" value="0.4010416666666667" />
         <entry key="app/src/main/res/layout/layout_tutorial_dialog_view.xml" value="0.21784420289855072" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/player_crad_fragment.xml" value="0.18432971014492755" />
         <entry key="app/src/main/res/layout/player_details_activity.xml" value="0.335" />
         <entry key="app/src/main/res/layout/player_item.xml" value="0.45" />
         <entry key="app/src/main/res/layout/player_participation_item.xml" value="0.22864583333333333" />
@@ -27,7 +29,10 @@
         <entry key="app/src/main/res/menu/games_menu.xml" value="0.1" />
         <entry key="app/src/main/res/menu/main.xml" value="0.18425925925925926" />
         <entry key="app/src/main/res/menu/make_teams_menu.xml" value="0.203125" />
+        <entry key="app/src/main/res/menu/move_options.xml" value="0.22864583333333333" />
+        <entry key="app/src/main/res/menu/shuffle_options.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/menu/statisctics_menu.xml" value="0.203125" />
+        <entry key="app/src/main/res/xml/preferences.xml" value="0.28900565573582904" />
       </map>
     </option>
   </component>

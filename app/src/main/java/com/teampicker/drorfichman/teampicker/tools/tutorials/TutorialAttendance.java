@@ -12,7 +12,7 @@ import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 
 public class TutorialAttendance extends AbstractTutorialStep {
 
-    public static TutorialAttendance instance = new TutorialAttendance();
+    static TutorialAttendance instance = new TutorialAttendance();
 
     @Override
     public TutorialManager.TutorialStepStatus shouldBeDisplayed(Context ctx) {

@@ -13,7 +13,7 @@ import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 
 public class TutorialStartPickTeams extends AbstractTutorialStep {
 
-    public static TutorialStartPickTeams instance = new TutorialStartPickTeams();
+    static TutorialStartPickTeams instance = new TutorialStartPickTeams();
 
     @Override
     public TutorialManager.TutorialStepStatus shouldBeDisplayed(Context ctx) {

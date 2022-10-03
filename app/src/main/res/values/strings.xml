@@ -88,10 +88,17 @@
     <string name="setting_team_color_scheme_color_1">Orange -- Blue</string>
     <string name="setting_team_color_scheme_color_2">Black -- White</string>
     <string name="setting_title_divide_attempts">Divide Attempts</string>
+    <string name="setting_summary_divide_attempts">Number of teams division to consider (1–200)</string>
     <string name="setting_title_grade_weight">Grade Weight</string>
-    <string name="setting_title_color_scheme">Teams visualization - select color scheme</string>
+    <string name="setting_summary_grade_weight">Grade weight percentage (0%–100%)</string>
+    <string name="setting_title_color_scheme">Teams Colors</string>
+    <string name="setting_summary_color_scheme">Teams visualization - select color scheme</string>
     <string name="setting_title_clear_tutorial">Reset Tutorials</string>
-    <string name="setting_title_show_grades">"Show players' grades"</string>
+    <string name="setting_summary_clear_tutorial">Reset tutorials skipped steps</string>
+    <string name="setting_title_show_grades">Show Grades</string>
+    <string name="setting_summary_show_grades">Show players' grades</string>
+    <string name="setting_title_auto_sync_games">Auto Sync</string>
+    <string name="setting_summary_auto_sync_games">Automatically sync new games to cloud</string>
 
     <!--    Messages-->
     <string name="parentheses">"(%1$d)"</string>

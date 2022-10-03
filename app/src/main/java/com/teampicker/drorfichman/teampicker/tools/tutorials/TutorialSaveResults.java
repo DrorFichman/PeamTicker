@@ -14,7 +14,7 @@ import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 
 public class TutorialSaveResults extends AbstractTutorialStep {
 
-    public static TutorialSaveResults instance = new TutorialSaveResults();
+    static TutorialSaveResults instance = new TutorialSaveResults();
 
     @Override
     public TutorialManager.TutorialStepStatus shouldBeDisplayed(Context ctx) {
