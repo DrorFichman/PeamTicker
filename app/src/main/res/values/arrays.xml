@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="settings_team_color_scheme">
-        <item>@string/setting_team_color_scheme_color_1</item>
-        <item>@string/setting_team_color_scheme_color_2</item>
+        <item>@string/setting_team_color_scheme_orange_blue</item>
+        <item>@string/setting_team_color_scheme_black_white</item>
+        <item>@string/setting_team_color_scheme_orange_yellow</item>
     </array>
 </resources>

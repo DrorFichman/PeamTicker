@@ -9,6 +9,7 @@
     <color name="blueTeam">@android:color/holo_blue_light</color>
     <color name="blackTeam">#555555</color>
     <color name="whiteTeam">#EEEEEE</color>
+    <color name="yellowTeam">#FFFF00</color>
 
     <color name="win">#00FF00</color>
     <color name="lose">#FF0000</color>

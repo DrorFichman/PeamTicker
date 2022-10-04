@@ -34,13 +34,16 @@
             android:title="@string/setting_title_color_scheme" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Cloud Sync">
+    <PreferenceCategory
+        android:title="Cloud Sync"
+        app:isPreferenceVisible="false">
+
+<!--        TODO auto sync-->
         <CheckBoxPreference
             android:defaultValue="false"
             android:icon="@drawable/nav_setting"
             android:key="auto_sync_cloud"
             android:summary="@string/setting_summary_auto_sync_games"
-            app:isPreferenceVisible="false"
             app:title="@string/setting_title_auto_sync_games" />
     </PreferenceCategory>
 

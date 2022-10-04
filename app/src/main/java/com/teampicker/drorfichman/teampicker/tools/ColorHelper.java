@@ -13,8 +13,9 @@ import androidx.core.content.ContextCompat;
 public class ColorHelper {
 
     enum ColorScheme {
-        OrangeBlue(R.string.setting_team_color_scheme_color_1),
-        BlackWhite(R.string.setting_team_color_scheme_color_2);
+        OrangeBlue(R.string.setting_team_color_scheme_orange_blue),
+        BlackWhite(R.string.setting_team_color_scheme_black_white),
+        OrangeYellow(R.string.setting_team_color_scheme_orange_yellow);
 
         int stringRes;
         ColorScheme(int res) {
@@ -30,7 +31,10 @@ public class ColorHelper {
         if (colorScheme.equals(ctx.getString(ColorScheme.BlackWhite.stringRes))) {
             colors[0] = ContextCompat.getColor(ctx, R.color.blackTeam);
             colors[1] = ContextCompat.getColor(ctx, R.color.whiteTeam);
-        } else { // if BlueOrange
+        } else if (colorScheme.equals(ctx.getString(ColorScheme.OrangeYellow.stringRes))) {
+            colors[0] = ContextCompat.getColor(ctx, R.color.orangeTeam);
+            colors[1] = ContextCompat.getColor(ctx, R.color.yellowTeam);
+        } else { // Orange - Blue
             colors[0] = ContextCompat.getColor(ctx, R.color.orangeTeam);
             colors[1] = ContextCompat.getColor(ctx, R.color.blueTeam);
         }
@@ -45,7 +49,10 @@ public class ColorHelper {
         if (colorScheme.equals(ctx.getString(ColorScheme.BlackWhite.stringRes))) {
             icons[0] = R.drawable.circle_black;
             icons[1] = R.drawable.circle_white;
-        } else { // if BlueOrange
+        } else if (colorScheme.equals(ctx.getString(ColorScheme.OrangeYellow.stringRes))) {
+            icons[0] = R.drawable.circle_orange;
+            icons[1] = R.drawable.circle_yellow;
+        } else { // if Orange Blue
             icons[0] = R.drawable.circle_orange;
             icons[1] = R.drawable.circle_blue;
         }

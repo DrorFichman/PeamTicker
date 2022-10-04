@@ -23,6 +23,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setDivisionGradePercentage();
         setTutorialsReset();
         setShowGrade();
+        setColorScheme();
+    }
+
+    private void setColorScheme() {
+        Preference color = findPreference(SettingsHelper.SETTING_TEAM_COLOR_SCHEME);
+        color.setOnPreferenceChangeListener((preference, newValue) -> {
+            LocalNotifications.sendNotification(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION);
+            return true;
+        });
     }
 
     private void setShowGrade() {

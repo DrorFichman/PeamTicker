@@ -107,6 +107,7 @@ public class GamesFragment extends Fragment {
         notificationHandler = new GameResultBroadcast();
         LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION, notificationHandler);
         LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION, notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION, notificationHandler); // team colors
     }
 
     @Override
