@@ -12,7 +12,7 @@ import androidx.annotation.DrawableRes;
 public enum ResultEnum {
     Win("W", PlayerGamesDbHelper.WIN, Color.GREEN, R.drawable.circle_win),
     Lose("L", PlayerGamesDbHelper.LOSE, Color.RED, R.drawable.circle_lose),
-    Tie("T", PlayerGamesDbHelper.TIE, Color.BLACK, R.drawable.circle_draw),
+    Tie("T", PlayerGamesDbHelper.TIE, Color.BLACK, R.drawable.circle_draw_blue),
     NA("?", PlayerGamesDbHelper.EMPTY_RESULT, Color.BLACK, R.drawable.circle_na),
     Missed("M", PlayerGamesDbHelper.MISSED_GAME, Color.GRAY, R.drawable.circle_na);
 

@@ -74,6 +74,7 @@
     <string name="paste_players">Paste Players</string>
     <string name="show_archived">Players Archive</string>
     <string name="make_teams">Pick Teams</string>
+    <string name="new_game">New Game</string>
     <string name="enter_results">Enter Results</string>
     <string name="action_50_games">Last 50 games</string>
     <string name="action_all_games">All games</string>

@@ -24,6 +24,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
@@ -59,6 +60,8 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class MakeTeamsActivity extends AppCompatActivity {
+    private static final String SET_RESULT = "SET_RESULT";
+
     static final int RECENT_GAMES = 50;
     static final int MAX_SCORE = 100;
 
@@ -100,8 +103,20 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     protected View analysisHeaders1, analysisHeaders2;
 
+    @Nullable
     public static Intent getIntent(Context ctx) {
-        return new Intent(ctx, MakeTeamsActivity.class);
+        ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(ctx, 0);
+        if (comingPlayers.size() > 0) {
+            TutorialManager.userActionTaken(ctx, TutorialManager.TutorialUserAction.clicked_teams);
+            return new Intent(ctx, MakeTeamsActivity.class);
+        } else {
+            return null;
+        }
+    }
+
+    public static Intent setResult(Intent intent) {
+        intent.putExtra(MakeTeamsActivity.SET_RESULT, true);
+        return intent;
     }
 
     @Override
@@ -128,13 +143,13 @@ public class MakeTeamsActivity extends AppCompatActivity {
         progressBarTeamDivision = findViewById(R.id.calculating_teams_progress);
         progressBarTeamDivisionStatus = findViewById(R.id.calculating_teams_progress_status);
 
-        area1 = (LinearLayout) findViewById(R.id.panel1);
-        area2 = (LinearLayout) findViewById(R.id.panel2);
+        area1 = findViewById(R.id.panel1);
+        area2 = findViewById(R.id.panel2);
         list1 = findViewById(R.id.team_1);
         list2 = findViewById(R.id.team_2);
         setDefaultTeamColors();
 
-        areaBench = (LinearLayout) findViewById(R.id.panel_bench);
+        areaBench = findViewById(R.id.panel_bench);
         benchListLayout = findViewById(R.id.players_bench);
         benchList = findViewById(R.id.players_bench_list);
 
@@ -232,6 +247,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private void initialTeams() {
 
         int currGame = DbHelper.getActiveGame(this);
+        mSetResult = getIntent().getBooleanExtra(SET_RESULT, false);
         if (currGame < 0) {
             Toast.makeText(this, "Initial teams", Toast.LENGTH_SHORT).show();
             divideComingPlayers(selectedDivision);
@@ -239,19 +255,24 @@ public class MakeTeamsActivity extends AppCompatActivity {
             players1 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team1, RECENT_GAMES);
             players2 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team2, RECENT_GAMES);
 
-            benchedPlayers = DbHelper.getCurrTeam(this, currGame, TeamEnum.Bench, RECENT_GAMES);
+            if (mSetResult) {
+                refreshPlayers();
+                initSetResults();
+            } else {
+                benchedPlayers = DbHelper.getCurrTeam(this, currGame, TeamEnum.Bench, RECENT_GAMES);
 
-            boolean changed = handleComingChanges(getPlayers());
-            if (benchedPlayers.size() > 0) {
-                enterMoveMode();
-                if (changed) {
-                    Snackbar.make(this, benchListLayout, "Notice: some players are benched", Snackbar.LENGTH_SHORT).show();
+                boolean changed = handleComingChanges(getPlayers());
+                if (benchedPlayers.size() > 0) {
+                    enterMoveMode();
+                    if (changed) {
+                        Snackbar.make(this, benchListLayout, "Notice: some players are benched", Snackbar.LENGTH_SHORT).show();
 
-                    new Handler().postDelayed((Runnable) this::showMoveOptions, 300);
+                        new Handler().postDelayed((Runnable) this::showMoveOptions, 300);
+                    }
                 }
-            }
 
-            refreshPlayers();
+                refreshPlayers();
+            }
         }
     }
 
@@ -408,12 +429,15 @@ public class MakeTeamsActivity extends AppCompatActivity {
         if (!mSetResult) {
             initSetResults();
         } else {
-            // Remove bench players before persisting the
+            // Remove bench players before persisting the game
             saveCurrentTeams(false);
+            // clear missed state to avoid writing them for the next game
+            missedPlayers.clear();
 
             int currGame = DbHelper.getActiveGame(this);
             Game game = new Game(currGame, getGameDateString(), team1Score.getValue(), team2Score.getValue());
 
+            // TODO Improve above - can set the results when inserting the teams
             DbHelper.insertGame(this, game);
 
             if (SettingsHelper.getAutoSyncCloud(this)) {
@@ -797,7 +821,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private final AdapterView.OnItemLongClickListener playerLongClicked = (parent, view, position, id) -> {
-        if (isAnalysisMode()) {
+        if (isAnalysisMode() || mSetResult) {
             return false;
         } else {
             enterMoveMode();

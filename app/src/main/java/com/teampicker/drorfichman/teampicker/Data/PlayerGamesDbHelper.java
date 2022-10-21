@@ -56,7 +56,7 @@ public class PlayerGamesDbHelper {
         values.put(PlayerContract.PlayerGameEntry.DATE, pg.date != null ? pg.date : DateHelper.getNow());
         values.put(PlayerContract.PlayerGameEntry.NAME, pg.playerName);
         values.put(PlayerContract.PlayerGameEntry.PLAYER_GRADE, pg.playerGrade);
-        values.put(PlayerContract.PlayerGameEntry.TEAM, pg.team.ordinal());
+        if (pg.team != null) values.put(PlayerContract.PlayerGameEntry.TEAM, pg.team.ordinal()); // TODO temp
         values.put(PlayerContract.PlayerGameEntry.PLAYER_AGE, pg.playerAge);
         values.put(PlayerContract.PlayerGameEntry.ATTRIBUTES, pg.attributes);
 
@@ -136,9 +136,10 @@ public class PlayerGamesDbHelper {
     public static void clearOldGameTeams(SQLiteDatabase db) {
         Log.d("teams", "Clear old Game teams ");
 
-        // Delete only rows with EMPTY_RESULT = -10 value
+        // Delete only empty result and rows with EMPTY_RESULT = -10 value
         int n = db.delete(PlayerContract.PlayerGameEntry.TABLE_NAME,
-                PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ? ",
+                PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NULL OR " +
+                        PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ? ",
                 new String[]{String.valueOf(PlayerGamesDbHelper.EMPTY_RESULT)});
 
         Log.d("teams", "deleted games players " + n);
@@ -256,11 +257,10 @@ public class PlayerGamesDbHelper {
         updateTeamGameResult(db, gameId, date, TeamEnum.Team2, TeamEnum.getTeam2Result(winningTeam));
     }
 
-    public static void updatePlayerResult(SQLiteDatabase db, int gameId, String name, ResultEnum res, int newTeam) {
+    public static void updatePlayerResultMissed(SQLiteDatabase db, int gameId, String name) {
         ContentValues values = new ContentValues();
-        values.put(PlayerContract.PlayerGameEntry.PLAYER_RESULT, res.getValue());
-        values.put(PlayerContract.PlayerGameEntry.DID_WIN, res == ResultEnum.Win ? 1 : 0);
-        if (newTeam >= 0) values.put(PlayerContract.PlayerGameEntry.TEAM, newTeam);
+        values.put(PlayerContract.PlayerGameEntry.PLAYER_RESULT, ResultEnum.Missed.getValue());
+        values.put(PlayerContract.PlayerGameEntry.DID_WIN, 0);
 
         String where = PlayerContract.PlayerGameEntry.GAME + " = ? AND " +
                 PlayerContract.PlayerGameEntry.NAME + " = ? ";
@@ -340,6 +340,7 @@ public class PlayerGamesDbHelper {
                         " from player_game, player " +
                         " where " +
                         " player.name = player_game.name " + nameFilter +
+                        " AND result IS NOT NULL " +
                         " AND result NOT IN ( " +
                         PlayerGamesDbHelper.EMPTY_RESULT + ", " +
                         PlayerGamesDbHelper.MISSED_GAME + " ) " +
@@ -418,6 +419,7 @@ public class PlayerGamesDbHelper {
                         " where " +
                         " player.name = player_game.name AND player.name =  ? " +
                         limitUpToDate +
+                        " AND result IS NOT NULL " +
                         " AND result NOT IN ( " +
                         PlayerGamesDbHelper.EMPTY_RESULT + ", " +
                         PlayerGamesDbHelper.MISSED_GAME + " ) " +

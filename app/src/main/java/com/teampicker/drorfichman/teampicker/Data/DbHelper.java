@@ -60,7 +60,7 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         if (missedPlayers != null) {
             for (Player m : missedPlayers) {
-                DbHelper.setPlayerResult(ctx, currGame, m.mName, ResultEnum.Missed);
+                DbHelper.setPlayerResultMissed(ctx, currGame, m.mName);
             }
         }
     }
@@ -337,8 +337,8 @@ public class DbHelper extends SQLiteOpenHelper {
         PlayerGamesDbHelper.updateGameDate(getSqLiteDatabase(context), game.gameId, gameDate);
     }
 
-    public static void setPlayerResult(Context context, int gameId, String name, ResultEnum res) {
-        PlayerGamesDbHelper.updatePlayerResult(getSqLiteDatabase(context), gameId, name, res, -1);
+    public static void setPlayerResultMissed(Context context, int gameId, String name) {
+        PlayerGamesDbHelper.updatePlayerResultMissed(getSqLiteDatabase(context), gameId, name);
     }
 
     public static int updateRecord(SQLiteDatabase db, ContentValues values, String where, String[] whereArgs, String tableName) {

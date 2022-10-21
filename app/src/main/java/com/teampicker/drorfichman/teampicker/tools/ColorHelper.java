@@ -18,6 +18,7 @@ public class ColorHelper {
         OrangeYellow(R.string.setting_team_color_scheme_orange_yellow);
 
         int stringRes;
+
         ColorScheme(int res) {
             stringRes = res;
         }
@@ -38,29 +39,32 @@ public class ColorHelper {
             colors[0] = ContextCompat.getColor(ctx, R.color.orangeTeam);
             colors[1] = ContextCompat.getColor(ctx, R.color.blueTeam);
         }
-        return  colors;
+        return colors;
     }
 
     @DrawableRes
-    public static int[] getTeamsIcons(Context ctx){
+    public static int[] getTeamsIcons(Context ctx) {
+
         String colorScheme = SettingsHelper.getColorScheme(ctx);
 
-        int[] icons = new int[2];
         if (colorScheme.equals(ctx.getString(ColorScheme.BlackWhite.stringRes))) {
-            icons[0] = R.drawable.circle_black;
-            icons[1] = R.drawable.circle_white;
+            return new int[]{R.drawable.circle_black,
+                    R.drawable.circle_white,
+                    R.drawable.circle_draw_blue};
         } else if (colorScheme.equals(ctx.getString(ColorScheme.OrangeYellow.stringRes))) {
-            icons[0] = R.drawable.circle_orange;
-            icons[1] = R.drawable.circle_yellow;
+            return new int[]{R.drawable.circle_orange,
+                    R.drawable.circle_yellow,
+                    R.drawable.circle_draw_gray};
         } else { // if Orange Blue
-            icons[0] = R.drawable.circle_orange;
-            icons[1] = R.drawable.circle_blue;
+            return new int[]{R.drawable.circle_orange,
+                    R.drawable.circle_blue,
+                    R.drawable.circle_draw_blue};
         }
-        return icons;
     }
 
     /**
      * Sets the appropriate color for the text view based on a percentage
+     *
      * @param percentage - 0-100 value
      */
     public static void setColorAlpha(Context ctx, TextView textView, int percentage) {
@@ -74,7 +78,8 @@ public class ColorHelper {
 
     /**
      * Sets the appropriate color for the text view based on a delta value out of a max value
-     * @param delta - difference from 0
+     *
+     * @param delta    - difference from 0
      * @param maxDelta - max difference
      */
     public static void setColorAlpha(Context ctx, TextView textView, int delta, int maxDelta) {

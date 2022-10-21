@@ -308,9 +308,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void launchMakeTeams() {
-        ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(getContext(), 0);
-        if (comingPlayers.size() > 0) {
-            TutorialManager.userActionTaken(getContext(), TutorialManager.TutorialUserAction.clicked_teams);
+        Intent makeTeamsIntent = MakeTeamsActivity.getIntent(getContext());
+        if (makeTeamsIntent != null) {
             startActivity(MakeTeamsActivity.getIntent(getContext()));
         } else {
             Toast.makeText(getContext(), "First - select attending players", Toast.LENGTH_SHORT).show();

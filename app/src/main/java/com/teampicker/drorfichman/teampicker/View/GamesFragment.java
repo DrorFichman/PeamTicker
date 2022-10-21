@@ -11,7 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +40,7 @@ public class GamesFragment extends Fragment {
 
     private GameResultBroadcast notificationHandler;
     private final Sorting sorting = new Sorting(null, null);
+    private Button newGameButton;
 
     public interface gamesCountHandler {
         void onGamesCount(int count);
@@ -67,10 +70,27 @@ public class GamesFragment extends Fragment {
         setHasOptionsMenu(isAllGamesView());
 
         gamesList = root.findViewById(R.id.games_list);
+        newGameButton = root.findViewById(R.id.games_list_make_teams);
+
         setHeadlines(root);
+        setNewGameButton();
         refreshGames();
 
         return root;
+    }
+
+    private void setNewGameButton() {
+        newGameButton.setVisibility(isAllGamesView() ? View.VISIBLE : View.GONE);
+
+        newGameButton.setOnClickListener(view -> {
+            Intent makeTeamsIntent = MakeTeamsActivity.getIntent(getContext());
+            if (makeTeamsIntent != null) {
+                MakeTeamsActivity.setResult(makeTeamsIntent);
+                startActivity(makeTeamsIntent);
+            } else {
+                Toast.makeText(getContext(), "First - select attending players", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setHeadlines(View root) {

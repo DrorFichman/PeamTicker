@@ -114,7 +114,7 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
                 } else if (res == ResultEnum.Lose) {
                     starView.get(r).setImageResource(R.drawable.circle_lose);
                 } else if (res == ResultEnum.Tie) {
-                    starView.get(r).setImageResource(R.drawable.circle_draw);
+                    starView.get(r).setImageResource(R.drawable.circle_draw_blue);
                 } else if (res == ResultEnum.Missed) {
                     starView.get(r).setImageResource(R.drawable.circle_na);
                 }

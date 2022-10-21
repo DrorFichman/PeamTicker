@@ -1,6 +1,7 @@
 package com.teampicker.drorfichman.teampicker.Data;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
@@ -11,22 +12,20 @@ import androidx.annotation.DrawableRes;
  * Created by drorfichman on 10/3/16.
  */
 public enum TeamEnum {
-    Team1(0, -1),
-    Team2(1, -1),
-    Tie(-1, R.drawable.circle_draw),
-    Bench(-1, -1);
+    Team1(0),
+    Team2(1),
+    Tie(2), // TODO should move reference to result enum?
+    Bench(3);
 
-    private int drawable;
     private int teamColorIndex;
 
-    TeamEnum(int drawableIndex, int drawableResource) {
-        this.teamColorIndex = drawableIndex;
-        drawable = drawableResource;
+    TeamEnum(int teamColorIndex) {
+        this.teamColorIndex = teamColorIndex;
     }
 
     public static TeamEnum getResultFromOrdinal(int res) {
         for (TeamEnum r : TeamEnum.values()) {
-            if (r.teamColorIndex == res) {
+            if (r.teamColorIndex == res) { // TODO should reference ordinal value that's saved in DB (addPlayerGame)
                 return r;
             }
         }
@@ -35,11 +34,13 @@ public enum TeamEnum {
 
     @DrawableRes
     public int getDrawable(Context ctx) {
-        if (teamColorIndex == 0 || teamColorIndex == 1) {
+        if (teamColorIndex == 0 || teamColorIndex == 1 || teamColorIndex == 2) {
             int[] colors = ColorHelper.getTeamsIcons(ctx);
             return colors[teamColorIndex];
         } else {
-            return drawable;
+            // TODO is this possible?
+            Log.e("TeamEnum", "Get team color for " + teamColorIndex);
+            return 0;
         }
     }
 
