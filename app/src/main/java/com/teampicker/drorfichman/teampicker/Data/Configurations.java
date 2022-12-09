@@ -1,13 +1,8 @@
 package com.teampicker.drorfichman.teampicker.Data;
 
-import android.content.Context;
-
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.Exclude;
 import com.teampicker.drorfichman.teampicker.BuildConfig;
-import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
-import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
-import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetConfiguration;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,18 +22,45 @@ public class Configurations implements Serializable {
     public Configurations() {
     }
 
+    public enum UserCloudState {
+        Unknown,
+        Disabled,
+        RequireAuthentication,
+        NotAllowed,
+        Allowed;
+    }
+
     @Exclude
-    public static boolean isCloudFeaturesAllowed() {
-        if (remote == null) return false;
-        FirebaseUser user = AuthHelper.getUser();
-        return (remote.allowCloudFeatures ||
-                (user != null && remote.allowedAccounts.contains(user.getEmail())));
+    public static UserCloudState getUserCloudState(FirebaseUser user) {
+        if (remote == null)
+            return UserCloudState.Unknown;
+        if (!isCloudFeatureSupported())
+            return UserCloudState.Disabled;
+        if (user == null)
+            return UserCloudState.RequireAuthentication;
+        if (isCloudFeatureAllowed(user)) {
+            return UserCloudState.Allowed;
+        } else {
+            return UserCloudState.NotAllowed;
+        }
     }
 
     @Exclude
     public static boolean isCloudFeatureSupported() {
-        if (remote == null) return true;
-        return (remote.allowCloudFeatures || remote.allowedAccounts.size() > 0);
+        if (remote == null) return true; // assume it is
+
+        // Unauthenticated user might (allowedAccounts) or definitely will have access
+        return (remote.allowCloudFeatures ||
+                remote.allowedAccounts.size() > 0);
+    }
+
+    @Exclude
+    public static boolean isCloudFeatureAllowed(FirebaseUser user) {
+        if (remote == null) return false; // assume it isn't
+
+        // Authenticated user allowed generally (allowCloudFeatures) or explicitly (allowedAccounts)
+        return (remote.allowCloudFeatures ||
+                remote.allowedAccounts.contains(user.getEmail()));
     }
 
     @Exclude

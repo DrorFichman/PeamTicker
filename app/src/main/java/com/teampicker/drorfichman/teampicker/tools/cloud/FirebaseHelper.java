@@ -60,6 +60,10 @@ public class FirebaseHelper implements CloudSync {
         app,
     }
 
+    public interface PostConfigurationAction {
+        void execute();
+    }
+
     public static DatabaseReference games() {
         return getNode(Node.games);
     }
@@ -107,18 +111,33 @@ public class FirebaseHelper implements CloudSync {
     //region Sync
     @Override
     public void syncToCloud(Context ctx, SyncProgress progress) {
-
-        if (!Configurations.isCloudFeaturesAllowed()) {
-            if (Configurations.remote == null)
+        switch (Configurations.getUserCloudState(AuthHelper.getUser())) {
+            case Allowed:
+                TutorialManager.userActionTaken(ctx, TutorialManager.TutorialUserAction.click_sync_to_cloud);
+                checkSync(ctx, progress);
+                break;
+            case RequireAuthentication: // can't because checked previously, no break
+                Log.e("User", "Unauthenticated user at syncToCloud " + AuthHelper.getUser());
+            case Unknown:
                 Toast.makeText(ctx, ctx.getString(R.string.main_connectivity), Toast.LENGTH_SHORT).show();
-            else
+                break;
+            case NotAllowed:
+            case Disabled:
                 Toast.makeText(ctx, ctx.getString(R.string.main_cloud_not_allowed), Toast.LENGTH_SHORT).show();
-            return;
+                break;
         }
+    }
 
-        TutorialManager.userActionTaken(ctx, TutorialManager.TutorialUserAction.click_sync_to_cloud);
+    private void checkSync(Context ctx, SyncProgress progress) {
+        DialogHelper.showApprovalDialog(ctx,
+                "Sync players and games to the cloud?", "",
+                (dialog, positive) -> {
+                    progress.showSyncStatus("Syncing...");
+                    syncData(ctx, progress);
+                });
+    }
 
-        progress.showSyncStatus("Syncing...");
+    private void syncData(Context ctx, SyncProgress progress) {
         syncPlayersToCloud(ctx, () ->
                 syncGamesToCloud(ctx, () ->
                         syncPlayersGamesToCloud(ctx, () -> {
@@ -204,32 +223,36 @@ public class FirebaseHelper implements CloudSync {
     //region Pull
     @Override
     public void pullFromCloud(Context ctx, SyncProgress handler) {
+        switch (Configurations.getUserCloudState(AuthHelper.getUser())) {
+            case Allowed:
+                if (isAdmin()) {
 
-        if (!Configurations.isCloudFeaturesAllowed()) {
-            if (Configurations.remote == null)
-                Toast.makeText(ctx, ctx.getString(R.string.main_connectivity), Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(ctx, ctx.getString(R.string.main_cloud_not_allowed), Toast.LENGTH_SHORT).show();
-            return;
-        }
+                    GetUsers.query(ctx, result -> {
+                        showUsersDialog(ctx, result, handler);
+                    });
 
-        if (isAdmin()) {
-
-            GetUsers.query(ctx, result -> {
-                showUsersDialog(ctx, result, handler);
-            });
-
-        } else {
-
-            GetLastGame.query(ctx, (game) -> {
-                if (game != null) {
-                    Log.d("Date", "Date " + game.dateString);
-                    checkPull(ctx, game.getDisplayDate(ctx), handler);
                 } else {
-                    Toast.makeText(ctx, "No Games found - sync to cloud first", Toast.LENGTH_LONG).show();
-                }
-            });
 
+                    GetLastGame.query(ctx, (game) -> {
+                        if (game != null) {
+                            Log.d("Date", "Date " + game.dateString);
+                            checkPull(ctx, game.getDisplayDate(ctx), handler);
+                        } else {
+                            Toast.makeText(ctx, "No Games found - sync to cloud first", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
+                break;
+            case RequireAuthentication: // can't because checked previously, no break
+                Log.e("User", "Unauthenticated user at pull from cloud " + AuthHelper.getUser());
+            case Unknown:
+                Toast.makeText(ctx, ctx.getString(R.string.main_connectivity), Toast.LENGTH_SHORT).show();
+                break;
+            case NotAllowed:
+            case Disabled:
+                Toast.makeText(ctx, ctx.getString(R.string.main_cloud_not_allowed), Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 
@@ -266,7 +289,7 @@ public class FirebaseHelper implements CloudSync {
 
         DialogHelper.showApprovalDialog(ctx,
                 "Pull data from cloud? \n" + "Last game - " + date, "",
-                (dialog, which) -> {
+                (dialog, positive) -> {
                     fetchData(ctx, handler);
                 });
     }
@@ -372,17 +395,25 @@ public class FirebaseHelper implements CloudSync {
     //endregion
 
     //region Remote config
-    public static void fetchConfigurations(Context ctx, boolean forcePull, GetConfiguration.Results caller) {
+    public static void fetchConfigurations(Context ctx) {
+        executePostConfiguration(ctx, true, null);
+    }
+
+    public static void executePostConfiguration(Context ctx, boolean forcePull,
+                                                PostConfigurationAction action) {
         if (Configurations.remote == null || forcePull) {
             FirebaseHelper.pullRemoteConfiguration(ctx, result -> {
                 Configurations.remote = result;
-                if (!Configurations.isVersionSupported()) {
+
+                // Version support check occurs only during new app lunch
+                if (!Configurations.isVersionSupported())
                     showForceUpgradeDialog(ctx);
-                }
-                if (caller != null) caller.queryResults(result);
+                else if (action != null)
+                    action.execute();
             });
         } else {
-            if (caller != null) caller.queryResults(Configurations.remote);
+            if (action != null)
+                action.execute();
         }
     }
 
@@ -404,7 +435,7 @@ public class FirebaseHelper implements CloudSync {
         alertDialogBuilder.create().show();
     }
 
-    public static void pullRemoteConfiguration(Context ctx, GetConfiguration.Results caller) {
+    public static void pullRemoteConfiguration(Context ctx, GetConfiguration.ConfigurationResult caller) {
         GetConfiguration.query(ctx, caller);
     }
     //endregion

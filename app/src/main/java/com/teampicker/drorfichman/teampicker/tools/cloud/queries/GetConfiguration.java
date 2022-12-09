@@ -11,11 +11,11 @@ import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 public class GetConfiguration {
 
-    public interface Results {
-        void queryResults(Configurations result);
+    public interface ConfigurationResult {
+        void onResults(Configurations result);
     }
 
-    public static void query(Context ctx, Results caller) {
+    public static void query(Context ctx, ConfigurationResult caller) {
         ValueEventListener query = new ValueEventListener() {
 
             @Override
@@ -24,7 +24,7 @@ public class GetConfiguration {
                 Configurations conf = dataSnapshot.getValue(Configurations.class);
                 Log.i("GetConfiguration", conf.toString());
 
-                caller.queryResults(conf);
+                caller.onResults(conf);
             }
 
             @Override

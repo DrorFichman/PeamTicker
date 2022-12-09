@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity
 
         FirebaseHelper.getInstance().storeAccountData();
 
-        FirebaseHelper.fetchConfigurations(this, true, null);
+        FirebaseHelper.fetchConfigurations(this);
     }
 
     private void authenticate() {
@@ -190,9 +190,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             showAbout();
         } else if (id == R.id.nav_data_sync) {
-            FirebaseHelper.fetchConfigurations(this, true, this::syncToCloud);
+            FirebaseHelper.executePostConfiguration(this, true, this::syncToCloud);
         } else if (id == R.id.nav_data_pull) {
-            FirebaseHelper.fetchConfigurations(this, true, this::pullFromCloud);
+            FirebaseHelper.executePostConfiguration(this, true, this::pullFromCloud);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     //region cloud snapshot
-    private void pullFromCloud(Configurations remote) {
+    private void pullFromCloud() {
         if (AuthHelper.getUser() == null && Configurations.isCloudFeatureSupported()) {
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
             authenticate();
@@ -210,11 +210,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void syncToCloud(Configurations remote) {
+    private void syncToCloud() {
         if (AuthHelper.getUser() == null && Configurations.isCloudFeatureSupported()) {
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
             authenticate();
-        } else {
+        } else { // user is authenticated, and cloud is not disabled
             FirebaseHelper.getInstance().syncToCloud(this, this::showSyncStatus);
         }
     }
