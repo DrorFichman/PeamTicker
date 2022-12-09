@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
@@ -46,7 +47,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         TextView gradeView = view.findViewById(R.id.player_grade);
         final CheckBox vComing = view.findViewById(R.id.player_coming);
         View vComingTitle = view.findViewById(R.id.player_rsvp_title);
-        TextView recentPerformance = view.findViewById(R.id.player_recent_performance);
+        ImageView recentPerformance = view.findViewById(R.id.player_recent_performance);
         TextView ageView = view.findViewById(R.id.player_age);
         TextView attributes = view.findViewById(R.id.player_attributes);
 
@@ -130,7 +131,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         }
     }
 
-    private void setPlayerRecentPerformance(TextView recentPerformance, Player player) {
+    private void setPlayerRecentPerformance(ImageView recentPerformance, Player player) {
         if (!SettingsHelper.getShowGrades(context)) {
             recentPerformance.setVisibility(View.INVISIBLE);
             return;
@@ -139,12 +140,10 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         int suggestedGrade = player.getSuggestedGrade();
 
         if (suggestedGrade > player.mGrade) {
-            recentPerformance.setText(String.valueOf(suggestedGrade));
-            recentPerformance.setTextColor(Color.GREEN);
+            recentPerformance.setImageResource(R.drawable.increase);
             recentPerformance.setVisibility(View.VISIBLE);
         } else if (suggestedGrade < player.mGrade) {
-            recentPerformance.setText(String.valueOf(suggestedGrade));
-            recentPerformance.setTextColor(Color.RED);
+            recentPerformance.setImageResource(R.drawable.decrease);
             recentPerformance.setVisibility(View.VISIBLE);
         } else {
             recentPerformance.setVisibility(View.INVISIBLE);
