@@ -8,8 +8,8 @@ android {
         applicationId "com.teampicker.drorfichman.teampicker"
         minSdkVersion 29
         targetSdkVersion 32
-        versionCode 29
-        versionName "0.9.4.2.3"
+        versionCode 30
+        versionName "0.9.4.2.3.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
