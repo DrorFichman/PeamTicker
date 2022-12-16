@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamAnalysisAdapter;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamGameAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
@@ -58,6 +59,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.logging.Logger;
 
 public class MakeTeamsActivity extends AppCompatActivity {
     private static final String SET_RESULT = "SET_RESULT";
@@ -103,6 +105,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     protected View analysisHeaders1, analysisHeaders2;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     @Nullable
     public static Intent getIntent(Context ctx) {
         ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(ctx, 0);
@@ -123,6 +127,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_make_teams_activity);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         teamStatsLayout = findViewById(R.id.internal_stats_layout);
         teamData1 = findViewById(R.id.total_list1);
@@ -317,6 +323,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void divideComingPlayers(TeamDivision.DivisionStrategy division) {
+        analyticsDivision(division.name());
+
         selectedDivision = division;
 
         if (division == TeamDivision.DivisionStrategy.Optimize) {
@@ -327,6 +335,13 @@ public class MakeTeamsActivity extends AppCompatActivity {
         } else {
             divideComingPlayers(division, true);
         }
+    }
+
+    private void analyticsDivision(String type) {
+        Log.i("Analytics", "Analytics make teams");
+        Bundle bundle = new Bundle();
+        bundle.putString("type", type);
+        mFirebaseAnalytics. logEvent("make_teams", bundle);
     }
 
     protected void divideComingPlayers(TeamDivision.DivisionStrategy selectedDivision, boolean refreshPlayersView) {
