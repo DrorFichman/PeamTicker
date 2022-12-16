@@ -108,7 +108,7 @@ public class Sorting {
 
     public void removeHeadlineSorting(Activity ctx, int textField, String title) {
         TextView headlineView = null;
-        if (textField > 0)
+        if (textField > 0 && ctx.findViewById(textField) instanceof TextView)
             headlineView = ctx.findViewById(textField);
 
         if (headlineView != null) {
