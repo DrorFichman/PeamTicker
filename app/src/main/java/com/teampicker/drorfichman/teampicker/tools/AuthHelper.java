@@ -44,6 +44,7 @@ public class AuthHelper {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
+    // TODO why not used
     public static void signOut() {
         if (FirebaseAuth.getInstance() != null) {
             FirebaseAuth.getInstance().signOut();
@@ -55,8 +56,15 @@ public class AuthHelper {
         if (fetchUser != null && fetchUser.uid != null) {
             return fetchUser.uid;
         } else {
+            // TODO Unauthenticated users should not write at all
+            // return getUser() != null ? getUser().getUid() + modifyUserId() : "";
             return getUser() != null ? getUser().getUid() : "";
         }
+    }
+
+    private static String modifyUserId() {
+        // TODO check - pull and sync to a new location (for admin)
+        return "";
     }
 
     // Allow fetching data on behalf of another user

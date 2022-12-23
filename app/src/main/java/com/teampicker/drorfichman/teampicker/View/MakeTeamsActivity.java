@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
@@ -45,11 +46,9 @@ import com.teampicker.drorfichman.teampicker.Data.TeamEnum;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.DateHelper;
-import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
-import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
@@ -98,6 +97,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private Button shuffleView, moveView, saveView;
     private Button shuffleOptions, moveOptions;
+    private CheckBox saveSyncToCloudCheckbox;
 
     private View resultViews;
     private NumberPicker team1Score, team2Score;
@@ -164,6 +164,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         saveView = findViewById(R.id.save_results);
         saveView.setOnClickListener(view -> saveResultsClicked());
+        saveSyncToCloudCheckbox = findViewById(R.id.save_auto_sync_checkbox);
 
         shuffleView = findViewById(R.id.shuffle);
         shuffleView.setOnClickListener(v -> shuffleClicked());
@@ -455,8 +456,12 @@ public class MakeTeamsActivity extends AppCompatActivity {
             // TODO Improve above - can set the results when inserting the teams
             DbHelper.insertGame(this, game);
 
-            if (SettingsHelper.getAutoSyncCloud(this)) {
+            if (saveSyncToCloudCheckbox.isChecked()) {
+                // TODO set auto sync setting
+                // SettingsHelper.setAutoSyncCloud(this, true);
+
                 // TODO FirebaseHelper.syncGame(this, game)
+                // FirebaseHelper.fetchConfigurations(); syncGame(this, game)
                 // TODO initCollaboration(); and print / keep expected winner?
             }
 
@@ -494,6 +499,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private void displayResultsViews(boolean enterResults) {
         mSetResult = enterResults;
         saveView.setText(enterResults ? R.string.save : R.string.enter_results);
+
+        saveSyncToCloudCheckbox.setChecked(SettingsHelper.getAutoSyncCloud(this));
+        // TODO saveSyncToCloudCheckbox.setVisibility(enterResults ? View.VISIBLE : View.INVISIBLE);
 
         teamStatsLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         moveLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);

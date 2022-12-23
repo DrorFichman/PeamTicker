@@ -60,4 +60,8 @@ public class SettingsHelper {
     public static boolean getAutoSyncCloud(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_AUTO_SYNC_CLOUD, false);
     }
+
+    public static void setAutoSyncCloud(Context ctx, boolean set) {
+        PreferenceHelper.setSharedPreferenceBoolean(ctx, SETTING_AUTO_SYNC_CLOUD, set); // TODO check
+    }
 }

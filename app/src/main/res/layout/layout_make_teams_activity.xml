@@ -314,15 +314,13 @@
                 android:text="@string/action_enter_results"
                 android:textAllCaps="false" />
 
-            <Button
-                android:id="@+id/save_options"
-                android:visibility="invisible"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+            <CheckBox
+                android:id="@+id/save_auto_sync_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="@color/fui_transparent"
-                android:drawableStart="@drawable/more"
-                android:textAllCaps="false" />
+                android:text="@string/team_save_sync_to_cloud"
+                android:visibility="invisible" />
         </LinearLayout>
 
     </LinearLayout>

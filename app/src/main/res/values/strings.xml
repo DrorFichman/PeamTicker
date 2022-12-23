@@ -56,6 +56,7 @@
     <string name="action_switch_team_colors">Switch Colors</string>
     <string name="action_button_results">Results</string>
     <string name="teams_bench_title">Bench (drop players here when they are not playing)</string>
+    <string name="team_save_sync_to_cloud">Sync to cloud</string>
 
     <!--    Navigation-->
     <string name="nav_players">Players</string>
