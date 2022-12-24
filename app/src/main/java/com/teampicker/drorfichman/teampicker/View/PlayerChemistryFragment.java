@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerChemistryAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.SortType;
@@ -34,6 +35,8 @@ import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -192,6 +195,7 @@ public class PlayerChemistryFragment extends Fragment implements Sorting.sorting
     }
 
     private AdapterView.OnItemClickListener onPlayerClick = (parent, view, position, id) -> {
+        Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.player_collaboration_clicked);
         String selected = ((PlayerChemistry) parent.getItemAtPosition(position)).mName;
         Intent gameActivityIntent = GamesActivity.getGameActivityIntent(getContext(), pPlayer.mName, selected, false);
         startActivity(gameActivityIntent);

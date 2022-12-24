@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
@@ -23,6 +24,8 @@ import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
@@ -146,6 +149,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         setChildGameActions(g, actionsLayout, edit, delete, copy);
 
         TutorialManager.userActionTaken(context, TutorialManager.TutorialUserAction.clicked_game_in_history);
+        Event.logEvent(FirebaseAnalytics.getInstance(context), EventType.view_game);
 
         return view;
     }
@@ -240,6 +244,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
             } else {
                 updateGameDate(game, DateHelper.getDate(selectedDate.getTimeInMillis()));
                 LocalNotifications.sendNotification(context, LocalNotifications.GAME_UPDATE_ACTION);
+                Event.logEvent(FirebaseAnalytics.getInstance(context), EventType.edit_game);
             }
         }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE));
         d.show();
@@ -264,6 +269,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
                     if (mGameModifiedHandler != null) mGameModifiedHandler.onGameModified();
                     LocalNotifications.sendNotification(context, LocalNotifications.GAME_UPDATE_ACTION);
                     Snackbar.make(context, mList, "Game deleted", Snackbar.LENGTH_SHORT).show();
+                    Event.logEvent(FirebaseAnalytics.getInstance(context), EventType.delete_game);
                 })
         );
     }
@@ -285,6 +291,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         Snackbar.make(context, mList, context.getString(R.string.copy_players_success), Snackbar.LENGTH_SHORT).show();
 
         LocalNotifications.sendNotification(context, LocalNotifications.PLAYER_UPDATE_ACTION);
+        Event.logEvent(FirebaseAnalytics.getInstance(context), EventType.copy_game);
     }
     //endregion
 }

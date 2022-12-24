@@ -3,10 +3,9 @@ package com.teampicker.drorfichman.teampicker.Data;
 import android.content.Context;
 import android.util.Log;
 
-import com.teampicker.drorfichman.teampicker.R;
-import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
-
 import androidx.annotation.DrawableRes;
+
+import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 
 /**
  * Created by drorfichman on 10/3/16.

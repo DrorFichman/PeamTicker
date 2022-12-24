@@ -4,9 +4,13 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
+import com.teampicker.drorfichman.teampicker.tools.analytics.ParameterType;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import androidx.preference.EditTextPreference;
@@ -30,6 +34,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference color = findPreference(SettingsHelper.SETTING_TEAM_COLOR_SCHEME);
         color.setOnPreferenceChangeListener((preference, newValue) -> {
             LocalNotifications.sendNotification(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION);
+            Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.settings_changed_color);
             return true;
         });
     }
@@ -38,6 +43,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference showGrade = findPreference(SettingsHelper.SETTING_SHOW_GRADES);
         showGrade.setOnPreferenceChangeListener((preference, newValue) -> {
             LocalNotifications.sendNotification(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION);
+            Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.settings_changed_grades);
             return true;
         });
     }
@@ -48,6 +54,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             TutorialManager.clearTutorialPreferences(getContext());
             LocalNotifications.sendNotification(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION);
             Toast.makeText(getContext(), "Tutorial reset", Toast.LENGTH_SHORT).show();
+            Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.settings_changed_tutorial_reset);
             return true;
         });
     }
@@ -61,6 +68,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             editText.setSingleLine();
         });
 
+        gradeWeight.setOnPreferenceChangeListener((preference, newValue) -> {
+            Event event = new Event(EventType.settings_changed_division_percentage);
+            event.set(ParameterType.percentage, String.valueOf(newValue));
+            event.log(FirebaseAnalytics.getInstance(getContext()));
+            return true;
+        });
     }
 
     private void setDivisionAttemptsPreference() {
@@ -70,6 +83,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             editText.setText(String.valueOf(SettingsHelper.getDivideAttemptsCount(getContext())));
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
             editText.setSingleLine();
+        });
+
+        attemptsPref.setOnPreferenceChangeListener((preference, newValue) -> {
+            Event event = new Event(EventType.settings_changed_division_attempts);
+            event.set(ParameterType.percentage, String.valueOf(newValue));
+            event.log(FirebaseAnalytics.getInstance(getContext()));
+            return true;
         });
     }
 }

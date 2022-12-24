@@ -8,15 +8,20 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
+import com.teampicker.drorfichman.teampicker.tools.analytics.ParameterType;
 
 public class PlayerDetailsActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYER = "existing_player";
@@ -30,6 +35,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
 
     @NonNull
     public static Intent getEditPlayerIntent(Context context, String playerName) {
+        Event.logEvent(FirebaseAnalytics.getInstance(context), EventType.player_clicked);
         Intent intent = new Intent(context, PlayerDetailsActivity.class);
         intent.putExtra(PlayerDetailsActivity.EXTRA_PLAYER, playerName);
         return intent;
@@ -44,6 +50,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
 
     @NonNull
     public static Intent getNewPlayerIntent(Context context) {
+        Event.logEvent(FirebaseAnalytics.getInstance(context), EventType.new_player);
         return new Intent(context, PlayerDetailsActivity.class);
     }
 
@@ -74,6 +81,28 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mPager);
 
         mPager.setCurrentItem(0);
+
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 0)
+                    Event.logEvent(FirebaseAnalytics.getInstance(PlayerDetailsActivity.this), EventType.player_details_tab);
+                else if (position == 1)
+                    Event.logEvent(FirebaseAnalytics.getInstance(PlayerDetailsActivity.this), EventType.player_games_tab);
+                else
+                    Event.logEvent(FirebaseAnalytics.getInstance(PlayerDetailsActivity.this), EventType.player_team_tab);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     void finish(String newName) {

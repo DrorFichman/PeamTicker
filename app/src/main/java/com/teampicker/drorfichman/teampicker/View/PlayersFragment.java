@@ -37,6 +37,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
@@ -46,6 +47,8 @@ import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
@@ -280,12 +283,17 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 switchArchivedPlayersView();
                 break;
             case R.id.clear_all:
-                DbHelper.clearComingPlayers(getContext());
-                refreshPlayers();
+                clearAttendance();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void clearAttendance() {
+        DbHelper.clearComingPlayers(getContext());
+        refreshPlayers();
+        Event.logEvent(FirebaseAnalytics.getInstance(getContext()), EventType.clear_attendance);
     }
 
     private void onPlayerComingChanged(boolean coming) {
@@ -310,7 +318,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private void launchMakeTeams() {
         Intent makeTeamsIntent = MakeTeamsActivity.getIntent(getContext());
         if (makeTeamsIntent != null) {
-            startActivity(MakeTeamsActivity.getIntent(getContext()));
+            startActivity(makeTeamsIntent);
         } else {
             Toast.makeText(getContext(), "First - select attending players", Toast.LENGTH_SHORT).show();
         }
@@ -369,6 +377,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
         backPress.setEnabled(showArchivedPlayers);
         refreshPlayers();
+
+        Event.logEvent(FirebaseAnalytics.getInstance(getContext()), EventType.players_archive);
     }
 
     private void setHeadlines(boolean show) {
@@ -476,6 +486,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             }
 
             if (pasted.size() > 0) {
+                Event.logEvent(FirebaseAnalytics.getInstance(getContext()), EventType.paste_players);
                 displayPastedIdentifiers(pasted);
             } else {
                 Toast.makeText(getContext(), "Paste multiple messages", Toast.LENGTH_SHORT).show();

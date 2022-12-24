@@ -10,8 +10,11 @@ import android.util.Log;
 
 import com.ajts.androidmads.library.ExcelToSQLite;
 import com.ajts.androidmads.library.SQLiteToExcel;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.PlayerContract;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 
 import java.io.File;
 
@@ -48,6 +51,8 @@ public class DBSnapshotUtils {
         PermissionTools.checkPermissionsForExecution(activity, 3,
                 () -> takeDBSnapshotPermitted(activity, listener, name),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        Event.logEvent(FirebaseAnalytics.getInstance(activity), EventType.backup_to_file);
     }
 
     public static File getSnapshotPath() {

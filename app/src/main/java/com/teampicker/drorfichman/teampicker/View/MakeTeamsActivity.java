@@ -28,6 +28,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.util.Pair;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -49,6 +50,9 @@ import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
+import com.teampicker.drorfichman.teampicker.tools.analytics.ParameterType;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
@@ -58,7 +62,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.logging.Logger;
 
 public class MakeTeamsActivity extends AppCompatActivity {
     private static final String SET_RESULT = "SET_RESULT";
@@ -105,12 +108,11 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     protected View analysisHeaders1, analysisHeaders2;
 
-    private FirebaseAnalytics mFirebaseAnalytics;
-
     @Nullable
     public static Intent getIntent(Context ctx) {
         ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(ctx, 0);
         if (comingPlayers.size() > 0) {
+            Event.logEvent(FirebaseAnalytics.getInstance(ctx), EventType.make_teams);
             TutorialManager.userActionTaken(ctx, TutorialManager.TutorialUserAction.clicked_teams);
             return new Intent(ctx, MakeTeamsActivity.class);
         } else {
@@ -127,8 +129,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_make_teams_activity);
-
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         teamStatsLayout = findViewById(R.id.internal_stats_layout);
         teamData1 = findViewById(R.id.total_list1);
@@ -324,7 +324,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void divideComingPlayers(TeamDivision.DivisionStrategy division) {
-        analyticsDivision(division.name());
+        Event event = new Event(EventType.shuffle_teams,
+                new Pair<>(ParameterType.type, division.name()));
+        event.log(FirebaseAnalytics.getInstance(this));
 
         selectedDivision = division;
 
@@ -336,13 +338,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         } else {
             divideComingPlayers(division, true);
         }
-    }
-
-    private void analyticsDivision(String type) {
-        Log.i("Analytics", "Analytics make teams");
-        Bundle bundle = new Bundle();
-        bundle.putString("type", type);
-        mFirebaseAnalytics. logEvent("make_teams", bundle);
     }
 
     protected void divideComingPlayers(TeamDivision.DivisionStrategy selectedDivision, boolean refreshPlayersView) {
@@ -465,6 +460,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 // TODO initCollaboration(); and print / keep expected winner?
             }
 
+            Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.save_results);
             LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
 
             Toast.makeText(this, "Results saved", Toast.LENGTH_SHORT).show();
@@ -556,6 +552,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
         };
 
         new Handler().postDelayed(r, 200);
+
+        Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.send_teams);
     }
 
     private void enterSendMode() {
@@ -695,6 +693,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 if (playerStats != null) analysisSelectedPlayer = player.mName;
 
                 refreshPlayers();
+
+                Event.logEvent(FirebaseAnalytics.getInstance(MakeTeamsActivity.this), EventType.analysis_mode_player_clicked);
 
             } else if (mSetResult) { // Setting "Missed" when setting results
 
@@ -897,6 +897,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
                     }
 
                     refreshPlayers();
+
+                    Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.move_player);
                 }
         }
 
@@ -907,6 +909,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     //region Analysis
     private void analysisClicked() {
         TutorialManager.userActionTaken(this, TutorialManager.TutorialUserAction.clicked_analysis);
+        Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.analysis_mode);
 
         if (!backFromAnalysis(false) && !analysisAsyncInProgress) { // enter analysis mode
             cancelSetResults();

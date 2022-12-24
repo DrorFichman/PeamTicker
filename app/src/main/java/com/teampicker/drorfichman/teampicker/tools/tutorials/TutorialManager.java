@@ -12,9 +12,12 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Adapter.TutorialStepsAdapter;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -136,6 +139,7 @@ public class TutorialManager {
     public static void dismissAllTutorials(Context ctx, boolean dismiss) {
         PreferenceHelper.setSharedPreferenceString(ctx, PreferenceHelper.pref_skip_all_tutorial,
                 dismiss ? "1" : null);
+        Event.logEvent(FirebaseAnalytics.getInstance(ctx), EventType.tutorial_dismissed);
     }
 
     public static boolean isSkipAllTutorials(Context ctx) {
