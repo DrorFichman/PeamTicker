@@ -16,6 +16,7 @@ public class Configurations implements Serializable {
 
     public boolean allowCloudFeatures = false;
     public ArrayList<String> allowedAccounts = new ArrayList<>();
+    public ArrayList<String> adminAccounts = new ArrayList<>();
     public int oldestSupportedVersion = 0;
     public String oldestSupportedVersionMessage = "";
 
@@ -73,6 +74,12 @@ public class Configurations implements Serializable {
     public static String outdatedVersionMessage() {
         if (remote == null) return "";
         else return remote.oldestSupportedVersionMessage;
+    }
+
+    @Exclude
+    public static boolean isAdmin(FirebaseUser user) {
+        if (remote == null) return false;
+        else return remote.adminAccounts.contains(user.getEmail());
     }
 
     @Exclude

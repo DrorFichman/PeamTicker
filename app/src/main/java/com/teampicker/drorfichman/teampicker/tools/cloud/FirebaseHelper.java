@@ -448,7 +448,8 @@ public class FirebaseHelper implements CloudSync {
     }
 
     public static boolean isAdmin() {
-        return ("T13cmH6prBhDyMeSgYrmKut7sPG3".equals(AuthHelper.getUserUID()));
+        // return ("T13cmH6prBhDyMeSgYrmKut7sPG3".equals(AuthHelper.getUserUID()));
+        return Configurations.isAdmin(AuthHelper.getUser());
     }
 }
 
