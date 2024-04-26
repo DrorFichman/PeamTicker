@@ -4,6 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/PeamTicker.iml" filepath="$PROJECT_DIR$/.idea/PeamTicker.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PeamTicker.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PeamTicker.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PeamTicker.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PeamTicker.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PeamTicker.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PeamTicker.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PeamTicker.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PeamTicker.app.unitTest.iml" />
     </modules>
   </component>
 </project>
