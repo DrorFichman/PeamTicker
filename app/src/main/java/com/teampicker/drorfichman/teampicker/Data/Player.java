@@ -30,6 +30,7 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
     public boolean isPlaymaker;
     public boolean isUnbreakable;
     public boolean isExtra;
+    public boolean isInjured;
 
     public Player() {
     }
@@ -148,20 +149,21 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
     }
 
     public boolean hasAttributes() {
-        return isGK || isPlaymaker || isDefender || isUnbreakable || isExtra;
+        return isGK || isPlaymaker || isDefender || isUnbreakable || isExtra || isInjured;
     }
 
     @Exclude
     public String getAttributes() {
         if (!hasAttributes()) return "";
 
-        String attributes = "";
-        if (isUnbreakable) attributes += "B,";
-        if (isGK) attributes += "GK,";
-        if (isPlaymaker) attributes += "PM,";
-        if (isDefender) attributes += "D,";
-        if (isExtra) attributes += "E,";
-        return attributes.substring(0, attributes.length() - 1);
+        StringBuilder attributes = new StringBuilder();
+        if (isUnbreakable) attributes.append(PlayerAttribute.isUnbreakable.displayName).append(",");
+        if (isGK) attributes.append(PlayerAttribute.isGK.displayName).append(",");
+        if (isPlaymaker) attributes.append(PlayerAttribute.isPlaymaker.displayName).append(",");
+        if (isDefender) attributes.append(PlayerAttribute.isDefender.displayName).append(",");
+        if (isExtra) attributes.append(PlayerAttribute.isExtra.displayName).append(",");
+        if (isInjured) attributes.append(PlayerAttribute.isInjured.displayName).append(",");
+        return attributes.toString().substring(0, attributes.length() - 1);
     }
 
     public boolean isAttribute(PlayerAttribute attribute) {
@@ -177,6 +179,8 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
                     return isUnbreakable;
                 case isExtra:
                     return isExtra;
+                case isInjured:
+                    return isInjured;
             }
         }
         return false;

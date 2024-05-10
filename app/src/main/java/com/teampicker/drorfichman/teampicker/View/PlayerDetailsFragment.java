@@ -40,6 +40,7 @@ public class PlayerDetailsFragment extends Fragment {
     private EditText vGrade;
     private TextView vBirth;
     private CheckBox isGK;
+    private CheckBox isInjured;
     private CheckBox isDefender;
     private CheckBox isPlaymaker;
     private CheckBox isUnbreakable;
@@ -68,6 +69,7 @@ public class PlayerDetailsFragment extends Fragment {
         vBirth = root.findViewById(R.id.edit_player_birthday);
         vBirth.setOnClickListener(this::showBirthdayPicker);
 
+        isInjured = root.findViewById(R.id.player_is_injured);
         isGK = root.findViewById(R.id.player_is_gk);
         isDefender = root.findViewById(R.id.player_is_defender);
         isPlaymaker = root.findViewById(R.id.player_is_playmaker);
@@ -186,6 +188,7 @@ public class PlayerDetailsFragment extends Fragment {
         player.isPlaymaker = isPlaymaker.isChecked();
         player.isUnbreakable = isUnbreakable.isChecked();
         player.isExtra = isExtra.isChecked();
+        player.isInjured = isInjured.isChecked();
         DbHelper.updatePlayerAttributes(getContext(), player);
     }
 
@@ -196,6 +199,7 @@ public class PlayerDetailsFragment extends Fragment {
         isPlaymaker.setChecked(player.isPlaymaker);
         isUnbreakable.setChecked(player.isUnbreakable);
         isExtra.setChecked(player.isExtra);
+        isInjured.setChecked(player.isInjured);
     }
 
     public void showBirthdayPicker(View view) {

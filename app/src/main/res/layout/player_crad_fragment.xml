@@ -112,6 +112,12 @@
                 android:textSize="18sp" />
 
             <CheckBox
+                android:id="@+id/player_is_injured"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Injured" />
+
+            <CheckBox
                 android:id="@+id/player_is_gk"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
