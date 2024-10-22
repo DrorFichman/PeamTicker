@@ -30,7 +30,7 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
     public boolean isPlaymaker;
     public boolean isUnbreakable;
     public boolean isExtra;
-    public boolean isInjured;
+    // public boolean isInjured;
 
     public Player() {
     }
@@ -149,7 +149,8 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
     }
 
     public boolean hasAttributes() {
-        return isGK || isPlaymaker || isDefender || isUnbreakable || isExtra || isInjured;
+        return isGK || isPlaymaker || isDefender || isUnbreakable || isExtra;
+        // || isInjured;
     }
 
     @Exclude
@@ -162,7 +163,7 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
         if (isPlaymaker) attributes.append(PlayerAttribute.isPlaymaker.displayName).append(",");
         if (isDefender) attributes.append(PlayerAttribute.isDefender.displayName).append(",");
         if (isExtra) attributes.append(PlayerAttribute.isExtra.displayName).append(",");
-        if (isInjured) attributes.append(PlayerAttribute.isInjured.displayName).append(",");
+        // if (isInjured) attributes.append(PlayerAttribute.isInjured.displayName).append(",");
         return attributes.toString().substring(0, attributes.length() - 1);
     }
 
@@ -179,8 +180,8 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
                     return isUnbreakable;
                 case isExtra:
                     return isExtra;
-                case isInjured:
-                    return isInjured;
+//                case isInjured:
+//                    return isInjured;
             }
         }
         return false;
