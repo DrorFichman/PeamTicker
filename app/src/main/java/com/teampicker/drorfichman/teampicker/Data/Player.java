@@ -5,8 +5,11 @@ import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Controller.Sort.Sortable;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import androidx.annotation.Nullable;
 
@@ -64,6 +67,14 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
         } else {
             int suggestedGrade = getAverageGrade() + getSuccess() / 2;
             return Math.max(Math.min(suggestedGrade, 99), 1);
+        }
+    }
+
+    public Date lastPlayedGame() {
+        if (results == null || results.isEmpty() || results.get(0).gameDateString == null) {
+            return null;
+        } else {
+            return results.get(0).getDate();
         }
     }
 
@@ -204,6 +215,13 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
     @Override
     public int grade() {
         return mGrade;
+    }
+
+    @Override
+    public Date lastGame() {
+        Date date = lastPlayedGame();
+        if (date == null) return Date.from(Instant.now().minus(1000, ChronoUnit.DAYS));
+        else return date;
     }
 
     @Override

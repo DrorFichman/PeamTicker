@@ -324,12 +324,19 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         }
     }
 
+    private boolean shouldShowIndications() {
+        if (showPastedPlayers) return false;
+        else if (showArchivedPlayers) return false;
+        else return true;
+    }
+
     private void setPlayersList(List<Player> players, AdapterView.OnItemClickListener clickHandler) {
         boolean hasPlayers = (players != null && players.size() > 0);
         playersList.setVisibility(hasPlayers ? View.VISIBLE : View.GONE);
 
         setHeadlines(true);
         playersAdapter = new PlayerAdapter(getContext(), players, this::onPlayerComingChanged);
+        playersAdapter.setShowIndications(shouldShowIndications());
 
         if (clickHandler != null) {
             playersList.setOnItemClickListener(clickHandler);

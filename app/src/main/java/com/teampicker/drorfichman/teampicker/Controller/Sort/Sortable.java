@@ -1,5 +1,7 @@
 package com.teampicker.drorfichman.teampicker.Controller.Sort;
 
+import java.util.Date;
+
 public class Sortable {
 
     public String name() {
@@ -32,6 +34,10 @@ public class Sortable {
 
     public int grade() {
         return 0;
+    }
+
+    public Date lastGame() {
+        return null;
     }
 
     public int suggestedGrade() {

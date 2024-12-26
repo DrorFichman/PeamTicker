@@ -17,12 +17,17 @@ import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by drorfichman on 7/30/16.
  */
 public class PlayerAdapter extends ArrayAdapter<Player> {
+
+    private static int LAST_GAME_DAYS = 180;
 
     public interface onPlayerComingChange {
         void playerComingChanged(boolean coming);
@@ -32,12 +37,17 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     private final List<Player> mPlayers;
     private onPlayerComingChange handler;
     private String filterValue;
+    private boolean showIndications = true;
 
     public PlayerAdapter(Context ctx, List<Player> players, onPlayerComingChange caller) {
         super(ctx, -1, players);
         context = ctx;
         mPlayers = players;
         handler = caller;
+    }
+
+    public void setShowIndications(boolean showIndications) {
+        this.showIndications = showIndications;
     }
 
     @Override
@@ -132,14 +142,20 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     }
 
     private void setPlayerRecentPerformance(ImageView recentPerformance, Player player) {
-        if (!SettingsHelper.getShowGrades(context)) {
+        if (!SettingsHelper.getShowGrades(context) || !showIndications) {
             recentPerformance.setVisibility(View.INVISIBLE);
             return;
         }
 
         int suggestedGrade = player.getSuggestedGrade();
+        Date lastPlayerGame = player.lastPlayedGame();
 
-        if (suggestedGrade > player.mGrade) {
+        if (lastPlayerGame == null ||
+                lastPlayerGame.before(Date.from(Instant.now().minus(LAST_GAME_DAYS, ChronoUnit.DAYS)))) {
+            if (!player.archived) {
+                recentPerformance.setImageResource(R.drawable.archive);
+            }
+        } else if (suggestedGrade > player.mGrade) {
             recentPerformance.setImageResource(R.drawable.increase);
             recentPerformance.setVisibility(View.VISIBLE);
         } else if (suggestedGrade < player.mGrade) {

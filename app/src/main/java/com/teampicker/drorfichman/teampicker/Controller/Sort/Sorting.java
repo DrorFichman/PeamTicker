@@ -64,12 +64,12 @@ public class Sorting {
 
             // Main
             case name:
-                return (p1, p2) -> p2.name().compareTo(p1.name());
+                return Comparator.comparing(Sortable::name).reversed();
             case grade:
                 return Comparator.comparing(Sortable::grade);
             case suggestedGrade:
-                return Comparator.comparing(Sortable::suggestedGrade).
-                        thenComparing(Sortable::grade);
+                return Comparator.comparing(Sortable::lastGame)
+                                .thenComparing(Sortable::suggestedGrade);
             case age:
                 return Comparator.comparing(Sortable::age);
             case attributes:
@@ -79,8 +79,8 @@ public class Sorting {
 
             // Statistics
             case success:
-                return Comparator.comparing(Sortable::success).
-                        thenComparing(Sortable::winRate);
+                return Comparator.comparing(Sortable::success)
+                                .thenComparing(Sortable::winRate);
             case winPercentage:
                 return Comparator.comparing(Sortable::winRate);
             case games:
@@ -88,19 +88,19 @@ public class Sorting {
 
             // Participation
             case gamesWith:
-                return Comparator.comparing(Sortable::gamesWithCount).
-                        thenComparing(Sortable::successWith).
-                        thenComparing(Sortable::winRateWith);
+                return Comparator.comparing(Sortable::gamesWithCount)
+                                .thenComparing(Sortable::successWith)
+                                        .thenComparing(Sortable::winRateWith);
             case successWith:
-                return Comparator.comparing(Sortable::successWith).
-                        thenComparing(Sortable::winRateWith);
+                return Comparator.comparing(Sortable::successWith)
+                                .thenComparing(Sortable::winRateWith);
             case gamesVs:
-                return Comparator.comparing(Sortable::gamesVsCount).
-                        thenComparing(Sortable::successVs).
-                        thenComparing(Sortable::winRateVs);
+                return Comparator.comparing(Sortable::gamesVsCount)
+                                .thenComparing(Sortable::successVs)
+                                        .thenComparing(Sortable::winRateVs);
             case successVs:
-                return Comparator.comparing(Sortable::successVs).
-                        thenComparing(Sortable::winRateVs);
+                return Comparator.comparing(Sortable::successVs)
+                                .thenComparing(Sortable::winRateVs);
             default:
                 return null;
         }
