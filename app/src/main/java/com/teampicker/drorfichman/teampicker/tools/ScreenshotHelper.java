@@ -2,6 +2,7 @@ package com.teampicker.drorfichman.teampicker.tools;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,16 +11,21 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.core.content.FileProvider;
 
@@ -29,41 +35,58 @@ import androidx.core.content.FileProvider;
 public class ScreenshotHelper {
 
     public static void takeListScreenshot(Activity activity, ListView list, View titles, ArrayAdapter adapter) {
-
         PermissionTools.checkPermissionsForExecution(activity, 1, () -> {
             try {
                 Bitmap bitmap = getWholeListViewItemsToBitmap(list, titles, adapter);
 
-                File imageFile = getImageFromBitmap(bitmap, 100);
+                Uri imageUri = saveImageUri(activity, bitmap, 100);
 
-                openScreenshot(activity, imageFile);
-
+                openScreenshot(activity, imageUri);
             } catch (Throwable e) {
-
-                // Several error may come out with file handling or OOM
-                Toast.makeText(activity, "Failed to take screenshot " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, "Failed to take screenshot: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
-        }, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+        }, Manifest.permission.READ_MEDIA_IMAGES);
+    }
+
+    private static Uri saveImageUri(Context context, Bitmap bitmap, int quality) throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String fileName = "IMG_" + timeStamp + ".jpg";
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+
+        Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        if (uri != null) {
+            try (OutputStream out = context.getContentResolver().openOutputStream(uri)) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out);
+            }
+            return uri;
+        } else {
+            throw new IOException("Failed to save image");
+        }
     }
 
     public static void takeScreenshot(Activity activity, View view) {
-
         PermissionTools.checkPermissionsForExecution(activity, 1, () -> {
             try {
+                // Capture the bitmap from the provided view
                 Bitmap bitmap = getBitmapFromView(view);
 
-                File imageFile = getImageFromBitmap(bitmap, 50);
+                // Save the bitmap to a file
+                Uri imageUri = saveImageUri(activity, bitmap, 50);
 
-                openScreenshot(activity, imageFile);
+                // Open the screenshot for preview
+                openScreenshot(activity, imageUri);
 
             } catch (Throwable e) {
-
-                // Several error may come out with file handling or OOM
-                Toast.makeText(activity, "Failed to take screenshot " + e.getMessage(), Toast.LENGTH_LONG).show();
+                // Handle potential errors
+                Toast.makeText(activity, "Failed to take screenshot: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
-        }, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+        }, Manifest.permission.READ_MEDIA_IMAGES); // Only READ_EXTERNAL_STORAGE is needed
     }
 
     private static File getImageFromBitmap(Bitmap bitmap, int quality) throws IOException {
@@ -142,15 +165,11 @@ public class ScreenshotHelper {
         childView.setBackgroundColor(Color.parseColor("#ede6e6"));
     }
 
-    private static void openScreenshot(Context ctx, File imageFile) {
-
+    private static void openScreenshot(Context context, Uri uri) {
         Intent intent = new Intent(Intent.ACTION_SEND);
-        Uri photoURI = FileProvider.getUriForFile(ctx,
-                ctx.getApplicationContext().getPackageName() + ".team.picker.share.screenshot",
-                imageFile);
-
-        intent.putExtra(Intent.EXTRA_STREAM, photoURI);
-        intent.setType("image/*");
-        ctx.startActivity(Intent.createChooser(intent, "Share screenshot"));
+        intent.setDataAndType(uri, "image/*");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(intent, "Share Teams"));
     }
 }

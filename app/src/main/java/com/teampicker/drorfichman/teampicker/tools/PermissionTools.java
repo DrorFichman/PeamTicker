@@ -2,7 +2,6 @@ package com.teampicker.drorfichman.teampicker.tools;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
@@ -12,19 +11,22 @@ public class PermissionTools {
         void execute();
     }
 
-    public static void checkPermissionsForExecution(Activity ctx, int requestCode,
-                                                    onPermissionGranted handler,
-                                                    String... check) {
-
+    public static void checkPermissionsForExecution(Activity ctx, int requestCode, onPermissionGranted handler, String... check) {
+        // Check if all permissions are granted
+        boolean allGranted = true;
         for (String per : check) {
-            int permission = ActivityCompat.checkSelfPermission(ctx, per);
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(ctx, "Permission is required; retry after allowing", Toast.LENGTH_LONG).show();
-                ActivityCompat.requestPermissions(ctx, check, requestCode);
-                return;
+            if (ActivityCompat.checkSelfPermission(ctx, per) != PackageManager.PERMISSION_GRANTED) {
+                allGranted = false;
+                break;
             }
         }
 
-        handler.execute();
+        if (allGranted) {
+            // If all permissions are granted, execute the handler
+            handler.execute();
+        } else {
+            // Request permissions if not granted
+            ActivityCompat.requestPermissions(ctx, check, requestCode);
+        }
     }
 }

@@ -579,15 +579,25 @@ public class MakeTeamsActivity extends AppCompatActivity {
         DbHelper.saveTeams(this, players1, players2, saveBench ? benchedPlayers : null, missedPlayers);
     }
 
+    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == 1) {
-            if (grantResults.length > 0 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            boolean allGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            if (allGranted) {
                 exitSendMode();
                 Snackbar.make(list1, "We're ready! you can now share your screenshot :)", Snackbar.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permissions denied.", Toast.LENGTH_SHORT).show();
             }
         }
     }
