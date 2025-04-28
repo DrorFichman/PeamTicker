@@ -139,8 +139,7 @@ public class DbHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    private static SQLiteDatabase getSqLiteDatabase(Context context) {
-
+    public static SQLiteDatabase getSqLiteDatabase(Context context) {
         // Gets the data repository in write mode
         if (writableDatabase == null) {
             DbHelper mDbHelper = new DbHelper(context.getApplicationContext());
@@ -365,5 +364,9 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public static int getActiveGame(Context context) {
         return PlayerGamesDbHelper.getActiveGame(getSqLiteDatabase(context));
+    }
+
+    public static PlayerGamesDbHelper.StreakInfo getLongestUnbeatenRun(Context context, String playerName) {
+        return PlayerGamesDbHelper.getLongestUnbeatenRun(getSqLiteDatabase(context), playerName);
     }
 }

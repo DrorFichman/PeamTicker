@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
+import com.teampicker.drorfichman.teampicker.Data.PlayerGamesDbHelper;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
@@ -39,6 +40,7 @@ public class PlayerDetailsFragment extends Fragment {
     private EditText vName;
     private EditText vGrade;
     private TextView vBirth;
+    private TextView vLongestUnbeatenRun;
     private CheckBox isGK;
     // private CheckBox isInjured;
     private CheckBox isDefender;
@@ -65,8 +67,8 @@ public class PlayerDetailsFragment extends Fragment {
 
         vName = root.findViewById(R.id.edit_player_name);
         vGrade = root.findViewById(R.id.edit_player_grade);
-
         vBirth = root.findViewById(R.id.edit_player_birthday);
+        vLongestUnbeatenRun = root.findViewById(R.id.longest_unbeaten_run);
         vBirth.setOnClickListener(this::showBirthdayPicker);
 
         // isInjured = root.findViewById(R.id.player_is_injured);
@@ -81,6 +83,7 @@ public class PlayerDetailsFragment extends Fragment {
             vGrade.setText(String.valueOf(player.mGrade));
             initBirthdayView(player);
             initPlayerAttributesView();
+            updateLongestUnbeatenRun();
         } else if (createFromIdentifier != null) {
             vName.setText(createFromIdentifier);
         } else {
@@ -222,6 +225,28 @@ public class PlayerDetailsFragment extends Fragment {
             vBirth.setText(String.valueOf(p.getAge()));
             vBirth.setTag(p.mBirthDay + "/" + p.mBirthMonth + "/" + p.mBirthYear);
         }
+    }
+
+    private void updateLongestUnbeatenRun() {
+        if (player != null && getContext() != null) {
+            PlayerGamesDbHelper.StreakInfo streak = DbHelper.getLongestUnbeatenRun(getContext(), player.mName);
+            if (streak.length > 0) {
+                String startDate = formatDate(streak.startDate);
+                String endDate = formatDate(streak.endDate);
+                vLongestUnbeatenRun.setText(String.format("%d games (%s - %s)", 
+                    streak.length, 
+                    startDate, 
+                    endDate));
+            } else {
+                vLongestUnbeatenRun.setText("0");
+            }
+        }
+    }
+
+    private String formatDate(String date) {
+        if (date == null || date.length() < 7) return date;
+        // Convert from YYYY-MM-DD to MM-YYYY
+        return date.substring(5, 7) + "-" + date.substring(0, 4);
     }
     //endregion
 
