@@ -1,6 +1,5 @@
 package com.teampicker.drorfichman.teampicker.View;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -36,11 +35,7 @@ import com.teampicker.drorfichman.teampicker.Data.Configurations;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
-import com.teampicker.drorfichman.teampicker.tools.DBSnapshotUtils;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
-import com.teampicker.drorfichman.teampicker.tools.FileHelper;
-import com.teampicker.drorfichman.teampicker.tools.PermissionTools;
-import com.teampicker.drorfichman.teampicker.tools.SnapshotHelper;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.analytics.UserProperty;
@@ -192,14 +187,6 @@ public class MainActivity extends AppCompatActivity
 
             setUsernameView();
 
-        } else if (requestCode == ACTIVITY_RESULT_IMPORT_FILE_SELECTED &&
-                resultCode == RESULT_OK &&
-                data != null && data.getData() != null) {
-
-            // Import data result
-            SnapshotHelper.checkImportApproved(this, getImportListener(),
-                    FileHelper.getPath(this, data.getData()));
-
         }
     }
 
@@ -231,11 +218,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_save_snapshot) {
-            DBSnapshotUtils.takeDBSnapshot(this, getExportListener(), null);
-        } else if (id == R.id.nav_import_snapshot) {
-            selectFileForImport();
-        } else if (id == R.id.nav_settings) {
+        if (id == R.id.nav_settings) {
             Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.settings_view);
             startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_getting_started) {
@@ -321,68 +304,6 @@ public class MainActivity extends AppCompatActivity
                 });
 
         alertDialogBuilder.create().show();
-    }
-    //endregion
-
-    //region local snapshot
-    private DBSnapshotUtils.ImportListener getImportListener() {
-        return new DBSnapshotUtils.ImportListener() {
-            @Override
-            public void preImport() {
-            }
-
-            @Override
-            public void importStarted() {
-                Toast.makeText(MainActivity.this, "Import Started", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void importCompleted() {
-                Toast.makeText(MainActivity.this, "Import Completed", Toast.LENGTH_SHORT).show();
-                LocalNotifications.sendNotification(MainActivity.this, LocalNotifications.PULL_DATA_ACTION);
-            }
-
-            @Override
-            public void importError(String msg) {
-                Toast.makeText(MainActivity.this, "Import Failed : " + msg, Toast.LENGTH_LONG).show();
-            }
-        };
-    }
-
-    private DBSnapshotUtils.ExportListener getExportListener() {
-        return new DBSnapshotUtils.ExportListener() {
-
-            @Override
-            public void exportStarted() {
-                Toast.makeText(MainActivity.this, "Export Started", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void exportCompleted(File snapshot) {
-                Toast.makeText(MainActivity.this, "Export Completed " + snapshot, Toast.LENGTH_SHORT).show();
-
-                SnapshotHelper.sendSnapshot(MainActivity.this, snapshot);
-            }
-
-            @Override
-            public void exportError(String msg) {
-                Toast.makeText(MainActivity.this, "Data export failed " + msg, Toast.LENGTH_LONG).show();
-            }
-        };
-    }
-
-    public void selectFileForImport() {
-        Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.import_from_file);
-
-        PermissionTools.checkPermissionsForExecution(this, 2, () -> {
-            Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-            chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
-            chooseFile.setType("*/*"); // TODO xls?
-            startActivityForResult(
-                    Intent.createChooser(chooseFile, "Select xls snapshot file to import"),
-                    MainActivity.ACTIVITY_RESULT_IMPORT_FILE_SELECTED
-            );
-        }, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
     //endregion
 
