@@ -17,20 +17,6 @@
                 android:visible="true" />
         </group>
         <group
-            android:id="@+id/menu_snapshot"
-            android:checkableBehavior="none">
-            <item
-                android:id="@+id/nav_save_snapshot"
-                android:icon="@drawable/nav_backup"
-                android:title="@string/nav_backup_to_file"
-                android:visible="false" />
-            <item
-                android:id="@+id/nav_import_snapshot"
-                android:icon="@android:drawable/ic_menu_upload"
-                android:title="@string/nav_import_from_file"
-                android:visible="false" />
-        </group>
-        <group
             android:id="@+id/menu_help"
             android:checkableBehavior="none">
             <item

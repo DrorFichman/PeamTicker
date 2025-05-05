@@ -25,6 +25,18 @@ public class PlayerGamesDbHelper {
     public static final int WIN = 1;
     public static final int LOSE = -1;
 
+    public static class StreakInfo {
+        public final int length;
+        public final String startDate;
+        public final String endDate;
+
+        public StreakInfo(int length, String startDate, String endDate) {
+            this.length = length;
+            this.startDate = startDate;
+            this.endDate = endDate;
+        }
+    }
+
     private static final String SQL_CREATE_PLAYERS_GAMES =
             "CREATE TABLE " + PlayerContract.PlayerGameEntry.TABLE_NAME + " (" +
                     PlayerContract.PlayerGameEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -538,5 +550,88 @@ public class PlayerGamesDbHelper {
         }
 
         return 1;
+    }
+
+    /**
+     * Calculates the longest unbeaten run (consecutive games without a loss) for a player
+     * @param db SQLiteDatabase instance
+     * @param playerName Name of the player to check
+     * @return The length of the longest unbeaten run
+     */
+    public static StreakInfo getLongestUnbeatenRun(SQLiteDatabase db, String playerName) {
+        Cursor c = db.rawQuery(
+            "WITH RECURSIVE " +
+            "  game_sequence AS (" +
+            "    SELECT " +
+            "      game, " +
+            "      " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " as player_result, " +
+            "      date, " +
+            "      ROW_NUMBER() OVER (ORDER BY date) as row_num " +
+            "    FROM " + PlayerContract.PlayerGameEntry.TABLE_NAME + " " +
+            "    WHERE name = ? " +
+            "      AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NOT NULL " +
+            "      AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " != " + MISSED_GAME + " " +
+            "    ORDER BY date" +
+            "  ), " +
+            "  streaks AS (" +
+            "    SELECT " +
+            "      row_num, " +
+            "      game, " +
+            "      player_result, " +
+            "      date, " +
+            "      CASE " +
+            "        WHEN player_result = " + LOSE + " THEN 0 " +
+            "        ELSE 1 " +
+            "      END as is_unbeaten, " +
+            "      CASE " +
+            "        WHEN player_result = " + LOSE + " THEN 0 " +
+            "        ELSE 1 " +
+            "      END as streak, " +
+            "      date as streak_start_date " +
+            "    FROM game_sequence " +
+            "    WHERE row_num = 1 " +
+            "    UNION ALL " +
+            "    SELECT " +
+            "      gs.row_num, " +
+            "      gs.game, " +
+            "      gs.player_result, " +
+            "      gs.date, " +
+            "      CASE " +
+            "        WHEN gs.player_result = " + LOSE + " THEN 0 " +
+            "        ELSE 1 " +
+            "      END as is_unbeaten, " +
+            "      CASE " +
+            "        WHEN gs.player_result = " + LOSE + " THEN 0 " +
+            "        ELSE s.streak + 1 " +
+            "      END as streak, " +
+            "      CASE " +
+            "        WHEN gs.player_result = " + LOSE + " THEN gs.date " +
+            "        ELSE s.streak_start_date " +
+            "      END as streak_start_date " +
+            "    FROM game_sequence gs " +
+            "    JOIN streaks s ON gs.row_num = s.row_num + 1 " +
+            "  ) " +
+            "SELECT " +
+            "  MAX(streak) as longest_streak, " +
+            "  MIN(CASE WHEN streak = (SELECT MAX(streak) FROM streaks) THEN streak_start_date END) as start_date, " +
+            "  MAX(CASE WHEN streak = (SELECT MAX(streak) FROM streaks) THEN date END) as end_date " +
+            "FROM streaks",
+            new String[]{playerName}
+        );
+
+        try {
+            if (c.moveToFirst()) {
+                int streak = c.getInt(c.getColumnIndex("longest_streak"));
+                if (streak > 0) {
+                    String startDate = c.getString(c.getColumnIndex("start_date"));
+                    String endDate = c.getString(c.getColumnIndex("end_date"));
+                    return new StreakInfo(streak, startDate, endDate);
+                }
+            }
+        } finally {
+            c.close();
+        }
+
+        return new StreakInfo(0, null, null);
     }
 }
