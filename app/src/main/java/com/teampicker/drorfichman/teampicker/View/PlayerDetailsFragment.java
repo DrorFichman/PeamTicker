@@ -21,7 +21,7 @@ import androidx.fragment.app.Fragment;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.Data.PlayerGamesDbHelper;
+import com.teampicker.drorfichman.teampicker.Data.StreakInfo;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
@@ -229,24 +229,14 @@ public class PlayerDetailsFragment extends Fragment {
 
     private void updateLongestUnbeatenRun() {
         if (player != null && getContext() != null) {
-            PlayerGamesDbHelper.StreakInfo streak = DbHelper.getLongestUnbeatenRun(getContext(), player.mName);
+            StreakInfo streak = DbHelper.getLongestUnbeatenRun(getContext(), player.mName);
             if (streak.length > 0) {
-                String startDate = formatDate(streak.startDate);
-                String endDate = formatDate(streak.endDate);
-                vLongestUnbeatenRun.setText(String.format("%d games (%s - %s)", 
-                    streak.length, 
-                    startDate, 
-                    endDate));
+                vLongestUnbeatenRun.setText(String.format("%d games\n(%d days)", streak.length, streak.days));
+                vLongestUnbeatenRun.setVisibility(View.VISIBLE);
             } else {
-                vLongestUnbeatenRun.setText("0");
+                vLongestUnbeatenRun.setVisibility(View.GONE);
             }
         }
-    }
-
-    private String formatDate(String date) {
-        if (date == null || date.length() < 7) return date;
-        // Convert from YYYY-MM-DD to MM-YYYY
-        return date.substring(5, 7) + "-" + date.substring(0, 4);
     }
     //endregion
 

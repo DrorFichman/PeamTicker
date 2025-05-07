@@ -366,7 +366,7 @@ public class DbHelper extends SQLiteOpenHelper {
         return PlayerGamesDbHelper.getActiveGame(getSqLiteDatabase(context));
     }
 
-    public static PlayerGamesDbHelper.StreakInfo getLongestUnbeatenRun(Context context, String playerName) {
+    public static StreakInfo getLongestUnbeatenRun(Context context, String playerName) {
         return PlayerGamesDbHelper.getLongestUnbeatenRun(getSqLiteDatabase(context), playerName);
     }
 }
