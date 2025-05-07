@@ -41,6 +41,7 @@ public class PlayerDetailsFragment extends Fragment {
     private EditText vGrade;
     private TextView vBirth;
     private TextView vLongestUnbeatenRun;
+    private TextView vConsecutiveAttendance;
     private CheckBox isGK;
     // private CheckBox isInjured;
     private CheckBox isDefender;
@@ -69,6 +70,7 @@ public class PlayerDetailsFragment extends Fragment {
         vGrade = root.findViewById(R.id.edit_player_grade);
         vBirth = root.findViewById(R.id.edit_player_birthday);
         vLongestUnbeatenRun = root.findViewById(R.id.longest_unbeaten_run);
+        vConsecutiveAttendance = root.findViewById(R.id.consecutive_attendance);
         vBirth.setOnClickListener(this::showBirthdayPicker);
 
         // isInjured = root.findViewById(R.id.player_is_injured);
@@ -84,6 +86,7 @@ public class PlayerDetailsFragment extends Fragment {
             initBirthdayView(player);
             initPlayerAttributesView();
             updateLongestUnbeatenRun();
+            updateConsecutiveAttendance();
         } else if (createFromIdentifier != null) {
             vName.setText(createFromIdentifier);
         } else {
@@ -235,6 +238,18 @@ public class PlayerDetailsFragment extends Fragment {
                 vLongestUnbeatenRun.setVisibility(View.VISIBLE);
             } else {
                 vLongestUnbeatenRun.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void updateConsecutiveAttendance() {
+        if (player != null && getContext() != null) {
+            StreakInfo streak = DbHelper.getConsecutiveAttendance(getContext(), player.mName);
+            if (streak.length > 0) {
+                vConsecutiveAttendance.setText(String.format("%d games\n(%d days)", streak.length, streak.days));
+                vConsecutiveAttendance.setVisibility(View.VISIBLE);
+            } else {
+                vConsecutiveAttendance.setVisibility(View.GONE);
             }
         }
     }

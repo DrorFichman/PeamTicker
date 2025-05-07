@@ -112,6 +112,30 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start|center_vertical"
+                android:text="Consecutive Attendance"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/consecutive_attendance"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:minHeight="48dp"
+                android:textSize="14sp" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout

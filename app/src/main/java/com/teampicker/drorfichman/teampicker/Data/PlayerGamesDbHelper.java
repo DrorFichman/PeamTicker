@@ -598,4 +598,57 @@ public class PlayerGamesDbHelper {
 
         return new StreakInfo(0, null, null);
     }
+
+    public static StreakInfo getConsecutiveAttendance(SQLiteDatabase db, String playerName) {
+        try (Cursor c = db.rawQuery(
+                "SELECT " +
+                        "  " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " as player_result, " +
+                        "  date " +
+                        " FROM " + PlayerContract.PlayerGameEntry.TABLE_NAME + " " +
+                        " WHERE name = ? " +
+                        "  AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NOT NULL " +
+                        "  AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NOT " + PlayerGamesDbHelper.EMPTY_RESULT +
+                        " ORDER BY date, " + PlayerContract.PlayerGameEntry.ID + " ASC",
+                new String[]{playerName}
+        )) {
+            int currentStreak = 0;
+            int longestStreak = 0;
+            String streakStartDate = null;
+            String currentStreakStartDate = null;
+            String streakEndDate = null;
+
+            if (c.moveToFirst()) {
+                do {
+                    int result = c.getInt(c.getColumnIndex("player_result"));
+                    String date = c.getString(c.getColumnIndex("date"));
+
+                    if (result == MISSED_GAME) {
+                        // Reset streak on missed game
+                        currentStreak = 0;
+                        currentStreakStartDate = null;
+                    } else {
+                        // Start new streak or continue existing one
+                        if (currentStreak == 0) {
+                            currentStreakStartDate = date;
+                        }
+                        Log.d("cons", "getConsecutiveAttendance: " + currentStreak + " - " + date);
+                        currentStreak++;
+
+                        // Update longest streak if current streak is longer
+                        if (currentStreak > longestStreak) {
+                            longestStreak = currentStreak;
+                            streakStartDate = currentStreakStartDate;
+                            streakEndDate = date;
+                        }
+                    }
+                } while (c.moveToNext());
+            }
+
+            if (longestStreak > 0) {
+                return new StreakInfo(longestStreak, streakStartDate, streakEndDate);
+            }
+        }
+
+        return new StreakInfo(0, null, null);
+    }
 }
