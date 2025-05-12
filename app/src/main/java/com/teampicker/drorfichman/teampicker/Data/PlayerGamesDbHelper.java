@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by drorfichman on 10/3/16.
@@ -600,48 +601,61 @@ public class PlayerGamesDbHelper {
     }
 
     public static StreakInfo getConsecutiveAttendance(SQLiteDatabase db, String playerName) {
-        try (Cursor c = db.rawQuery(
-                "SELECT " +
-                        "  " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " as player_result, " +
-                        "  date " +
-                        " FROM " + PlayerContract.PlayerGameEntry.TABLE_NAME + " " +
-                        " WHERE name = ? " +
-                        "  AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NOT NULL " +
-                        "  AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NOT " + PlayerGamesDbHelper.EMPTY_RESULT +
-                        " ORDER BY date, " + PlayerContract.PlayerGameEntry.ID + " ASC",
-                new String[]{playerName}
+        // First get all unique game dates
+        try (Cursor gamesDates = db.rawQuery(
+                "SELECT DISTINCT " + PlayerContract.PlayerGameEntry.DATE +
+                " FROM " + PlayerContract.PlayerGameEntry.TABLE_NAME + " " +
+                " ORDER BY date ASC",
+                null
         )) {
+            // Get all player's game dates into a HashSet for O(1) lookup
+            HashSet<String> playerGameDates = new HashSet<>();
+            try (Cursor playerGamesCursor = db.rawQuery(
+                    "SELECT DISTINCT " + PlayerContract.PlayerGameEntry.DATE +
+                    " FROM " + PlayerContract.PlayerGameEntry.TABLE_NAME + " " +
+                    " WHERE name = ? " +
+                    "  AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NOT NULL " +
+                    "  AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NOT " + PlayerGamesDbHelper.EMPTY_RESULT +
+                    "  AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NOT " + PlayerGamesDbHelper.MISSED_GAME,
+                    new String[]{playerName}
+            )) {
+                if (playerGamesCursor.moveToFirst()) {
+                    do {
+                        playerGameDates.add(
+                                playerGamesCursor.getString(playerGamesCursor.getColumnIndex(PlayerContract.PlayerGameEntry.DATE)));
+                    } while (playerGamesCursor.moveToNext());
+                }
+            }
+
             int currentStreak = 0;
             int longestStreak = 0;
             String streakStartDate = null;
             String currentStreakStartDate = null;
             String streakEndDate = null;
 
-            if (c.moveToFirst()) {
+            if (gamesDates.moveToFirst()) {
                 do {
-                    int result = c.getInt(c.getColumnIndex("player_result"));
-                    String date = c.getString(c.getColumnIndex("date"));
+                    String currentGameDate = gamesDates.getString(gamesDates.getColumnIndex(PlayerContract.PlayerGameEntry.DATE));
+                    boolean hadGameOnCurrentDate = playerGameDates.contains(currentGameDate);
 
-                    if (result == MISSED_GAME) {
-                        // Reset streak on missed game
-                        currentStreak = 0;
-                        currentStreakStartDate = null;
-                    } else {
-                        // Start new streak or continue existing one
+                    if (hadGameOnCurrentDate) {
                         if (currentStreak == 0) {
-                            currentStreakStartDate = date;
+                            currentStreakStartDate = currentGameDate;
                         }
-                        Log.d("cons", "getConsecutiveAttendance: " + currentStreak + " - " + date);
                         currentStreak++;
 
                         // Update longest streak if current streak is longer
                         if (currentStreak > longestStreak) {
                             longestStreak = currentStreak;
                             streakStartDate = currentStreakStartDate;
-                            streakEndDate = date;
+                            streakEndDate = currentGameDate;
                         }
+                    } else {
+                        // Reset streak if player missed this date
+                        currentStreak = 0;
+                        currentStreakStartDate = null;
                     }
-                } while (c.moveToNext());
+                } while (gamesDates.moveToNext());
             }
 
             if (longestStreak > 0) {
