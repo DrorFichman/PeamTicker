@@ -1,6 +1,5 @@
 package com.teampicker.drorfichman.teampicker.tools;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,18 +34,16 @@ import androidx.core.content.FileProvider;
 public class ScreenshotHelper {
 
     public static void takeListScreenshot(Activity activity, ListView list, View titles, ArrayAdapter adapter) {
-        PermissionTools.checkPermissionsForExecution(activity, 1, () -> {
-            try {
-                Bitmap bitmap = getWholeListViewItemsToBitmap(list, titles, adapter);
+        try {
+            Bitmap bitmap = getWholeListViewItemsToBitmap(list, titles, adapter);
 
-                Uri imageUri = saveImageUri(activity, bitmap, 100);
+            Uri imageUri = saveImageUri(activity, bitmap, 100);
 
-                openScreenshot(activity, imageUri);
-            } catch (Throwable e) {
-                Toast.makeText(activity, "Failed to take screenshot: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                e.printStackTrace();
-            }
-        }, Manifest.permission.READ_MEDIA_IMAGES);
+            openScreenshot(activity, imageUri);
+        } catch (Throwable e) {
+            Toast.makeText(activity, "Failed to take screenshot: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
     }
 
     private static Uri saveImageUri(Context context, Bitmap bitmap, int quality) throws IOException {
@@ -70,23 +67,21 @@ public class ScreenshotHelper {
     }
 
     public static void takeScreenshot(Activity activity, View view) {
-        PermissionTools.checkPermissionsForExecution(activity, 1, () -> {
-            try {
-                // Capture the bitmap from the provided view
-                Bitmap bitmap = getBitmapFromView(view);
+        try {
+            // Capture the bitmap from the provided view
+            Bitmap bitmap = getBitmapFromView(view);
 
-                // Save the bitmap to a file
-                Uri imageUri = saveImageUri(activity, bitmap, 50);
+            // Save the bitmap to a file
+            Uri imageUri = saveImageUri(activity, bitmap, 50);
 
-                // Open the screenshot for preview
-                openScreenshot(activity, imageUri);
+            // Open the screenshot for preview
+            openScreenshot(activity, imageUri);
 
-            } catch (Throwable e) {
-                // Handle potential errors
-                Toast.makeText(activity, "Failed to take screenshot: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                e.printStackTrace();
-            }
-        }, Manifest.permission.READ_MEDIA_IMAGES); // Only READ_EXTERNAL_STORAGE is needed
+        } catch (Throwable e) {
+            // Handle potential errors
+            Toast.makeText(activity, "Failed to take screenshot: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
     }
 
     private static File getImageFromBitmap(Bitmap bitmap, int quality) throws IOException {
