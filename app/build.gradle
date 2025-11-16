@@ -5,14 +5,14 @@ plugins {
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.teampicker.drorfichman.teampicker"
         minSdkVersion 29
-        targetSdkVersion 34
-        versionCode 35
-        versionName "0.9.5.4.0"
+        targetSdkVersion 35
+        versionCode 36
+        versionName "0.9.5.5.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -30,7 +30,7 @@ android {
         abortOnError false
     }
     namespace 'com.teampicker.drorfichman.teampicker'
-    buildToolsVersion '34.0.0'
+    buildToolsVersion '35.0.0'
 }
 
 dependencies {
