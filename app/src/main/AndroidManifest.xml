@@ -12,6 +12,11 @@
             android:name="google_analytics_adid_collection_enabled"
             android:value="false" />
 
+        <!-- Declare support for screen orientation restrictions on Android 15+ -->
+        <property
+            android:name="android.window.PROPERTY_ACTIVITY_EMBEDDING_ALLOW_SYSTEM_OVERRIDE"
+            android:value="false" />
+
         <activity
             android:name=".View.MainActivity"
             android:exported="true"
@@ -29,35 +34,35 @@
             android:exported="true"
             android:label="Games history"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
 
         <activity
             android:name=".View.SettingsActivity"
             android:exported="true"
             android:label="Settings"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
 
         <activity
             android:name=".View.PlayerDetailsActivity"
             android:exported="true"
             android:label="Player details"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
 
         <activity
             android:name=".View.MakeTeamsActivity"
             android:exported="true"
             android:label="Pick Teams"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
 
         <activity
             android:name=".View.PlayerChemistryActivity"
             android:exported="true"
             android:label="Player's success with/vs teammates"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
 
         <provider
             android:name=".Provider.ShareTeamProvider"
@@ -71,7 +76,7 @@
 
     </application>
 
-     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

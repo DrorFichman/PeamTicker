@@ -731,6 +731,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private void setDefaultTeamColors() {
         int[] colors = ColorHelper.getTeamsColors(this);
+        area1.setBackgroundColor(colors[0]);
+        area2.setBackgroundColor(colors[1]);
         list1.setBackgroundColor(colors[0]);
         list2.setBackgroundColor(colors[1]);
     }
