@@ -11,8 +11,8 @@ android {
         applicationId "com.teampicker.drorfichman.teampicker"
         minSdkVersion 29
         targetSdkVersion 35
-        versionCode 36
-        versionName "0.9.5.5.0"
+        versionCode 37
+        versionName "0.9.5.6.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -48,6 +48,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+
+    // Retrofit for weather API
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0-alpha05'
     androidTestImplementation 'androidx.test:rules:1.4.0-alpha05'
