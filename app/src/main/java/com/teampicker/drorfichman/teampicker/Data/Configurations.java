@@ -19,6 +19,7 @@ public class Configurations implements Serializable {
     public ArrayList<String> adminAccounts = new ArrayList<>();
     public int oldestSupportedVersion = 0;
     public String oldestSupportedVersionMessage = "";
+    public boolean weatherFeatureEnabled = true;
 
     public Configurations() {
     }
@@ -83,12 +84,19 @@ public class Configurations implements Serializable {
     }
 
     @Exclude
+    public static boolean isWeatherFeatureEnabled() {
+        if (remote == null) return true; // default to enabled if config not loaded
+        return remote.weatherFeatureEnabled;
+    }
+
+    @Exclude
     @Override
     public String toString() {
         return "Configurations{" +
                 "allowCloudFeatures=" + allowCloudFeatures +
                 ", allowedAccounts=" + allowedAccounts +
                 ", oldestSupportedVersion=" + oldestSupportedVersion +
+                ", weatherFeatureEnabled=" + weatherFeatureEnabled +
                 '}';
     }
 }

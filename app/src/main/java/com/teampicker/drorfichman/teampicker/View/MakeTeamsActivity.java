@@ -39,6 +39,7 @@ import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.Collaboratio
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.PlayerCollaboration;
 import com.teampicker.drorfichman.teampicker.Controller.TeamDivision.TeamDivision;
+import com.teampicker.drorfichman.teampicker.Data.Configurations;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
@@ -50,6 +51,8 @@ import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
+import com.teampicker.drorfichman.teampicker.tools.WeatherService;
+import com.teampicker.drorfichman.teampicker.tools.WeatherSettingsDialog;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.analytics.ParameterType;
@@ -105,6 +108,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private View resultViews;
     private NumberPicker team1Score, team2Score;
     private Button setGameDate;
+    
+    private View weatherDisplay;
+    private TextView weatherEmoji, weatherTemperature, weatherTimeRange;
+    private TextView weatherDate;
 
     protected View analysisHeaders1, analysisHeaders2;
 
@@ -178,6 +185,21 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         analysisHeaders1 = findViewById(R.id.analysis_headers_1);
         analysisHeaders2 = findViewById(R.id.analysis_headers_2);
+        
+        weatherDisplay = findViewById(R.id.weather_display);
+        weatherEmoji = findViewById(R.id.weather_emoji);
+        weatherTemperature = findViewById(R.id.weather_temperature);
+        weatherTimeRange = findViewById(R.id.weather_time_range);
+        weatherDate = findViewById(R.id.weather_date);
+
+        // Show/hide weather based on configuration
+        if (Configurations.isWeatherFeatureEnabled()) {
+            weatherDisplay.setOnClickListener(v -> showWeatherSettingsDialog());
+            weatherDisplay.setVisibility(View.VISIBLE);
+            fetchWeatherData();
+        } else {
+            weatherDisplay.setVisibility(View.GONE);
+        }
 
         area1.setOnDragListener(playerMoveDragListener);
         area2.setOnDragListener(playerMoveDragListener);
@@ -1036,6 +1058,75 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private void updateAnalysisProgress(int progress, String score) {
         runOnUiThread(() -> progressBarTeamDivisionStatus.setText(
                 getString(R.string.analysis_progress_update, progress, score)));
+    }
+    //endregion
+    
+    //region Weather
+    private void fetchWeatherData() {
+        // Skip if feature is disabled
+        if (!Configurations.isWeatherFeatureEnabled()) {
+            return;
+        }
+        
+        WeatherService weatherService = new WeatherService(this);
+        
+        weatherService.fetchWeatherForGameTime(new WeatherService.WeatherCallback() {
+            @Override
+            public void onWeatherReceived(com.teampicker.drorfichman.teampicker.Data.WeatherData weatherData) {
+                runOnUiThread(() -> updateWeatherDisplay(weatherData));
+            }
+
+            @Override
+            public void onWeatherError(String error) {
+                runOnUiThread(() -> {
+                    weatherEmoji.setText("❓");
+                    weatherTemperature.setText("Weather unavailable");
+                    Log.w("Weather", "Failed to fetch weather: " + error);
+                });
+            }
+        });
+    }
+    
+    private void updateWeatherDisplay(com.teampicker.drorfichman.teampicker.Data.WeatherData weatherData) {
+        if (weatherData.hasError()) {
+            weatherEmoji.setText("");
+            weatherTemperature.setText(weatherData.getErrorMessage());
+            weatherDate.setVisibility(View.GONE);
+            weatherTimeRange.setVisibility(View.GONE);
+            return;
+        }
+        
+        weatherEmoji.setText(weatherData.getWeatherEmoji());
+        
+        int minTemp = Math.round(weatherData.getMinTemperature());
+        int maxTemp = Math.round(weatherData.getMaxTemperature());
+        
+        if (minTemp == maxTemp) {
+            weatherTemperature.setText(String.format("%d°C", minTemp));
+        } else {
+            weatherTemperature.setText(String.format("%d-%d°C", minTemp, maxTemp));
+        }
+        
+        int startHour = WeatherService.getWeatherStartHour(this);
+        int startMinute = WeatherService.getWeatherStartMinute(this);
+        int endHour = WeatherService.getWeatherEndHour(this);
+        int endMinute = WeatherService.getWeatherEndMinute(this);
+        weatherTimeRange.setText(String.format("(%02d:%02d-%02d:%02d)", startHour, startMinute, endHour, endMinute));
+        weatherTimeRange.setVisibility(View.VISIBLE);
+        Calendar selectedDate = WeatherService.getWeatherDate(this);
+
+        weatherDate.setText(WeatherService.formatWeatherDate(selectedDate));
+        weatherDate.setVisibility(View.VISIBLE);
+    }
+    
+    private void showWeatherSettingsDialog() {
+        // Skip if feature is disabled
+        if (!Configurations.isWeatherFeatureEnabled()) {
+            Toast.makeText(this, "Weather feature is currently disabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        WeatherSettingsDialog.show(this, this::fetchWeatherData);
     }
     //endregion
 }

@@ -10,6 +10,15 @@ public class PreferenceHelper {
     private final static String PREF_FILE = "PLAYERS";
 
     public static String pref_shuffle = "shuffle_strategy";
+    
+    public static String pref_weather_start_hour = "weather_start_hour";
+    public static String pref_weather_start_minute = "weather_start_minute";
+    public static String pref_weather_end_hour = "weather_end_hour";
+    public static String pref_weather_end_minute = "weather_end_minute";
+    public static String pref_weather_day_of_week = "weather_day_of_week";
+    public static String pref_weather_location_name = "weather_location_name";
+    public static String pref_weather_location_lat = "weather_location_lat";
+    public static String pref_weather_location_lng = "weather_location_lng";
 
     public static String pref_skip_tutorial_players = "pref_skip_tutorial_players";
     public static String pref_skip_tutorial_attendance = "pref_skip_tutorial_attendance";
