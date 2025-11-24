@@ -1109,9 +1109,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         
         int startHour = WeatherService.getWeatherStartHour(this);
         int startMinute = WeatherService.getWeatherStartMinute(this);
-        int endHour = WeatherService.getWeatherEndHour(this);
-        int endMinute = WeatherService.getWeatherEndMinute(this);
-        weatherTimeRange.setText(String.format("(%02d:%02d-%02d:%02d)", startHour, startMinute, endHour, endMinute));
+        weatherTimeRange.setText(String.format("(%02d:%02d)", startHour, startMinute));
         weatherTimeRange.setVisibility(View.VISIBLE);
         Calendar selectedDate = WeatherService.getWeatherDate(this);
 
