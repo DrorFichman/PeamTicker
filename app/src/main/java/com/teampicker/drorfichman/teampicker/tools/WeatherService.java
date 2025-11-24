@@ -8,7 +8,6 @@ import com.google.gson.annotations.SerializedName;
 import com.teampicker.drorfichman.teampicker.Data.Configurations;
 import com.teampicker.drorfichman.teampicker.Data.WeatherData;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -34,7 +33,7 @@ public class WeatherService {
     // Default Tel Aviv coordinates
     private static final double DEFAULT_LATITUDE = 32.0853;
     private static final double DEFAULT_LONGITUDE = 34.7818;
-    private static final String DEFAULT_LOCATION_NAME = "Ginegar, Israel";
+    private static final String DEFAULT_LOCATION_NAME = "Tel Aviv, Israel";
     
     // Default game time window (14:00-17:00)
     private static final int DEFAULT_START_HOUR = 14;
