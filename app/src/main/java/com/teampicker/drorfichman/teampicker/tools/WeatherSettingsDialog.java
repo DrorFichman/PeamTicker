@@ -6,7 +6,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
 import android.view.Gravity;
-import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -181,6 +181,7 @@ public class WeatherSettingsDialog {
         LinearLayout startTimeLayout = new LinearLayout(activity);
         startTimeLayout.setOrientation(LinearLayout.HORIZONTAL);
         startTimeLayout.setGravity(Gravity.CENTER);
+        startTimeLayout.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         
         NumberPicker startHourPicker = new NumberPicker(activity);
         startHourPicker.setMinValue(0);
@@ -221,6 +222,7 @@ public class WeatherSettingsDialog {
         LinearLayout endTimeLayout = new LinearLayout(activity);
         endTimeLayout.setOrientation(LinearLayout.HORIZONTAL);
         endTimeLayout.setGravity(Gravity.CENTER);
+        endTimeLayout.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         
         NumberPicker endHourPicker = new NumberPicker(activity);
         endHourPicker.setMinValue(0);
