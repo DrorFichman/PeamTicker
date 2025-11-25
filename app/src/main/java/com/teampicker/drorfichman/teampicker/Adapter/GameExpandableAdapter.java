@@ -287,7 +287,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
 
         DbHelper.setPlayerComing(context, mTeam1);
         DbHelper.setPlayerComing(context, mTeam2);
-        DbHelper.saveTeams(context, mTeam1, mTeam2, null, null);
+        DbHelper.saveTeams(context, mTeam1, mTeam2, null, null, null);
         Snackbar.make(context, mList, context.getString(R.string.copy_players_success), Snackbar.LENGTH_SHORT).show();
 
         LocalNotifications.sendNotification(context, LocalNotifications.PLAYER_UPDATE_ACTION);

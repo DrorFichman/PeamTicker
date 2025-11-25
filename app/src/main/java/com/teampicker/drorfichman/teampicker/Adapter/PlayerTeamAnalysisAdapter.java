@@ -15,6 +15,7 @@ import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -31,12 +32,12 @@ public class PlayerTeamAnalysisAdapter extends ArrayAdapter<Player> {
     private Context context;
     private List<Player> mPlayers;
     private List<Player> mMovedPlayers;
-    private List<Player> mMarkedPlayers;
+    private Collection<Player> mMarkedPlayers;
     private String mSelectedPlayer;
     private Collaboration mCollaboration;
 
     public PlayerTeamAnalysisAdapter(Context ctx, List<Player> players,
-                                     List<Player> coloredPlayers, List<Player> markedPlayers,
+                                     List<Player> coloredPlayers, Collection<Player> markedPlayers,
                                      @NonNull Collaboration collaboration, String selectedPlayer) {
         super(ctx, -1, players);
         context = ctx;

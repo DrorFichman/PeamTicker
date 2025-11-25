@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +62,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -77,7 +77,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
     ArrayList<Player> movedPlayers = new ArrayList<>();
     ArrayList<Player> benchedPlayers = new ArrayList<>();
     ArrayList<Player> returnFromBenchPlayers = new ArrayList<>();
-    ArrayList<Player> missedPlayers = new ArrayList<>();
+    HashSet<Player> missedPlayers = new HashSet<>();
+    HashSet<Player> mvpPlayers = new HashSet<>();
 
     public Collaboration analysisResult;
     private String analysisSelectedPlayer;
@@ -105,9 +106,12 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private Button shuffleOptions, moveOptions;
     private CheckBox saveSyncToCloudCheckbox;
 
-    private View resultViews;
-    private NumberPicker team1Score, team2Score;
+    private View scoreDisplayContainer;
+    private TextView team1ScoreDisplay, team2ScoreDisplay;
+    private Button team1Plus, team1Minus, team2Plus, team2Minus;
     private Button setGameDate;
+    private int team1ScoreValue = 0;
+    private int team2ScoreValue = 0;
     
     private View weatherDisplay;
     private TextView weatherEmoji, weatherTemperature, weatherTimeRange;
@@ -142,11 +146,17 @@ public class MakeTeamsActivity extends AppCompatActivity {
         teamData2 = findViewById(R.id.total_list2);
         headlines = findViewById(R.id.total_headlines);
 
-        resultViews = findViewById(R.id.enter_result_views);
-        team1Score = findViewById(R.id.team_1_score);
-        team2Score = findViewById(R.id.team_2_score);
+        scoreDisplayContainer = findViewById(R.id.score_display_container);
+        team1ScoreDisplay = findViewById(R.id.team1_score_display);
+        team2ScoreDisplay = findViewById(R.id.team2_score_display);
+        team1Plus = findViewById(R.id.team1_plus);
+        team1Minus = findViewById(R.id.team1_minus);
+        team2Plus = findViewById(R.id.team2_plus);
+        team2Minus = findViewById(R.id.team2_minus);
         setGameDate = findViewById(R.id.set_game_date);
         setGameDate(Calendar.getInstance());
+        
+        setupScoreControls();
 
         teamsScreenArea = findViewById(R.id.teams_list_area);
         buttonsLayout = findViewById(R.id.buttons_layout);
@@ -468,7 +478,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
             missedPlayers.clear();
 
             int currGame = DbHelper.getActiveGame(this);
-            Game game = new Game(currGame, getGameDateString(), team1Score.getValue(), team2Score.getValue());
+            Game game = new Game(currGame, getGameDateString(), team1ScoreValue, team2ScoreValue);
 
             // TODO Improve above - can set the results when inserting the teams
             DbHelper.insertGame(this, game);
@@ -490,15 +500,45 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
     }
 
+    private void setupScoreControls() {
+        team1Plus.setOnClickListener(v -> {
+            if (team1ScoreValue < MAX_SCORE) {
+                team1ScoreValue++;
+                team1ScoreDisplay.setText(String.valueOf(team1ScoreValue));
+            }
+        });
+        
+        team1Minus.setOnClickListener(v -> {
+            if (team1ScoreValue > 0) {
+                team1ScoreValue--;
+                team1ScoreDisplay.setText(String.valueOf(team1ScoreValue));
+            }
+        });
+        
+        team2Plus.setOnClickListener(v -> {
+            if (team2ScoreValue < MAX_SCORE) {
+                team2ScoreValue++;
+                team2ScoreDisplay.setText(String.valueOf(team2ScoreValue));
+            }
+        });
+        
+        team2Minus.setOnClickListener(v -> {
+            if (team2ScoreValue > 0) {
+                team2ScoreValue--;
+                team2ScoreDisplay.setText(String.valueOf(team2ScoreValue));
+            }
+        });
+    }
+
     public void initSetResults() {
-        team1Score.setValue(0);
-        team1Score.setMinValue(0);
-        team1Score.setMaxValue(MAX_SCORE);
-        team1Score.setWrapSelectorWheel(false);
-        team2Score.setValue(0);
-        team2Score.setMinValue(0);
-        team2Score.setMaxValue(MAX_SCORE);
-        team2Score.setWrapSelectorWheel(false);
+        team1ScoreValue = 0;
+        team2ScoreValue = 0;
+        team1ScoreDisplay.setText("0");
+        team2ScoreDisplay.setText("0");
+
+        mvpPlayers.clear();
+
+        exitMoveMode();
 
         backFromAnalysis(false);
         setActivityTitle(getString(R.string.pick_teams_title_results));
@@ -510,6 +550,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void cancelSetResults() {
+        mvpPlayers.clear();
         displayResultsViews(false);
         setActivityTitle(null);
     }
@@ -525,12 +566,11 @@ public class MakeTeamsActivity extends AppCompatActivity {
         moveLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         shuffleLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
 
-        resultViews.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
-        team1Score.setValue(0);
-        team2Score.setValue(0);
-        team1Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
-        team2Score.setVisibility(mSetResult ? View.VISIBLE : View.INVISIBLE);
-        setGameDate.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
+        // Hide weather when in result mode
+        weatherDisplay.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+
+        // Show/hide score display
+        scoreDisplayContainer.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
     }
     //endregion
 
@@ -562,6 +602,49 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
     //endregion
 
+    //region player result status dialog
+    private void showPlayerResultStatusDialog(Player player) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_player_result_status, null);
+        
+        TextView playerNameView = dialogView.findViewById(R.id.dialog_player_name);
+        CheckBox missedCheckbox = dialogView.findViewById(R.id.dialog_missed_checkbox);
+        CheckBox mvpCheckbox = dialogView.findViewById(R.id.dialog_mvp_checkbox);
+        Button cancelButton = dialogView.findViewById(R.id.dialog_cancel_button);
+        Button okButton = dialogView.findViewById(R.id.dialog_ok_button);
+        
+        playerNameView.setText(player.mName);
+        missedCheckbox.setChecked(missedPlayers.contains(player));
+        mvpCheckbox.setChecked(mvpPlayers.contains(player));
+        
+        builder.setView(dialogView);
+        android.app.AlertDialog dialog = builder.create();
+        
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+        
+        okButton.setOnClickListener(v -> {
+            // Update missed status
+            if (missedCheckbox.isChecked() && !missedPlayers.contains(player)) {
+                missedPlayers.add(player);
+            } else if (!missedCheckbox.isChecked() && missedPlayers.contains(player)) {
+                missedPlayers.remove(player);
+            }
+            
+            // Update MVP status
+            if (mvpCheckbox.isChecked() && !mvpPlayers.contains(player)) {
+                mvpPlayers.add(player);
+            } else if (!mvpCheckbox.isChecked() && mvpPlayers.contains(player)) {
+                mvpPlayers.remove(player);
+            }
+            
+            refreshPlayers();
+            dialog.dismiss();
+        });
+        
+        dialog.show();
+    }
+    //endregion
+
     //region send teams
     private void onSendClicked() {
         saveCurrentTeams();
@@ -582,12 +665,36 @@ public class MakeTeamsActivity extends AppCompatActivity {
         exitMoveMode();
         teamStatsLayout.setVisibility(View.INVISIBLE);
 
+        if (mSetResult) {
+            // Hide weather when sharing screenshot
+            weatherDisplay.setVisibility(View.GONE);
+        }
+        
+        // Hide score controls (plus/minus buttons) when taking screenshot
+        if (mSetResult) {
+            team1Plus.setVisibility(View.GONE);
+            team1Minus.setVisibility(View.GONE);
+            team2Plus.setVisibility(View.GONE);
+            team2Minus.setVisibility(View.GONE);
+        }
+
         refreshPlayers(false);
     }
 
     private void exitSendMode() {
-
         teamStatsLayout.setVisibility(View.VISIBLE);
+        // Restore weather visibility (unless in result mode)
+        if (!mSetResult) {
+            weatherDisplay.setVisibility(View.VISIBLE);
+        }
+        
+        // Restore score controls visibility
+        if (mSetResult) {
+            team1Plus.setVisibility(View.VISIBLE);
+            team1Minus.setVisibility(View.VISIBLE);
+            team2Plus.setVisibility(View.VISIBLE);
+            team2Minus.setVisibility(View.VISIBLE);
+        }
 
         refreshPlayers(true);
     }
@@ -598,7 +705,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void saveCurrentTeams(boolean saveBench) {
-        DbHelper.saveTeams(this, players1, players2, saveBench ? benchedPlayers : null, missedPlayers);
+        DbHelper.saveTeams(this, players1, players2, saveBench ? benchedPlayers : null, missedPlayers, mvpPlayers);
     }
 
     @Override
@@ -638,9 +745,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
             list1.setAdapter(new PlayerTeamAnalysisAdapter(this, players1, moved, missedPlayers, analysisResult, analysisSelectedPlayer));
             list2.setAdapter(new PlayerTeamAnalysisAdapter(this, players2, moved, missedPlayers, analysisResult, analysisSelectedPlayer));
         } else {
-            list1.setAdapter(new PlayerTeamGameAdapter(this, players1, moved, missedPlayers, showInternalData, true));
-            list2.setAdapter(new PlayerTeamGameAdapter(this, players2, moved, missedPlayers, showInternalData, true));
-            benchList.setAdapter(new PlayerTeamGameAdapter(this, benchedPlayers, benchedPlayers, null, false, false));
+            list1.setAdapter(new PlayerTeamGameAdapter(this, players1, moved, missedPlayers, mvpPlayers, showInternalData, true));
+            list2.setAdapter(new PlayerTeamGameAdapter(this, players2, moved, missedPlayers, mvpPlayers, showInternalData, true));
+            benchList.setAdapter(new PlayerTeamGameAdapter(this, benchedPlayers, benchedPlayers, null, new ArrayList<>(), false, false));
         }
 
         updateStats();
@@ -728,16 +835,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
                 Event.logEvent(FirebaseAnalytics.getInstance(MakeTeamsActivity.this), EventType.analysis_mode_player_clicked);
 
-            } else if (mSetResult) { // Setting "Missed" when setting results
+            } else if (mSetResult) { // Setting "Missed" and "MVP" when setting results
 
-                // Switch player NA/Missed status
-                if (missedPlayers.contains(player)) {
-                    missedPlayers.remove(player);
-                } else {
-                    missedPlayers.add(player);
-                }
+                showPlayerResultStatusDialog(player);
 
-                refreshPlayers();
             } else if (isMoveMode()) { // Moving when making teams
 
                 Snackbar.make(MakeTeamsActivity.this, benchListLayout, getString(R.string.operation_move), Snackbar.LENGTH_LONG).show();

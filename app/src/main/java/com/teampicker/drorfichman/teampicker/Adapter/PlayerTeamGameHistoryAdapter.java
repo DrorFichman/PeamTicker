@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.teampicker.drorfichman.teampicker.Data.Player;
@@ -39,7 +40,18 @@ public class PlayerTeamGameHistoryAdapter extends ArrayAdapter<Player> {
         TextView name = rowView.findViewById(R.id.player_team_name);
         setName(player, name);
 
+        ImageView mvpTrophy = rowView.findViewById(R.id.player_mvp_trophy);
+        setMvpTrophy(player, mvpTrophy);
+
         return rowView;
+    }
+
+    private void setMvpTrophy(Player player, ImageView mvpTrophy) {
+        if (player.gameIsMVP) {
+            mvpTrophy.setVisibility(View.VISIBLE);
+        } else {
+            mvpTrophy.setVisibility(View.GONE);
+        }
     }
 
     private void setName(Player player, TextView name) {

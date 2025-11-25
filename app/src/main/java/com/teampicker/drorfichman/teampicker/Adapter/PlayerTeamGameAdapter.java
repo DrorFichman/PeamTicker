@@ -15,6 +15,7 @@ import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,20 +25,23 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
     private Context context;
     private List<Player> mPlayers;
     private List<Player> mMovedPlayers;
-    private List<Player> mMarkedPlayers;
+    private Collection<Player> mMarkedPlayers;
+    private Collection<Player> mMvpPlayers;
 
     private boolean isAttributesVisible;
     private boolean isGradeVisible;
     private final boolean isRecentGamesVisible;
 
     public PlayerTeamGameAdapter(Context ctx, List<Player> players,
-                                 List<Player> coloredPlayers, List<Player> markedPlayers,
+                                 List<Player> coloredPlayers, Collection<Player> markedPlayers,
+                                 Collection<Player> mvpPlayers,
                                  boolean showInternalData, boolean showRecentGames) {
         super(ctx, -1, players);
         context = ctx;
         mPlayers = players;
         mMovedPlayers = coloredPlayers != null ? coloredPlayers : new ArrayList<>();
         mMarkedPlayers = markedPlayers != null ? markedPlayers : new ArrayList<>();
+        mMvpPlayers = mvpPlayers != null ? mvpPlayers : new ArrayList<>();
 
         isGradeVisible = showInternalData;
         isAttributesVisible = showInternalData;
@@ -60,7 +64,18 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
         TextView grade = rowView.findViewById(R.id.player_team_grade);
         setGrade(player, grade);
 
+        ImageView mvpTrophy = rowView.findViewById(R.id.player_mvp_trophy);
+        setMvpTrophy(player, mvpTrophy);
+
         return rowView;
+    }
+
+    private void setMvpTrophy(Player player, ImageView mvpTrophy) {
+        if (mMvpPlayers.contains(player)) {
+            mvpTrophy.setVisibility(View.VISIBLE);
+        } else {
+            mvpTrophy.setVisibility(View.GONE);
+        }
     }
 
     private void setName(View rowView, Player player, TextView name) {
@@ -110,12 +125,14 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
         if (isRecentGamesVisible) {
             for (int r = 0; r < player.results.size() && r < starView.size(); ++r) {
                 ResultEnum res = player.results.get(r).result;
+                boolean isMVP = player.results.get(r).isMVP;
+                
                 if (res == ResultEnum.Win) {
-                    starView.get(r).setImageResource(R.drawable.circle_win);
+                    starView.get(r).setImageResource(isMVP ? R.drawable.mvp_star : R.drawable.circle_win);
                 } else if (res == ResultEnum.Lose) {
-                    starView.get(r).setImageResource(R.drawable.circle_lose);
+                    starView.get(r).setImageResource(isMVP ? R.drawable.circle_lose_mvp : R.drawable.circle_lose);
                 } else if (res == ResultEnum.Tie) {
-                    starView.get(r).setImageResource(R.drawable.circle_draw_blue);
+                    starView.get(r).setImageResource(isMVP ? R.drawable.circle_draw_mvp : R.drawable.circle_draw_blue);
                 } else if (res == ResultEnum.Missed) {
                     starView.get(r).setImageResource(R.drawable.circle_na);
                 }

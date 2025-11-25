@@ -123,6 +123,13 @@ public class PlayerGamesDbHelper {
                     // age is saved at the time the game was played
                     p.setAge(c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_AGE)));
                     p.gameResult = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
+                    
+                    // Check if player was MVP in this game
+                    int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);
+                    if (attrIndex >= 0) {
+                        String gameAttrs = c.getString(attrIndex);
+                        p.gameIsMVP = gameAttrs != null && gameAttrs.contains(PlayerAttribute.isMVP.displayName);
+                    }
 
                     players.add(p);
                 } while (c.moveToNext());
@@ -161,7 +168,8 @@ public class PlayerGamesDbHelper {
                 PlayerContract.PlayerGameEntry.DID_WIN
         };
 
-        String sortOrder = "date(" + PlayerContract.PlayerGameEntry.DATE + ") DESC";
+        String sortOrder = "date(" + PlayerContract.PlayerGameEntry.DATE + ") DESC, " 
+                + PlayerContract.PlayerGameEntry.GAME + " DESC";
 
         Cursor c = db.query(
                 PlayerContract.PlayerGameEntry.TABLE_NAME,  // The table to query
@@ -211,11 +219,14 @@ public class PlayerGamesDbHelper {
                 PlayerContract.PlayerGameEntry.GAME,
                 PlayerContract.PlayerGameEntry.DATE,
                 PlayerContract.PlayerGameEntry.PLAYER_RESULT,
-                PlayerContract.PlayerGameEntry.PLAYER_GRADE
+                PlayerContract.PlayerGameEntry.PLAYER_GRADE,
+                PlayerContract.PlayerGameEntry.ATTRIBUTES
         };
 
         // How you want the results sorted in the resulting Cursor
-        String sortOrder = "date(" + PlayerContract.PlayerGameEntry.DATE + ") DESC";
+        // Sort by date first (DESC), then by game ID (DESC) for games on the same date
+        String sortOrder = "date(" + PlayerContract.PlayerGameEntry.DATE + ") DESC, " 
+                + PlayerContract.PlayerGameEntry.GAME + " DESC";
 
         String where = PlayerContract.PlayerGameEntry.NAME + " = ? AND "
                 + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " > ? ";
@@ -238,7 +249,16 @@ public class PlayerGamesDbHelper {
                     int res = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
                     int grade = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
                     String date = c.getString(c.getColumnIndex(PlayerContract.PlayerGameEntry.DATE));
-                    PlayerGameStat stat = new PlayerGameStat(ResultEnum.getResultFromOrdinal(res), grade, date);
+                    
+                    // Check if player was MVP in this game
+                    boolean isMVP = false;
+                    int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);
+                    if (attrIndex >= 0) {
+                        String attributes = c.getString(attrIndex);
+                        isMVP = attributes != null && attributes.contains(PlayerAttribute.isMVP.displayName);
+                    }
+                    
+                    PlayerGameStat stat = new PlayerGameStat(ResultEnum.getResultFromOrdinal(res), grade, date, isMVP);
 
                     results.add(stat);
                     i++;

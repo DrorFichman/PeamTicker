@@ -78,6 +78,13 @@
 
         </LinearLayout>
 
+        <include
+            android:id="@+id/score_display_container"
+            layout="@layout/score_display_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -266,45 +273,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/enter_result_views"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:gravity="center"
-        android:visibility="gone">
-
-        <NumberPicker
-            android:id="@+id/team_1_score"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="20dp"
-            android:layout_weight="1"
-            android:selectionDividerHeight="5dp"
-            android:theme="@style/NumberPickerText" />
-
-        <Button
-            android:id="@+id/set_game_date"
-            android:layout_width="65dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/fui_transparent"
-            android:drawableTop="@drawable/button_date"
-            android:onClick="showDatePicker" />
-
-        <NumberPicker
-            android:id="@+id/team_2_score"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_weight="1"
-            android:selectionDividerHeight="5dp"
-            android:theme="@style/NumberPickerText" />
     </LinearLayout>
 
     <LinearLayout

@@ -48,6 +48,9 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
     @Exclude
     public int gameResult;
 
+    @Exclude
+    public boolean gameIsMVP;
+
     public Player(String name, int grade) {
         mName = name;
         mGrade = grade;
@@ -204,6 +207,11 @@ public class Player extends Sortable implements Serializable, Comparable, Filter
             return this.mName.equals(((Player) obj).mName);
         }
         return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return mName != null ? mName.hashCode() : 0;
     }
 
     //region Sortable

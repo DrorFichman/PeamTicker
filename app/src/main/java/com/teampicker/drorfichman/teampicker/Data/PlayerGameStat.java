@@ -11,11 +11,17 @@ public class PlayerGameStat implements Serializable {
     public ResultEnum result;
     public int grade;
     public String gameDateString;
+    public boolean isMVP;
 
     public PlayerGameStat(ResultEnum res, int currGrade, String date) {
+        this(res, currGrade, date, false);
+    }
+
+    public PlayerGameStat(ResultEnum res, int currGrade, String date, boolean mvp) {
         result = res;
         grade = currGrade;
         gameDateString = date;
+        isMVP = mvp;
     }
 
     @Exclude

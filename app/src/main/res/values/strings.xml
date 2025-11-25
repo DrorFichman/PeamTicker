@@ -51,6 +51,8 @@
     <string name="action_analysis">Analysis</string>
     <string name="action_share">Share</string>
     <string name="action_enter_results">Enter Results</string>
+    <string name="player_missed_game">Player missed the game</string>
+    <string name="player_mvp">Mark as MVP</string>
     <string name="action_empty_bench_left">Clear Bench (left)</string>
     <string name="action_empty_bench_right">Clear Bench (right)</string>
     <string name="action_switch_team_colors">Switch Colors</string>

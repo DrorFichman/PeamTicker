@@ -119,4 +119,14 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="14sp" />
 
+    <ImageView
+        android:id="@+id/player_mvp_trophy"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="2dp"
+        android:src="@drawable/trophy_better"
+        android:visibility="gone" />
+
 </LinearLayout>

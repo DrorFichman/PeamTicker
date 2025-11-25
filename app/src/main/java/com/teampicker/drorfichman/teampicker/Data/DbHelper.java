@@ -13,6 +13,7 @@ import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -39,22 +40,26 @@ public class DbHelper extends SQLiteOpenHelper {
     public static void saveTeams(Context ctx, ArrayList<Player> firstTeam,
                                  ArrayList<Player> secondTeam,
                                  ArrayList<Player> benchedPlayers,
-                                 ArrayList<Player> missedPlayers) {
+                                 Collection<Player> missedPlayers,
+                                 Collection<Player> mvpPlayers) {
         DbHelper.clearOldGameTeams(ctx);
 
         int currGame = DbHelper.getMaxGame(ctx) + 1;
 
         for (Player a : firstTeam) {
-            PlayerGame pg = new PlayerGame(currGame, a.mName, a.mGrade, TeamEnum.Team1, a.getAge(), a.getAttributes());
+            String attributes = getAttributesWithMVP(a, mvpPlayers);
+            PlayerGame pg = new PlayerGame(currGame, a.mName, a.mGrade, TeamEnum.Team1, a.getAge(), attributes);
             DbHelper.insertPlayerGame(ctx, pg);
         }
         for (Player b : secondTeam) {
-            PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Team2, b.getAge(), b.getAttributes());
+            String attributes = getAttributesWithMVP(b, mvpPlayers);
+            PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Team2, b.getAge(), attributes);
             DbHelper.insertPlayerGame(ctx, pg);
         }
         if (benchedPlayers != null) {
             for (Player b : benchedPlayers) {
-                PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Bench, b.getAge(), b.getAttributes());
+                String attributes = getAttributesWithMVP(b, mvpPlayers);
+                PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Bench, b.getAge(), attributes);
                 DbHelper.insertPlayerGame(ctx, pg);
             }
         }
@@ -63,6 +68,18 @@ public class DbHelper extends SQLiteOpenHelper {
                 DbHelper.setPlayerResultMissed(ctx, currGame, m.mName);
             }
         }
+    }
+
+    private static String getAttributesWithMVP(Player player, Collection<Player> mvpPlayers) {
+        String attributes = player.getAttributes();
+        if (mvpPlayers != null && mvpPlayers.contains(player)) {
+            if (attributes.isEmpty()) {
+                attributes = PlayerAttribute.isMVP.displayName;
+            } else {
+                attributes = attributes + "," + PlayerAttribute.isMVP.displayName;
+            }
+        }
+        return attributes;
     }
 
     public void onCreate(SQLiteDatabase db) {

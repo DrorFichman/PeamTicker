@@ -12,10 +12,21 @@
 
     <TextView
         android:id="@+id/player_team_name"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:gravity="start"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="13sp" />
+
+    <ImageView
+        android:id="@+id/player_mvp_trophy"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="2dp"
+        android:src="@drawable/trophy_better"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -6,7 +6,8 @@ public enum PlayerAttribute {
     isPlaymaker("_is_playmaker", "PM"),
     isUnbreakable("_is_breakable", "B"),
     isExtra("_is_extra", "E"),
-    isInjured("_is_injured", "I");
+    isInjured("_is_injured", "I"),
+    isMVP("_is_mvp", "MVP");
 
     public String attribute;
     public String displayName;
