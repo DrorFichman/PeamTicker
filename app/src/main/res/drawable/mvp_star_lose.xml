@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gold Star Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="10dp"
+    android:height="10dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Star shape -->
+    <path
+        android:fillColor="@color/lose"
+        android:pathData="M12,2l3.09,6.26L22,9.27l-5,4.87L18.18,21L12,17.77L5.82,21L7,14.14l-5,-4.87l6.91,-1.01L12,2z"/>
+    <!-- Inner glow/highlight -->
+    <path
+        android:fillColor="#FFF59D"
+        android:pathData="M12,5.5l2,4.04l4.45,0.65l-3.22,3.14l0.76,4.42L12,15.77l-3.99,2.1l0.76,-4.42l-3.22,-3.14l4.45,-0.65L12,5.5z"
+        android:fillAlpha="0.5"/>
+</vector>
+

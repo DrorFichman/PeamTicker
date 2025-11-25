@@ -130,9 +130,9 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
                 if (res == ResultEnum.Win) {
                     starView.get(r).setImageResource(isMVP ? R.drawable.mvp_star : R.drawable.circle_win);
                 } else if (res == ResultEnum.Lose) {
-                    starView.get(r).setImageResource(isMVP ? R.drawable.circle_lose_mvp : R.drawable.circle_lose);
+                    starView.get(r).setImageResource(isMVP ? R.drawable.mvp_star_lose : R.drawable.circle_lose);
                 } else if (res == ResultEnum.Tie) {
-                    starView.get(r).setImageResource(isMVP ? R.drawable.circle_draw_mvp : R.drawable.circle_draw_blue);
+                    starView.get(r).setImageResource(isMVP ? R.drawable.mvp_star_draw : R.drawable.circle_draw_blue);
                 } else if (res == ResultEnum.Missed) {
                     starView.get(r).setImageResource(R.drawable.circle_na);
                 }
