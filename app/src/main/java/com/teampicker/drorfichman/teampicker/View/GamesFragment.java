@@ -63,6 +63,14 @@ public class GamesFragment extends Fragment {
         return (mPlayerName == null && mPlayerCollaborator == null);
     }
 
+    private boolean isPlayerView() {
+        return (mPlayerName != null && mPlayerCollaborator == null);
+    }
+
+    private boolean isPlayerCollaboratorView() {
+        return (mPlayerName != null && mPlayerCollaborator != null);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -141,9 +149,9 @@ public class GamesFragment extends Fragment {
         if (activity == null) return;
 
         ArrayList<Game> games;
-        if (mPlayerName != null && mPlayerCollaborator != null) { // games in which both played
+        if (isPlayerCollaboratorView()) { // games in which both played
             games = DbHelper.getGames(activity, mPlayerName, mPlayerCollaborator);
-        } else if (mPlayerName != null) { // games in which selected player played
+        } else if (isPlayerView()) { // games in which selected player played
             games = DbHelper.getGames(activity, mPlayerName);
         } else { // all games
             games = DbHelper.getGames(activity, gamesCount);

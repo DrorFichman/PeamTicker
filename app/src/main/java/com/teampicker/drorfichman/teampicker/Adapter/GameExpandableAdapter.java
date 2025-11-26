@@ -108,12 +108,14 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         TextView resultDivider = view.findViewById(R.id.game_result_set_divider);
         ImageView res = view.findViewById(R.id.res_1);
         TextView playerGrade = view.findViewById(R.id.game_player_grade);
+        ImageView playerMVP = view.findViewById(R.id.game_player_mvp);
 
         dateView.setText(DateHelper.getDisplayDate(context, g.dateString));
         setResults(g, resultSet1, resultSet2, resultDivider);
         setPlayerCount(g, playerCountView);
         setPlayerResult(res, g);
         setPlayerGrade(playerGrade, g);
+        setPlayerMVP(playerMVP, g);
 
         view.setTag(R.id.game, g);
         view.setTag(R.id.game_index_id, position);
@@ -185,6 +187,14 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
             playerGrade.setText(context.getString(R.string.parentheses, g.playerGrade));
         } else { // game history mode
             playerGrade.setVisibility(View.GONE);
+        }
+    }
+
+    private void setPlayerMVP(ImageView playerMVP, Game g) {
+        if (mPlayerCollaborator == null && g.playerIsMVP) { // player view and was MVP
+            playerMVP.setVisibility(View.VISIBLE);
+        } else {
+            playerMVP.setVisibility(View.INVISIBLE);
         }
     }
 

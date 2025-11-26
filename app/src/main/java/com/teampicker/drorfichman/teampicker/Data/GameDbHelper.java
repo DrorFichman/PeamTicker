@@ -94,6 +94,7 @@ public class GameDbHelper {
         Cursor c = db.rawQuery("select " +
                         " game_index, g.date as date, " +
                         " res.date as rdate, res.result as result, res.player_grade as player_grade, " +
+                        " res.attributes as attributes, " +
                         " team_one_score, " +
                         " team_two_score " +
                         " from game g, player_game res " +
@@ -109,6 +110,7 @@ public class GameDbHelper {
         Cursor c = db.rawQuery("select " +
                         " game_index, g.date as date, " +
                         " res1.date as rdate, res1.result as result, res1.player_grade as player_grade, " +
+                        " res1.attributes as attributes, " +
                         " team_one_score, " +
                         " team_two_score " +
                         " from game g, player_game res1, player_game res2  " +
@@ -167,6 +169,13 @@ public class GameDbHelper {
                         g.playerResult = ResultEnum.getResultFromOrdinal(c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT)));
                     if (c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_GRADE) > 0)
                         g.playerGrade = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
+                    
+                    // Check if player was MVP in this game
+                    int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);
+                    if (attrIndex >= 0) {
+                        String attributes = c.getString(attrIndex);
+                        g.playerIsMVP = attributes != null && attributes.contains(PlayerAttribute.isMVP.displayName);
+                    }
 
                     games.add(g);
                     i++;
