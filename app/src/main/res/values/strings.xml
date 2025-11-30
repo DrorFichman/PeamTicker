@@ -162,4 +162,17 @@
     <string name="tutorial_completed_title">Tutorials Completed</string>
     <string name="tutorial_completed_message">Tutorials will be available in the side menu under \"Getting Started\"</string>
 
+    <!--    Player Insights-->
+    <string name="insights_tab_title">Insights</string>
+    <string name="insights_moving_win_rate">Moving Win Rate</string>
+    <string name="insights_cumulative_win_rate">Cumulative Win Rate</string>
+    <string name="insights_win_rate_label">Win Rate %</string>
+    <string name="insights_games_label">Games</string>
+    <string name="insights_window_label">Window Size:</string>
+    <string name="insights_show_cumulative">Show Cumulative Rate</string>
+    <string name="insights_window_10">Last 10 Games</string>
+    <string name="insights_window_25">Last 25 Games</string>
+    <string name="insights_window_50">Last 50 Games</string>
+    <string name="insights_no_data">Not enough game data to display insights. Play at least %1$d games to see statistics.</string>
+
 </resources>

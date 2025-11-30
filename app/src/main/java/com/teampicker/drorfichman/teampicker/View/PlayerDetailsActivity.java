@@ -94,6 +94,8 @@ public class PlayerDetailsActivity extends AppCompatActivity {
                     Event.logEvent(FirebaseAnalytics.getInstance(PlayerDetailsActivity.this), EventType.player_details_tab);
                 else if (position == 1)
                     Event.logEvent(FirebaseAnalytics.getInstance(PlayerDetailsActivity.this), EventType.player_games_tab);
+                else if (position == 2)
+                    Event.logEvent(FirebaseAnalytics.getInstance(PlayerDetailsActivity.this), EventType.player_insights_tab);
                 else
                     Event.logEvent(FirebaseAnalytics.getInstance(PlayerDetailsActivity.this), EventType.player_team_tab);
             }
@@ -124,7 +126,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return p != null ? 3 : 1;
+            return p != null ? 4 : 1;
         }
 
         @Override
@@ -139,6 +141,8 @@ public class PlayerDetailsActivity extends AppCompatActivity {
                 return "Details";
             } else if (position == 1) {
                 return "Games";
+            } else if (position == 2) {
+                return "Insights";
             } else {
                 return "Team";
             }
@@ -151,6 +155,8 @@ public class PlayerDetailsActivity extends AppCompatActivity {
                 return PlayerDetailsFragment.newInstance(p, createFromIdentifier, updateListener);
             } else if (position == 1) {
                 return GamesFragment.newInstance(p.mName, null, false, null);
+            } else if (position == 2) {
+                return PlayerInsightsFragment.newInstance(p);
             } else {
                 return PlayerChemistryFragment.newInstance(p, null, null);
             }

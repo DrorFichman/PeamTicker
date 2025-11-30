@@ -302,6 +302,10 @@ public class DbHelper extends SQLiteOpenHelper {
         return PlayerGamesDbHelper.getPlayersGames(getSqLiteDatabase(ctx));
     }
 
+    public static ArrayList<PlayerGameStat> getPlayerLastGames(Context context, Player player, int countLastGames) {
+        return PlayerGamesDbHelper.getPlayerLastGames(getSqLiteDatabase(context), player, countLastGames);
+    }
+
     public static ArrayList<Player> getCurrTeam(Context context, int currGame, TeamEnum team, int countLastGames) {
         ArrayList<Player> currTeam = PlayerGamesDbHelper.getCurrTeam(getSqLiteDatabase(context), currGame, team);
 

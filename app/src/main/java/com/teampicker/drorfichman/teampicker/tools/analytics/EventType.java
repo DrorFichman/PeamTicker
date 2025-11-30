@@ -2,7 +2,7 @@ package com.teampicker.drorfichman.teampicker.tools.analytics;
 
 public enum EventType {
     main_players_tab, main_games_tab, main_insights_tab, // Done
-    player_details_tab, player_games_tab, player_team_tab, // Done
+    player_details_tab, player_games_tab, player_insights_tab, player_team_tab, // Done
     view_game, edit_game, delete_game, copy_game, // Done
     new_player, player_clicked, player_collaboration_clicked, // Done
     make_teams, send_teams, save_results, shuffle_teams, move_player, analysis_mode, analysis_mode_player_clicked, // Done
