@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity
 
     View syncInProgress;
     TextView syncProgressStatus;
+    ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,17 +96,17 @@ public class MainActivity extends AppCompatActivity
 
     private void setTabs() {
         MainAdapter mAdapter = new MainAdapter(getSupportFragmentManager());
-        ViewPager pager = findViewById(R.id.main_tabs_pager);
-        pager.setAdapter(mAdapter);
+        viewPager = findViewById(R.id.main_tabs_pager);
+        viewPager.setAdapter(mAdapter);
 
         TabLayout tabLayout = findViewById(R.id.main_tab);
-        tabLayout.setupWithViewPager(pager);
+        tabLayout.setupWithViewPager(viewPager);
 
         tabLayout.getTabAt(0).setIcon(R.drawable.player_icon);
         tabLayout.getTabAt(1).setIcon(R.drawable.soccer_icon);
         tabLayout.getTabAt(2).setIcon(R.drawable.stat_icon);
 
-        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -196,7 +197,15 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) { // close drawer
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            // Check current tab position
+            int currentTab = viewPager.getCurrentItem();
+            if (currentTab == 1 || currentTab == 2) {
+                // If in Games or Insights tab, navigate to Players tab
+                viewPager.setCurrentItem(0);
+            } else {
+                // If in Players tab, exit the app
+                super.onBackPressed();
+            }
         }
     }
 
