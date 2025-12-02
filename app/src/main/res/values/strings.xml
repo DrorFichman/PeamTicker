@@ -164,8 +164,8 @@
 
     <!--    Player Insights-->
     <string name="insights_tab_title">Insights</string>
-    <string name="insights_moving_win_rate">Moving Win Rate</string>
-    <string name="insights_cumulative_win_rate">Cumulative Win Rate</string>
+    <string name="insights_moving_win_rate">Last 50 games Win Rate</string>
+    <string name="insights_cumulative_win_rate">All time Win Rate</string>
     <string name="insights_win_rate_label">Win Rate %</string>
     <string name="insights_games_label">Games</string>
     <string name="insights_window_label">Window Size:</string>
@@ -173,6 +173,7 @@
     <string name="insights_window_10">Last 10 Games</string>
     <string name="insights_window_25">Last 25 Games</string>
     <string name="insights_window_50">Last 50 Games</string>
+    <string name="insights_show_touch_data">Show data on touch</string>
     <string name="insights_no_data">Not enough game data to display insights. Play at least %1$d games to see statistics.</string>
 
 </resources>

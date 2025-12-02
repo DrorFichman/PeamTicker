@@ -5,28 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Controls Container -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="8dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/insights_window_label"
-            android:textSize="14sp"
-            android:paddingEnd="8dp"
-            android:paddingRight="8dp" />
-
-        <Spinner
-            android:id="@+id/insights_window_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
     <!-- Chart Container -->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/insights_chart"

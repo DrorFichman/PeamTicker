@@ -5,9 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -43,10 +41,10 @@ public class PlayerInsightsFragment extends Fragment {
     private Player player;
     private LineChart chart;
     private TextView emptyMessage;
-    private Spinner windowSpinner;
 
     private ArrayList<PlayerGameStat> gameHistory;
-    private int selectedWindow = 50;
+    private static final int WINDOW_SIZE = 50;
+    private ChartMarkerView markerView;
 
     public PlayerInsightsFragment() {
         super(R.layout.fragment_player_insights);
@@ -75,53 +73,10 @@ public class PlayerInsightsFragment extends Fragment {
         
         chart = root.findViewById(R.id.insights_chart);
         emptyMessage = root.findViewById(R.id.insights_empty_message);
-        windowSpinner = root.findViewById(R.id.insights_window_spinner);
 
-        setupWindowSpinner();
         loadDataAndSetupChart();
 
         return root;
-    }
-
-    private void setupWindowSpinner() {
-        String[] windowOptions = {
-            getString(R.string.insights_window_10),
-            getString(R.string.insights_window_25),
-            getString(R.string.insights_window_50)
-        };
-        
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            windowOptions
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        windowSpinner.setAdapter(adapter);
-        windowSpinner.setSelection(2); // Default to 50 games
-
-        windowSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        selectedWindow = 10;
-                        break;
-                    case 1:
-                        selectedWindow = 25;
-                        break;
-                    case 2:
-                    default:
-                        selectedWindow = 50;
-                        break;
-                }
-                updateChart();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
-            }
-        });
     }
 
     private void loadDataAndSetupChart() {
@@ -141,6 +96,9 @@ public class PlayerInsightsFragment extends Fragment {
         // Games are sorted DESC (newest first), we need oldest first for chronological chart
         Collections.reverse(gameHistory);
         
+        // Create marker view for touch data display
+        markerView = new ChartMarkerView(requireContext(), gameHistory);
+        
         setupChart();
         updateChart();
     }
@@ -149,7 +107,6 @@ public class PlayerInsightsFragment extends Fragment {
         chart.setVisibility(View.GONE);
         emptyMessage.setVisibility(View.VISIBLE);
         emptyMessage.setText(getString(R.string.insights_no_data, MIN_GAMES_FOR_DISPLAY));
-        windowSpinner.setEnabled(false);
     }
 
     private void setupChart() {
@@ -165,6 +122,9 @@ public class PlayerInsightsFragment extends Fragment {
         chart.setDrawBorders(true);
         chart.setNoDataText(getString(R.string.insights_no_data, MIN_GAMES_FOR_DISPLAY));
         chart.setBackgroundColor(Color.WHITE);
+        chart.setClipValuesToContent(false);
+        chart.setClipToPadding(false);
+        chart.setExtraRightOffset(30f); // Extra space on the right for marker
         
         // Configure X-axis
         XAxis xAxis = chart.getXAxis();
@@ -219,11 +179,43 @@ public class PlayerInsightsFragment extends Fragment {
         leftAxis.setGranularity(10f);
         leftAxis.setTextSize(10f);
 
+        // Add reference lines at 45%, 50%, and 55%
+        leftAxis.removeAllLimitLines();
+        
+        // 45% line - subtle
+        LimitLine line45 = new LimitLine(45f);
+        line45.setLineColor(Color.GRAY);
+        line45.setLineWidth(1f);
+        line45.enableDashedLine(10f, 10f, 0f);
+        leftAxis.addLimitLine(line45);
+        
+        // 50% line - highlighted
+        LimitLine line50 = new LimitLine(50f);
+        line50.setLineColor(Color.DKGRAY);
+        line50.setLineWidth(2f);
+        leftAxis.addLimitLine(line50);
+        
+        // 55% line - subtle
+        LimitLine line55 = new LimitLine(55f);
+        line55.setLineColor(Color.GRAY);
+        line55.setLineWidth(1f);
+        line55.enableDashedLine(10f, 10f, 0f);
+        leftAxis.addLimitLine(line55);
+
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
 
         chart.getLegend().setEnabled(true);
         chart.getLegend().setTextSize(12f);
+        chart.getLegend().setVerticalAlignment(com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.TOP);
+        chart.getLegend().setHorizontalAlignment(com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER);
+        chart.getLegend().setOrientation(com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL);
+        chart.getLegend().setDrawInside(false);
+
+        // Set marker view for touch data display
+        if (markerView != null) {
+            chart.setMarker(markerView);
+        }
     }
 
     private void updateChart() {
@@ -259,7 +251,7 @@ public class PlayerInsightsFragment extends Fragment {
 
         // Start from MIN_GAMES_FOR_DISPLAY to avoid extreme swings with few games
         for (int i = MIN_GAMES_FOR_DISPLAY - 1; i < gameHistory.size(); i++) {
-            int windowStart = Math.max(0, i - selectedWindow + 1);
+            int windowStart = Math.max(0, i - WINDOW_SIZE + 1);
             int windowEnd = i + 1;
             
             float winRate = calculateWinRate(windowStart, windowEnd);
@@ -273,14 +265,10 @@ public class PlayerInsightsFragment extends Fragment {
         LineDataSet dataSet = new LineDataSet(entries, getString(R.string.insights_moving_win_rate));
         dataSet.setColor(Color.rgb(76, 175, 80)); // Green
         dataSet.setLineWidth(3f);
-        dataSet.setDrawCircles(true);
-        dataSet.setCircleRadius(2.5f);
-        dataSet.setCircleColor(Color.rgb(76, 175, 80));
-        dataSet.setDrawCircleHole(false);
+        dataSet.setDrawCircles(false);
         dataSet.setDrawValues(false);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER); // Smoother curve
         dataSet.setCubicIntensity(0.2f);
-        dataSet.setDrawFilled(false);
 
         return dataSet;
     }
@@ -301,14 +289,10 @@ public class PlayerInsightsFragment extends Fragment {
         LineDataSet dataSet = new LineDataSet(entries, getString(R.string.insights_cumulative_win_rate));
         dataSet.setColor(Color.rgb(33, 150, 243)); // Blue
         dataSet.setLineWidth(3f);
-        dataSet.setDrawCircles(true);
-        dataSet.setCircleRadius(2.5f);
-        dataSet.setCircleColor(Color.rgb(33, 150, 243));
-        dataSet.setDrawCircleHole(false);
+        dataSet.setDrawCircles(false);
         dataSet.setDrawValues(false);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER); // Smoother curve
         dataSet.setCubicIntensity(0.2f);
-        dataSet.setDrawFilled(false);
 
         return dataSet;
     }
