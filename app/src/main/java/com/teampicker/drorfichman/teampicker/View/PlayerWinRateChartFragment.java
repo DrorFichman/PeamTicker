@@ -33,7 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class PlayerInsightsFragment extends Fragment {
+public class PlayerWinRateChartFragment extends Fragment {
 
     private static final String ARG_PLAYER = "player";
     private static final int MIN_GAMES_FOR_DISPLAY = 20;
@@ -46,12 +46,12 @@ public class PlayerInsightsFragment extends Fragment {
     private static final int WINDOW_SIZE = 50;
     private ChartMarkerView markerView;
 
-    public PlayerInsightsFragment() {
+    public PlayerWinRateChartFragment() {
         super(R.layout.fragment_player_insights);
     }
 
-    public static PlayerInsightsFragment newInstance(Player player) {
-        PlayerInsightsFragment fragment = new PlayerInsightsFragment();
+    public static PlayerWinRateChartFragment newInstance(Player player) {
+        PlayerWinRateChartFragment fragment = new PlayerWinRateChartFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PLAYER, player);
         fragment.setArguments(args);

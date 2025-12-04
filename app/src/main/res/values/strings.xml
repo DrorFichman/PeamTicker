@@ -176,4 +176,22 @@
     <string name="insights_show_touch_data">Show data on touch</string>
     <string name="insights_no_data">Not enough game data to display insights. Play at least %1$d games to see statistics.</string>
 
+    <!--    Insights Chip Labels-->
+    <string name="insights_chip_win_rate">Win Rate</string>
+    <string name="insights_chip_chemistry">Chemistry</string>
+    <string name="insights_chip_activity">Activity</string>
+
+    <!--    Player Collaboration Chart-->
+    <string name="insights_collaboration_title">Player Chemistry</string>
+    <string name="insights_collaboration_no_data">Not enough collaboration data. Play at least %1$d games with other players.</string>
+    <string name="insights_games_with_label">Games With (→)</string>
+    <string name="insights_games_against_label">Games Against (←)</string>
+
+    <!--    Player Participation Chart-->
+    <string name="insights_participation_title">Activity Over Time</string>
+    <string name="insights_participation_no_data">Not enough game data. Play at least %1$d games to see activity.</string>
+    <string name="insights_wins_label">Wins</string>
+    <string name="insights_ties_label">Ties</string>
+    <string name="insights_losses_label">Losses</string>
+
 </resources>

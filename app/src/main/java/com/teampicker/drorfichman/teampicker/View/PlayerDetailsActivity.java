@@ -156,7 +156,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             } else if (position == 1) {
                 return GamesFragment.newInstance(p.mName, null, false, null);
             } else if (position == 2) {
-                return PlayerInsightsFragment.newInstance(p);
+                return PlayerInsightsContainerFragment.newInstance(p);
             } else {
                 return PlayerChemistryFragment.newInstance(p, null, null);
             }

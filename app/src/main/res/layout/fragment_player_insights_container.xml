@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Chart selector tabs -->
+    <RadioGroup
+        android:id="@+id/insights_tab_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="8dp"
+        android:background="#F5F5F5">
+
+        <RadioButton
+            android:id="@+id/tab_win_rate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/insights_chip_win_rate"
+            android:textSize="13sp"
+            android:textColor="@color/insights_tab_text_color"
+            android:background="@drawable/insights_tab_selector"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/tab_chemistry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/insights_chip_chemistry"
+            android:textSize="13sp"
+            android:textColor="@color/insights_tab_text_color"
+            android:background="@drawable/insights_tab_selector"
+            android:layout_marginStart="4dp" />
+
+        <RadioButton
+            android:id="@+id/tab_activity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/insights_chip_activity"
+            android:textSize="13sp"
+            android:textColor="@color/insights_tab_text_color"
+            android:background="@drawable/insights_tab_selector"
+            android:layout_marginStart="4dp" />
+
+    </RadioGroup>
+
+    <!-- ViewPager2 for charts -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/insights_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>
