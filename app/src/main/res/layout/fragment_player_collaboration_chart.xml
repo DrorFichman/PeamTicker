@@ -3,7 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="48dp">
 
     <!-- Chart Title -->
     <TextView
@@ -16,8 +19,8 @@
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />
 
-    <!-- Scatter Chart -->
-    <com.github.mikephil.charting.charts.ScatterChart
+    <!-- Bubble Chart -->
+    <com.github.mikephil.charting.charts.BubbleChart
         android:id="@+id/collaboration_chart"
         android:layout_width="match_parent"
         android:layout_height="0dp"

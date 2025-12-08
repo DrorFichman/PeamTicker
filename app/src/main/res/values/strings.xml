@@ -164,6 +164,7 @@
 
     <!--    Player Insights-->
     <string name="insights_tab_title">Insights</string>
+    <string name="insights_win_rate_title">Win Rate Over Time</string>
     <string name="insights_moving_win_rate">Last 50 games Win Rate</string>
     <string name="insights_cumulative_win_rate">All time Win Rate</string>
     <string name="insights_win_rate_label">Win Rate %</string>
@@ -179,16 +180,16 @@
     <!--    Insights Chip Labels-->
     <string name="insights_chip_win_rate">Win Rate</string>
     <string name="insights_chip_chemistry">Chemistry</string>
-    <string name="insights_chip_activity">Activity</string>
+    <string name="insights_chip_activity">Participation</string>
 
     <!--    Player Collaboration Chart-->
-    <string name="insights_collaboration_title">Player Chemistry</string>
+    <string name="insights_collaboration_title">Player Chemistry - With(x) VS Against(y)</string>
     <string name="insights_collaboration_no_data">Not enough collaboration data. Play at least %1$d games with other players.</string>
-    <string name="insights_games_with_label">Games With (→)</string>
-    <string name="insights_games_against_label">Games Against (←)</string>
+    <string name="insights_success_with_label">Success With</string>
+    <string name="insights_success_against_label">Success Against</string>
 
     <!--    Player Participation Chart-->
-    <string name="insights_participation_title">Activity Over Time</string>
+    <string name="insights_participation_title">Participation Over Time</string>
     <string name="insights_participation_no_data">Not enough game data. Play at least %1$d games to see activity.</string>
     <string name="insights_wins_label">Wins</string>
     <string name="insights_ties_label">Ties</string>

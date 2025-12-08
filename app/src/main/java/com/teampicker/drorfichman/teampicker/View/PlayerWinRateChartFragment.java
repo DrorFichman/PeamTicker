@@ -124,7 +124,9 @@ public class PlayerWinRateChartFragment extends Fragment {
         chart.setBackgroundColor(Color.WHITE);
         chart.setClipValuesToContent(false);
         chart.setClipToPadding(false);
-        chart.setExtraRightOffset(30f); // Extra space on the right for marker
+        chart.setExtraTopOffset(70f);
+        chart.setExtraRightOffset(30f);
+        chart.setExtraBottomOffset(15f);
         
         // Configure X-axis
         XAxis xAxis = chart.getXAxis();

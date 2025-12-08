@@ -39,18 +39,28 @@ public class CollaborationMarkerView extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         // Entry data contains the index in our collaborators list
-        int index = (int) e.getData();
+        Object data = e.getData();
+        if (data == null) {
+            super.refreshContent(e, highlight);
+            return;
+        }
+        
+        int index = (int) data;
         
         if (index >= 0 && index < collaborators.size()) {
             PlayerChemistry player = collaborators.get(index);
             
-            playerNameView.setText(player.mName);
+            int totalGames = player.statisticsWith.gamesCount + player.statisticsVs.gamesCount;
+            playerNameView.setText(String.format(Locale.getDefault(), 
+                    "%s (%d games)", player.mName, totalGames));
             
-            // Games with stats
+            // Games with stats (success = wins - losses)
             if (player.statisticsWith.gamesCount > 0) {
+                String sign = player.statisticsWith.successRate >= 0 ? "+" : "";
                 gamesWithView.setText(String.format(Locale.getDefault(),
-                        "With: %d games, %d%% win rate",
-                        player.statisticsWith.gamesCount,
+                        "With: %s%d success, %d%% win",
+                        sign,
+                        player.statisticsWith.successRate,
                         player.statisticsWith.getWinRate()));
                 gamesWithView.setVisibility(VISIBLE);
             } else {
@@ -59,9 +69,11 @@ public class CollaborationMarkerView extends MarkerView {
             
             // Games against stats
             if (player.statisticsVs.gamesCount > 0) {
+                String sign = player.statisticsVs.successRate >= 0 ? "+" : "";
                 gamesAgainstView.setText(String.format(Locale.getDefault(),
-                        "Vs: %d games, %d%% win rate",
-                        player.statisticsVs.gamesCount,
+                        "Vs: %s%d success, %d%% win",
+                        sign,
+                        player.statisticsVs.successRate,
                         player.statisticsVs.getWinRate()));
                 gamesAgainstView.setVisibility(VISIBLE);
             } else {

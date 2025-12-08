@@ -11,13 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.charts.BubbleChart;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.ScatterData;
-import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.data.BubbleData;
+import com.github.mikephil.charting.data.BubbleDataSet;
+import com.github.mikephil.charting.data.BubbleEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.teampicker.drorfichman.teampicker.Data.BuilderPlayerCollaborationStatistics;
@@ -30,22 +30,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 /**
- * Scatter chart showing player collaboration statistics.
- * X-axis: Games count (negative = games against, positive = games with)
- * Y-axis: Success rate (wins - losses)
- * Each point represents another player with whom the current player has played.
+ * Bubble chart showing player collaboration statistics.
+ * X-axis: Success with (wins - losses when playing together)
+ * Y-axis: Success against (wins - losses when playing against)
+ * Bubble size: Total games (with + against)
+ * Each bubble represents another player.
  */
 public class PlayerCollaborationChartFragment extends Fragment {
 
     private static final String ARG_PLAYER = "player";
-    private static final int MIN_GAMES_THRESHOLD = 5; // Minimum games with/against to show a player
-    private static final int PLAYERS_COUNT = 15;
+    private static final int MIN_GAMES_THRESHOLD = 5; // Minimum total games to show a player
+    private static final int PLAYERS_COUNT = 20;
 
     private Player player;
-    private ScatterChart chart;
+    private BubbleChart chart;
     private TextView emptyMessage;
     private TextView chartTitle;
     private List<PlayerChemistry> collaboratorsList;
@@ -100,20 +100,22 @@ public class PlayerCollaborationChartFragment extends Fragment {
             return;
         }
 
-        // Filter to players with enough games
+        // Filter to players with enough games (both with AND against required)
         collaboratorsList = new ArrayList<>();
         for (PlayerChemistry pc : collaborations.values()) {
-            if (pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD || 
-                pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
+            int totalGames = pc.statisticsWith.gamesCount + pc.statisticsVs.gamesCount;
+            if (totalGames >= MIN_GAMES_THRESHOLD && 
+                pc.statisticsWith.gamesCount > 0 && 
+                pc.statisticsVs.gamesCount > 0) {
                 collaboratorsList.add(pc);
             }
         }
 
-        // Sort by max absolute success value and keep only top 15
+        // Sort by total games and keep top players
         collaboratorsList.sort((a, b) -> {
-            int absA = Math.max(Math.abs(a.statisticsWith.successRate), Math.abs(a.statisticsVs.successRate));
-            int absB = Math.max(Math.abs(b.statisticsWith.successRate), Math.abs(b.statisticsVs.successRate));
-            return Integer.compare(absB, absA); // Descending order
+            int totalA = a.statisticsWith.gamesCount + a.statisticsVs.gamesCount;
+            int totalB = b.statisticsWith.gamesCount + b.statisticsVs.gamesCount;
+            return Integer.compare(totalB, totalA); // Descending order
         });
 
         if (collaboratorsList.size() > PLAYERS_COUNT) {
@@ -147,44 +149,44 @@ public class PlayerCollaborationChartFragment extends Fragment {
         chart.setPinchZoom(true);
         chart.setDrawBorders(true);
         chart.setBackgroundColor(Color.WHITE);
+        chart.setClipValuesToContent(false);
+        chart.setClipToPadding(false);
+        chart.setExtraTopOffset(70f);
+        chart.setExtraRightOffset(30f);
+        chart.setExtraBottomOffset(15f);
 
-        // Configure X-axis (games count)
+        // Configure X-axis (Success With)
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(true);
         xAxis.setGridColor(Color.LTGRAY);
         xAxis.setTextSize(10f);
         xAxis.setDrawAxisLine(true);
-        
-        // Add vertical line at 0 (separating "with" and "against")
-        LimitLine centerLine = new LimitLine(0f);
-        centerLine.setLineColor(Color.DKGRAY);
-        centerLine.setLineWidth(2f);
-        xAxis.addLimitLine(centerLine);
 
-        // Configure Y-axis (success = wins - losses)
+        // Add vertical line at 0 with label
+        LimitLine xZeroLine = new LimitLine(0f);
+        xZeroLine.setLineColor(Color.DKGRAY);
+        xZeroLine.setLineWidth(1f);
+        xAxis.addLimitLine(xZeroLine);
+
+        // Configure Y-axis (Success Against)
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
         leftAxis.setGridColor(Color.LTGRAY);
         leftAxis.setTextSize(10f);
         leftAxis.setDrawAxisLine(true);
-        
+
         // Add horizontal line at 0
-        LimitLine zeroLine = new LimitLine(0f);
-        zeroLine.setLineColor(Color.DKGRAY);
-        zeroLine.setLineWidth(1f);
-        leftAxis.addLimitLine(zeroLine);
+        LimitLine yZeroLine = new LimitLine(0f);
+        yZeroLine.setLineColor(Color.DKGRAY);
+        yZeroLine.setLineWidth(1f);
+        leftAxis.addLimitLine(yZeroLine);
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
 
         // Configure legend
-        chart.getLegend().setEnabled(true);
-        chart.getLegend().setTextSize(11f);
-        chart.getLegend().setVerticalAlignment(com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.TOP);
-        chart.getLegend().setHorizontalAlignment(com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER);
-        chart.getLegend().setOrientation(com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL);
-        chart.getLegend().setDrawInside(false);
+        chart.getLegend().setEnabled(false); // Single dataset, no need for legend
 
         // Set marker view for detailed info on tap
         CollaborationMarkerView markerView = new CollaborationMarkerView(requireContext(), collaboratorsList);
@@ -196,93 +198,86 @@ public class PlayerCollaborationChartFragment extends Fragment {
             return;
         }
 
-        List<ScatterDataSet> dataSets = new ArrayList<>();
+        ArrayList<BubbleEntry> entries = new ArrayList<>();
 
-        // Create entries for "games with" (positive X)
-        ArrayList<Entry> gamesWithEntries = new ArrayList<>();
-        // Create entries for "games against" (negative X)
-        ArrayList<Entry> gamesAgainstEntries = new ArrayList<>();
+        // Find max total games and max absolute values for scaling
+        int maxTotalGames = 0;
+        int minTotalGames = Integer.MAX_VALUE;
+        float maxAbsValue = 0;
+        
+        for (PlayerChemistry pc : collaboratorsList) {
+            int total = pc.statisticsWith.gamesCount + pc.statisticsVs.gamesCount;
+            if (total > maxTotalGames) maxTotalGames = total;
+            if (total < minTotalGames) minTotalGames = total;
+            
+            // Track max absolute value for centering the chart
+            maxAbsValue = Math.max(maxAbsValue, Math.abs(pc.statisticsWith.successRate));
+            maxAbsValue = Math.max(maxAbsValue, Math.abs(pc.statisticsVs.successRate));
+        }
+
+        // Set symmetric axis ranges to center the chart around 0
+        float axisRange = Math.max(maxAbsValue + 5, 10); // At least 10, with some padding
+        chart.getXAxis().setAxisMinimum(-axisRange);
+        chart.getXAxis().setAxisMaximum(axisRange);
+        chart.getAxisLeft().setAxisMinimum(-axisRange);
+        chart.getAxisLeft().setAxisMaximum(axisRange);
 
         for (int i = 0; i < collaboratorsList.size(); i++) {
             PlayerChemistry pc = collaboratorsList.get(i);
 
-            // Games with - positive X axis
-            if (pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD) {
-                float x = pc.statisticsWith.gamesCount;
-                float y = pc.statisticsWith.successRate; // wins - losses
-                Entry entry = new Entry(x, y);
-                entry.setData(i); // Store index for marker lookup
-                gamesWithEntries.add(entry);
-            }
+            float x = pc.statisticsWith.successRate;  // Success with
+            float y = pc.statisticsVs.successRate;    // Success against
+            int totalGames = pc.statisticsWith.gamesCount + pc.statisticsVs.gamesCount;
+            
+            // Scale bubble size with much wider range for visible differences
+            // Use sqrt scaling for better visual representation
+            float normalizedGames = (float)(totalGames - minTotalGames) / Math.max(maxTotalGames - minTotalGames, 1);
+            float bubbleSize = 2f + (4f * (float)Math.sqrt(normalizedGames));
 
-            // Games against - negative X axis
-            if (pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
-                float x = -pc.statisticsVs.gamesCount; // Negative for "against"
-                float y = pc.statisticsVs.successRate; // wins - losses
-                Entry entry = new Entry(x, y);
-                entry.setData(i); // Store index for marker lookup
-                gamesAgainstEntries.add(entry);
-            }
+            BubbleEntry entry = new BubbleEntry(x, y, bubbleSize);
+            entry.setData(i); // Store index for marker lookup
+            entries.add(entry);
         }
 
-        // Sort entries by X value (required by MPAndroidChart)
-        Collections.sort(gamesWithEntries, new EntryXComparator());
-        Collections.sort(gamesAgainstEntries, new EntryXComparator());
+        Collections.sort(entries, new EntryXComparator());
 
-        // Create dataset for "games with"
-        if (!gamesWithEntries.isEmpty()) {
-            ScatterDataSet withDataSet = new ScatterDataSet(gamesWithEntries, getString(R.string.insights_games_with_label));
-            withDataSet.setColor(Color.rgb(76, 175, 80)); // Green
-            withDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
-            withDataSet.setScatterShapeSize(24f);
-            withDataSet.setDrawValues(true);
-            withDataSet.setValueTextSize(8f);
-            withDataSet.setValueFormatter(new ValueFormatter() {
-                @Override
-                public String getPointLabel(Entry entry) {
-                    int index = (int) entry.getData();
-                    if (index >= 0 && index < collaboratorsList.size()) {
-                        return collaboratorsList.get(index).mName;
-                    }
-                    return "";
-                }
-            });
-            dataSets.add(withDataSet);
-        }
-
-        // Create dataset for "games against"
-        if (!gamesAgainstEntries.isEmpty()) {
-            ScatterDataSet againstDataSet = new ScatterDataSet(gamesAgainstEntries, getString(R.string.insights_games_against_label));
-            againstDataSet.setColor(Color.rgb(244, 67, 54)); // Red
-            againstDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
-            againstDataSet.setScatterShapeSize(24f);
-            againstDataSet.setDrawValues(true);
-            againstDataSet.setValueTextSize(8f);
-            againstDataSet.setValueFormatter(new ValueFormatter() {
-                @Override
-                public String getPointLabel(Entry entry) {
-                    int index = (int) entry.getData();
-                    if (index >= 0 && index < collaboratorsList.size()) {
-                        return collaboratorsList.get(index).mName;
-                    }
-                    return "";
-                }
-            });
-            dataSets.add(againstDataSet);
-        }
-
-        if (dataSets.isEmpty()) {
-            showEmptyState();
-            return;
-        }
-
-        ScatterData scatterData = new ScatterData();
-        for (ScatterDataSet ds : dataSets) {
-            scatterData.addDataSet(ds);
-        }
+        BubbleDataSet dataSet = new BubbleDataSet(entries, getString(R.string.insights_collaboration_title));
+        dataSet.setColor(Color.argb(180, 33, 150, 243)); // Semi-transparent blue
+        dataSet.setHighlightCircleWidth(1.5f);
+        dataSet.setNormalizeSizeEnabled(false); // Use actual size values
+        dataSet.setDrawValues(true);
+        dataSet.setValueTextSize(8f);
+        dataSet.setValueTextColor(Color.DKGRAY);
         
-        chart.setData(scatterData);
+        // Custom formatter to show name with Y offset effect by adding newline prefix
+        dataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getBubbleLabel(BubbleEntry entry) {
+                Object data = entry.getData();
+                if (data != null) {
+                    int index = (int) data;
+                    if (index >= 0 && index < collaboratorsList.size()) {
+                        // Add newlines before name to push label above the bubble
+                        return collaboratorsList.get(index).mName;
+                    }
+                }
+                return "";
+            }
+        });
+
+        BubbleData bubbleData = new BubbleData(dataSet);
+        chart.setData(bubbleData);
+        
+        // Offset to prevent label clipping at edges
+        chart.setExtraOffsets(10, 70, 30, 15);
+        
+        // Center the Y-axis description label at the top after layout
+        chart.post(() -> {
+            float centerX = chart.getWidth() / 2f;
+            chart.getDescription().setPosition(centerX, 20f);
+            chart.invalidate();
+        });
+        
         chart.invalidate();
     }
 }
-

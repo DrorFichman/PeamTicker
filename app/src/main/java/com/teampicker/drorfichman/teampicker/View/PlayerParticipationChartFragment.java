@@ -11,20 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
+import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.PlayerGameStat;
 import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
 import com.teampicker.drorfichman.teampicker.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -35,10 +35,10 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Stacked bar chart showing player participation over time.
- * X-axis: Time periods (months or quarters)
- * Y-axis: Game count
- * Bars are stacked showing wins (green), ties (gray), losses (red).
+ * Line chart showing player participation rate over time (quarterly).
+ * X-axis: Time periods (quarters)
+ * Y-axis: Participation percentage (player games / total games that quarter)
+ * Markers show win/loss/tie breakdown on tap.
  */
 public class PlayerParticipationChartFragment extends Fragment {
 
@@ -46,12 +46,13 @@ public class PlayerParticipationChartFragment extends Fragment {
     private static final int MIN_GAMES_FOR_DISPLAY = 10;
 
     private Player player;
-    private BarChart chart;
+    private LineChart chart;
     private TextView emptyMessage;
     private TextView chartTitle;
 
     private ArrayList<PlayerGameStat> gameHistory;
-    private List<String> periodLabels;
+    private ArrayList<Game> allGames;
+    private List<ParticipationMarkerView.QuarterData> quarterDataList;
 
     public PlayerParticipationChartFragment() {
         super(R.layout.fragment_player_participation_chart);
@@ -93,7 +94,7 @@ public class PlayerParticipationChartFragment extends Fragment {
             return;
         }
 
-        // Fetch all game history for the player
+        // Fetch player's game history
         gameHistory = DbHelper.getPlayerLastGames(getContext(), player, 1000);
 
         if (gameHistory == null || gameHistory.size() < MIN_GAMES_FOR_DISPLAY) {
@@ -101,8 +102,17 @@ public class PlayerParticipationChartFragment extends Fragment {
             return;
         }
 
+        // Fetch all games to calculate total games per quarter
+        allGames = DbHelper.getGames(getContext());
+
+        if (allGames == null || allGames.isEmpty()) {
+            showEmptyState();
+            return;
+        }
+
         // Games are sorted DESC (newest first), we need oldest first for chronological chart
         Collections.reverse(gameHistory);
+        Collections.reverse(allGames);
 
         setupChart();
         updateChart();
@@ -126,8 +136,11 @@ public class PlayerParticipationChartFragment extends Fragment {
         chart.setPinchZoom(true);
         chart.setDrawBorders(true);
         chart.setBackgroundColor(Color.WHITE);
-        chart.setDrawBarShadow(false);
-        chart.setDrawValueAboveBar(false);
+        chart.setClipValuesToContent(false);
+        chart.setClipToPadding(false);
+        chart.setExtraTopOffset(70f);  // Extra space for marker at 100%
+        chart.setExtraRightOffset(30f);
+        chart.setExtraBottomOffset(15f);
 
         // Configure X-axis
         XAxis xAxis = chart.getXAxis();
@@ -137,144 +150,188 @@ public class PlayerParticipationChartFragment extends Fragment {
         xAxis.setLabelRotationAngle(-45);
         xAxis.setTextSize(10f);
 
-        // Configure Y-axis
+        // Configure Y-axis (percentage 0-100)
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
         leftAxis.setGridColor(Color.LTGRAY);
         leftAxis.setAxisMinimum(0f);
-        leftAxis.setGranularity(1f);
+        leftAxis.setAxisMaximum(100f);
+        leftAxis.setGranularity(10f);
         leftAxis.setTextSize(10f);
+        leftAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format(Locale.getDefault(), "%.0f%%", value);
+            }
+        });
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
 
         // Configure legend
-        chart.getLegend().setEnabled(true);
-        chart.getLegend().setTextSize(11f);
-        chart.getLegend().setVerticalAlignment(com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.TOP);
-        chart.getLegend().setHorizontalAlignment(com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER);
-        chart.getLegend().setOrientation(com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL);
-        chart.getLegend().setDrawInside(false);
+        chart.getLegend().setEnabled(false);
     }
 
     private void updateChart() {
-        if (gameHistory == null || gameHistory.isEmpty()) {
+        if (gameHistory == null || gameHistory.isEmpty() || allGames == null || allGames.isEmpty()) {
             return;
         }
 
-        // Determine if we should use months or quarters based on time span
-        boolean useQuarters = shouldUseQuarters();
+        // Build quarter data with participation rates
+        quarterDataList = buildQuarterData();
 
-        // Group games by period
-        Map<String, int[]> periodStats = groupGamesByPeriod(useQuarters);
-
-        if (periodStats.isEmpty()) {
+        if (quarterDataList.isEmpty()) {
             showEmptyState();
             return;
         }
 
-        // Create bar entries
-        ArrayList<BarEntry> entries = new ArrayList<>();
-        periodLabels = new ArrayList<>(periodStats.keySet());
-
-        int index = 0;
-        for (String period : periodLabels) {
-            int[] stats = periodStats.get(period);
-            // stats[0] = wins, stats[1] = ties, stats[2] = losses
-            entries.add(new BarEntry(index, new float[]{stats[0], stats[1], stats[2]}));
-            index++;
+        // Create line entries
+        ArrayList<Entry> entries = new ArrayList<>();
+        for (int i = 0; i < quarterDataList.size(); i++) {
+            ParticipationMarkerView.QuarterData data = quarterDataList.get(i);
+            entries.add(new Entry(i, data.participationRate));
         }
 
-        // Create stacked bar data set
-        BarDataSet dataSet = new BarDataSet(entries, "");
-        dataSet.setColors(
-                Color.rgb(76, 175, 80),   // Green for wins
-                Color.rgb(158, 158, 158), // Gray for ties
-                Color.rgb(244, 67, 54)    // Red for losses
-        );
-        dataSet.setStackLabels(new String[]{
-                getString(R.string.insights_wins_label),
-                getString(R.string.insights_ties_label),
-                getString(R.string.insights_losses_label)
-        });
+        // Create smooth line data set
+        LineDataSet dataSet = new LineDataSet(entries, getString(R.string.insights_participation_title));
+        dataSet.setColor(Color.rgb(33, 150, 243)); // Blue
+        dataSet.setLineWidth(3f);
+        dataSet.setDrawCircles(true);
+        dataSet.setCircleColor(Color.rgb(33, 150, 243));
+        dataSet.setCircleRadius(4f);
+        dataSet.setDrawCircleHole(true);
+        dataSet.setCircleHoleRadius(2f);
         dataSet.setDrawValues(false);
-
-        BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.8f);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER); // Smooth curve
+        dataSet.setCubicIntensity(0.2f);
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(Color.rgb(33, 150, 243));
+        dataSet.setFillAlpha(30);
+        dataSet.setHighLightColor(Color.rgb(255, 193, 7)); // Amber highlight
+        dataSet.setHighlightLineWidth(2f);
 
         // Set X-axis labels
         chart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 int idx = (int) value;
-                if (idx >= 0 && idx < periodLabels.size()) {
-                    return periodLabels.get(idx);
+                if (idx >= 0 && idx < quarterDataList.size()) {
+                    return quarterDataList.get(idx).periodLabel;
                 }
                 return "";
             }
         });
-        chart.getXAxis().setLabelCount(Math.min(periodLabels.size(), 12), false);
+        chart.getXAxis().setLabelCount(Math.min(quarterDataList.size(), 10), false);
 
-        chart.setData(barData);
-        chart.setFitBars(true);
+        // Set marker view
+        ParticipationMarkerView markerView = new ParticipationMarkerView(requireContext(), quarterDataList);
+        chart.setMarker(markerView);
+
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
         chart.invalidate();
     }
 
-    private boolean shouldUseQuarters() {
-        if (gameHistory.size() < 2) return false;
+    /**
+     * Build quarter data with player stats and total games per quarter.
+     * Includes all quarters from the first game to the last, even if player didn't participate.
+     */
+    private List<ParticipationMarkerView.QuarterData> buildQuarterData() {
+        List<ParticipationMarkerView.QuarterData> result = new ArrayList<>();
 
-        Date first = gameHistory.get(0).getDate();
-        Date last = gameHistory.get(gameHistory.size() - 1).getDate();
-        if (first == null || last == null) return false;
+        // Find the date range from all games
+        Date firstGameDate = allGames.get(0).getDate();
+        Date lastGameDate = allGames.get(allGames.size() - 1).getDate();
 
-        Calendar cal1 = Calendar.getInstance();
-        Calendar cal2 = Calendar.getInstance();
-        cal1.setTime(first);
-        cal2.setTime(last);
+        if (firstGameDate == null || lastGameDate == null) {
+            return result;
+        }
 
-        int yearDiff = cal2.get(Calendar.YEAR) - cal1.get(Calendar.YEAR);
-        int monthDiff = yearDiff * 12 + (cal2.get(Calendar.MONTH) - cal1.get(Calendar.MONTH));
+        // Build a map of all quarters with total game counts
+        Map<String, Integer> totalGamesPerQuarter = new LinkedHashMap<>();
+        for (Game game : allGames) {
+            Date gameDate = game.getDate();
+            if (gameDate == null) continue;
 
-        // Use quarters if span is more than 18 months
-        return monthDiff > 18;
-    }
+            String quarterKey = getQuarterKey(gameDate);
+            totalGamesPerQuarter.merge(quarterKey, 1, Integer::sum);
+        }
 
-    private Map<String, int[]> groupGamesByPeriod(boolean useQuarters) {
-        // LinkedHashMap to preserve insertion order
-        Map<String, int[]> periodStats = new LinkedHashMap<>();
-
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MMM yy", Locale.getDefault());
-
+        // Build player stats per quarter
+        Map<String, int[]> playerStatsPerQuarter = new LinkedHashMap<>();
         for (PlayerGameStat game : gameHistory) {
             Date gameDate = game.getDate();
             if (gameDate == null) continue;
 
-            String periodKey;
-            if (useQuarters) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(gameDate);
-                int quarter = (cal.get(Calendar.MONTH) / 3) + 1;
-                int year = cal.get(Calendar.YEAR) % 100;
-                periodKey = "Q" + quarter + " " + String.format(Locale.getDefault(), "%02d", year);
-            } else {
-                periodKey = monthFormat.format(gameDate);
-            }
-
-            int[] stats = periodStats.computeIfAbsent(periodKey, k -> new int[3]);
+            String quarterKey = getQuarterKey(gameDate);
+            // [0] = total player games, [1] = wins, [2] = ties, [3] = losses
+            int[] stats = playerStatsPerQuarter.computeIfAbsent(quarterKey, k -> new int[4]);
+            stats[0]++;
 
             if (game.result != null && ResultEnum.isActive(game.result)) {
                 int resultValue = game.result.getValue();
                 if (resultValue > 0) {
-                    stats[0]++; // Win
+                    stats[1]++; // Win
                 } else if (resultValue < 0) {
-                    stats[2]++; // Loss
+                    stats[3]++; // Loss
                 } else {
-                    stats[1]++; // Tie
+                    stats[2]++; // Tie
                 }
             }
         }
 
-        return periodStats;
+        // Generate all quarters in range, including those with no player participation
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(firstGameDate);
+        int startYear = startCal.get(Calendar.YEAR);
+        int startQuarter = (startCal.get(Calendar.MONTH) / 3) + 1;
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(lastGameDate);
+        int endYear = endCal.get(Calendar.YEAR);
+        int endQuarter = (endCal.get(Calendar.MONTH) / 3) + 1;
+
+        int year = startYear;
+        int quarter = startQuarter;
+
+        while (year < endYear || (year == endYear && quarter <= endQuarter)) {
+            String quarterKey = "Q" + quarter + " " + String.format(Locale.getDefault(), "%02d", year % 100);
+            String displayLabel = "Q" + quarter + " '" + String.format(Locale.getDefault(), "%02d", year % 100);
+
+            int totalGames = totalGamesPerQuarter.getOrDefault(quarterKey, 0);
+            int[] playerStats = playerStatsPerQuarter.getOrDefault(quarterKey, new int[4]);
+
+            // Only include quarters where games were actually played
+            if (totalGames > 0) {
+                result.add(new ParticipationMarkerView.QuarterData(
+                        displayLabel,
+                        playerStats[0], // player games
+                        totalGames,
+                        playerStats[1], // wins
+                        playerStats[2], // ties
+                        playerStats[3]  // losses
+                ));
+            }
+
+            // Move to next quarter
+            quarter++;
+            if (quarter > 4) {
+                quarter = 1;
+                year++;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Get quarter key string from date (e.g., "Q1 24" for January 2024)
+     */
+    private String getQuarterKey(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int quarter = (cal.get(Calendar.MONTH) / 3) + 1;
+        int year = cal.get(Calendar.YEAR) % 100;
+        return "Q" + quarter + " " + String.format(Locale.getDefault(), "%02d", year);
     }
 }
-
