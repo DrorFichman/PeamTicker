@@ -1,5 +1,6 @@
 package com.teampicker.drorfichman.teampicker.Adapter;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -94,6 +95,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public View getGroupView(int position, boolean expanded, View view, ViewGroup parent) {
         if (view == null) {
@@ -130,6 +132,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         playerCountView.setText(context.getString(R.string.games_player_count, team1.size() + team2.size()));
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public View getChildView(int position, int chilePosition, boolean expanded, View view, ViewGroup parent) {
         if (view == null) {
@@ -162,7 +165,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         } else {
             actionsLayout.setVisibility(View.VISIBLE);
             edit.setOnClickListener(view -> editGame(g));
-            delete.setOnClickListener(view -> deleteGame(view, g));
+            delete.setOnClickListener(view -> deleteGame(g));
             copy.setOnClickListener(view -> checkCopyGame(g));
         }
     }
@@ -266,7 +269,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         Snackbar.make(context, mList, "Game edited", Snackbar.LENGTH_SHORT).show();
     }
 
-    public void deleteGame(View view, Game game) {
+    public void deleteGame(Game game) {
         if (game == null) {
             Toast.makeText(context, "Select game to delete", Toast.LENGTH_SHORT).show();
             return;
