@@ -19,7 +19,7 @@
     <string name="grade">Grade</string>
     <string name="date">Date</string>
     <string name="score">Score</string>
-    <string name="grade_description">Grade (0-99)</string>
+    <string name="grade_description">Grade (0–99)</string>
     <string name="attributes">Attributes</string>
     <string name="age">Age</string>
     <string name="age_description">Age (birth date)</string>
@@ -37,7 +37,7 @@
     <string name="cancel">Cancel</string>
     <string name="yes">yes</string>
     <string name="edit">Edit</string>
-    <string name="copy">Copy</string>
+    <string name="copy_game">Copy</string>
     <string name="delete">Delete</string>
     <string name="new_player">New Player</string>
     <string name="move_players">Transfers\n&amp; Bench</string>
@@ -89,9 +89,9 @@
     <string name="stats_all_games">all games</string>
 
     <!--    Settings - values are saved in preferences - don't change-->
-    <string name="setting_team_color_scheme_black_white">Black -- White</string>
-    <string name="setting_team_color_scheme_orange_blue">Orange -- Blue</string>
-    <string name="setting_team_color_scheme_orange_yellow">Orange -- Yellow</string>
+    <string name="setting_team_color_scheme_black_white">Black — White</string>
+    <string name="setting_team_color_scheme_orange_blue">Orange — Blue</string>
+    <string name="setting_team_color_scheme_orange_yellow">Orange — Yellow</string>
 
     <string name="setting_title_divide_attempts">Divide Attempts</string>
     <string name="setting_summary_divide_attempts">Number of teams division to consider (1–200)</string>
@@ -139,6 +139,7 @@
     <string name="main_sign_out_dialog_message">Cloud features will not be available.</string>
 
     <!--    Tutorials-->
+    <string name="tutorial_progress">"%1$d%%"</string>
     <string name="tutorial_headline">Getting Started - Tutorials</string>
     <string name="tutorial_dismiss_message">Dismiss tutorial messages</string>
     <string name="tutorial_create_player_title">Create Players</string>
@@ -194,5 +195,4 @@
     <string name="insights_wins_label">Wins</string>
     <string name="insights_ties_label">Ties</string>
     <string name="insights_losses_label">Losses</string>
-
 </resources>

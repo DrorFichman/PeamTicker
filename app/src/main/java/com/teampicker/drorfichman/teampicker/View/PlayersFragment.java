@@ -60,7 +60,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private static final int RECENT_GAMES_COUNT = 10; // for +/- grade suggestion
 
-    Sorting sorting = new Sorting(this::sortingChanged, SortType.coming);
+    Sorting sorting = new Sorting(this, SortType.coming);
     boolean playerComingChanged = false;
 
     private boolean showArchivedPlayers = false;
@@ -84,8 +84,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     public static PlayersFragment newInstance() {
-        PlayersFragment playersFragment = new PlayersFragment();
-        return playersFragment;
+        return new PlayersFragment();
     }
 
     @Nullable
@@ -95,6 +94,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         setHasOptionsMenu(true);
 
         this.rootView = root;
+        assert root != null;
         playersList = root.findViewById(R.id.players_list);
 
         setTutorials(root);
@@ -149,7 +149,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void setProgress(int value) {
         this.progress.setProgress(value);
-        progressText.setText(String.valueOf(value) + '%');
+        progressText.setText(getString(R.string.tutorial_progress, value));
     }
 
     private void showTutorials() {
@@ -172,7 +172,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         if (show == NotDisplayed)
             show = TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.game_history, false);
         if (show == NotDisplayed)
-            show = TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.cloud, false);
+            TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.cloud, false);
     }
     //endregion
 
@@ -249,7 +249,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.players_menu, menu);
         setSearchView((SearchView) menu.findItem(R.id.player_search).getActionView());
         super.onCreateOptionsMenu(menu, inflater);
@@ -259,7 +259,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         filterView = new FilterView(view, value -> {
             playersAdapter.setFilter(value);
             int pos = playersAdapter.positionOfFirstFilterItem(() ->
-                    Snackbar.make(getContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show());
+                    Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show());
             playersList.smoothScrollToPosition(pos);
             backPress.setEnabled(handleBackPress());
         });
@@ -269,22 +269,16 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.make_teams:
-                launchMakeTeams();
-                break;
-            case R.id.paste_coming_players:
-                pasteComingPlayers();
-                break;
-            case R.id.add_player:
-                startActivity(PlayerDetailsActivity.getNewPlayerIntent(getContext()));
-                break;
-            case R.id.show_archived_players:
-                switchArchivedPlayersView();
-                break;
-            case R.id.clear_all:
-                clearAttendance();
-                break;
+        if (item.getItemId() == R.id.make_teams){
+            launchMakeTeams();
+        } else if (item.getItemId() == R.id.paste_coming_players) {
+            pasteComingPlayers();
+        } else if (item.getItemId() == R.id.add_player) {
+            startActivity(PlayerDetailsActivity.getNewPlayerIntent(getContext()));
+        } else if (item.getItemId() == R.id.show_archived_players) {
+            switchArchivedPlayersView();
+        } else if (item.getItemId() == R.id.clear_all) {
+            clearAttendance();
         }
 
         return super.onOptionsItemSelected(item);
@@ -293,7 +287,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private void clearAttendance() {
         DbHelper.clearComingPlayers(getContext());
         refreshPlayers();
-        Event.logEvent(FirebaseAnalytics.getInstance(getContext()), EventType.clear_attendance);
+        Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.clear_attendance);
     }
 
     private void onPlayerComingChanged(boolean coming) {
@@ -310,9 +304,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void setActionButtons() {
-        rootView.findViewById(R.id.main_make_teams).setOnClickListener(view -> {
-            launchMakeTeams();
-        });
+        rootView.findViewById(R.id.main_make_teams).setOnClickListener(view -> launchMakeTeams());
     }
 
     private void launchMakeTeams() {
@@ -325,13 +317,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private boolean shouldShowIndications() {
-        if (showPastedPlayers) return false;
-        else if (showArchivedPlayers) return false;
-        else return true;
+        return !showPastedPlayers && !showArchivedPlayers;
     }
 
     private void setPlayersList(List<Player> players, AdapterView.OnItemClickListener clickHandler) {
-        boolean hasPlayers = (players != null && players.size() > 0);
+        boolean hasPlayers = (players != null && !players.isEmpty());
         playersList.setVisibility(hasPlayers ? View.VISIBLE : View.GONE);
 
         setHeadlines(true);
@@ -376,7 +366,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         if (showArchivedPlayers) {
             showPastedPlayers = false;
             ArrayList<Player> players = DbHelper.getPlayers(getContext(), 0, showArchivedPlayers);
-            if (players.size() == 0) {
+            if (players.isEmpty()) {
                 Toast.makeText(getContext(), "No archived players found", Toast.LENGTH_SHORT).show();
                 showArchivedPlayers = false;
             }
@@ -385,7 +375,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         backPress.setEnabled(showArchivedPlayers);
         refreshPlayers();
 
-        Event.logEvent(FirebaseAnalytics.getInstance(getContext()), EventType.players_archive);
+        Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.players_archive);
     }
 
     private void setHeadlines(boolean show) {
@@ -426,7 +416,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     //region player archive & deletion
     private void checkPlayerDeletion(final Player player) {
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(requireContext());
 
         if (showArchivedPlayers) {
             alertDialogBuilder.setTitle("Do you want to remove the player?")
@@ -471,7 +461,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     //region pasted players
     private void pasteComingPlayers() {
-        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData primaryClip = clipboard.getPrimaryClip();
         if (primaryClip == null) {
             Toast.makeText(getContext(), "Copy some whatsapp messages to set attending players", Toast.LENGTH_LONG).show();
@@ -492,8 +482,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 }
             }
 
-            if (pasted.size() > 0) {
-                Event.logEvent(FirebaseAnalytics.getInstance(getContext()), EventType.paste_players);
+            if (!pasted.isEmpty()) {
+                Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.paste_players);
                 displayPastedIdentifiers(pasted);
             } else {
                 Toast.makeText(getContext(), "Paste multiple messages", Toast.LENGTH_SHORT).show();
@@ -549,11 +539,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Enter player name for : \n" + identity);
 
         final AutoCompleteTextView input = new AutoCompleteTextView(getContext());
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, playerNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, playerNames);
         input.setAdapter(adapter);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setThreshold(1);
@@ -563,9 +553,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         builder.setView(input);
 
         if (TextUtils.isEmpty(currPlayer)) {
-            builder.setNeutralButton("New Player", (dialogInterface, i) -> {
-                startActivity(PlayerDetailsActivity.getNewPlayerFromIdentifierIntent(getContext(), identity));
-            });
+            builder.setNeutralButton("New Player", (dialogInterface, i) -> startActivity(PlayerDetailsActivity.getNewPlayerFromIdentifierIntent(getContext(), identity)));
         }
 
         builder.setPositiveButton("OK", (dialog, which) -> {

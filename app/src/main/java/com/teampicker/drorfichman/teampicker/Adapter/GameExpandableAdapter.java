@@ -285,7 +285,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     private void checkCopyGame(Game g) {
-        DialogHelper.showApprovalDialog(context, context.getString(R.string.copy),
+        DialogHelper.showApprovalDialog(context, context.getString(R.string.copy_game),
                 "Copy attendance and teams?",
                 ((dialog, which) -> copyGamePlayers(g)));
     }
