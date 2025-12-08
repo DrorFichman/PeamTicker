@@ -556,6 +556,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, playerNames);
         input.setAdapter(adapter);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setThreshold(1);
+        input.setDropDownHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         input.requestFocus();
         input.setText(currPlayer);
         builder.setView(input);
@@ -601,7 +603,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
-        builder.show();
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        }
+        dialog.show();
     }
     //endregion
 
