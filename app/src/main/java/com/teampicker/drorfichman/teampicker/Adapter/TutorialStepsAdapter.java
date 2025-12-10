@@ -40,15 +40,16 @@ public class TutorialStepsAdapter extends ArrayAdapter<TutorialManager.Tutorials
         view.setTag(step);
 
         setTutorial(stepView, statusView, stateView, step);
-        view.setOnClickListener(v -> TutorialManager.displayTutorialStep(context, step, true));
+        // Show tutorial info dialog when clicked from menu (no target view available)
+        view.setOnClickListener(v -> TutorialManager.displayTutorialFromMenu(context, step));
 
         return view;
     }
 
     private void setTutorial(TextView stepView, TextView statusView, ImageView stateView, TutorialManager.Tutorials step) {
-        TutorialManager.TutorialStepStatus status = step.dialog.shouldBeDisplayed(context);
+        TutorialManager.TutorialStepStatus status = step.step.shouldBeDisplayed(context);
 
-        stepView.setText(step.dialog.name());
+        stepView.setText(step.step.name());
 
         statusView.setText(getDialogRequiredString(status));
 

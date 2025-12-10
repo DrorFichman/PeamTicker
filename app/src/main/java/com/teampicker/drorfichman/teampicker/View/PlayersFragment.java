@@ -1,14 +1,12 @@
 package com.teampicker.drorfichman.teampicker.View;
 
-import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialDisplayState.NotDisplayed;
-
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,17 +22,18 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.material.tabs.TabLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -46,7 +45,6 @@ import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
-import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
@@ -75,9 +73,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private PlayerUpdateBroadcast notificationHandler;
 
-    private View p;
-    private ProgressBar progress;
-    private TextView progressText;
+    // Tutorial target views
+    private View makeTeamsButton;
 
     public PlayersFragment() {
         super(R.layout.layout_players_fragment);
@@ -96,8 +93,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         this.rootView = root;
         assert root != null;
         playersList = root.findViewById(R.id.players_list);
-
-        setTutorials(root);
+        makeTeamsButton = root.findViewById(R.id.main_make_teams);
 
         refreshPlayers();
 
@@ -108,73 +104,89 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     //region tutorials
-    private void setTutorials(View root) {
-        p = root.findViewById(R.id.tutorial_main_layout);
-        progress = root.findViewById(R.id.tutorial_progress);
-        progressText = root.findViewById(R.id.tutorial_progress_text);
-
-        p.setOnClickListener(view -> onTutorialClicked(progress.getProgress()));
-
-        showTutorials();
-    }
-
-    private void onTutorialClicked(int progressStatus) {
-        if (progressStatus == 100) {
-            DialogHelper.showApprovalDialog(getContext(), getString(R.string.tutorial_completed_title),
-                    getString(R.string.tutorial_completed_message),
-                    (dialogInterface, i) -> p.setVisibility(View.GONE));
-        } else {
-            TutorialManager.displayTutorialFlow(getContext(), null);
-        }
-    }
-
-    private void updateTutorialProgress() {
-        int progressFrom = progress.getProgress();
-        if (getContext() == null) return;
-
-        int tutorialProgress = TutorialManager.getProgress(getContext());
-        if (progressFrom == 0 && tutorialProgress == 100) p.setVisibility(View.GONE);
-
-        if (progressFrom < tutorialProgress) {
-            final Runnable r = () -> {
-                int from = progressFrom + Math.max(1, (tutorialProgress - progressFrom) / 6);
-                setProgress(from);
-                updateTutorialProgress();
-            };
-            new Handler().postDelayed(r, 100);
-        } else {
-            setProgress(tutorialProgress);
-        }
-    }
-
-    private void setProgress(int value) {
-        this.progress.setProgress(value);
-        progressText.setText(getString(R.string.tutorial_progress, value));
-    }
-
     private void showTutorials() {
         if (TutorialManager.isSkipAllTutorials(getContext())) {
-            p.setVisibility(View.GONE);
             return;
         }
 
-        p.setVisibility(progress.getProgress() == 100 ? View.GONE : View.VISIBLE);
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
 
-        updateTutorialProgress();
+        // Get toolbar from activity for menu item tutorials
+        Toolbar toolbar = activity.findViewById(R.id.toolbar);
 
-        TutorialManager.TutorialDisplayState show = TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.players, false);
-        if (show == NotDisplayed)
-            show = TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.attendance, false);
-        if (show == NotDisplayed)
-            show = TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.start_pick_teams, false);
-        if (show == NotDisplayed)
-            show = TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.save_results, false);
-        if (show == NotDisplayed)
-            show = TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.game_history, false);
-        if (show == NotDisplayed)
-            TutorialManager.displayTutorialStep(getContext(), TutorialManager.Tutorials.cloud, false);
+        // Show tutorials in sequence - only one will show at a time
+        // For "new player" tutorial, target the add_player menu item in the toolbar
+        boolean shown = TutorialManager.displayTutorialStepOnMenuItem(activity, 
+                TutorialManager.Tutorials.players, toolbar, R.id.add_player, false);
+        
+        if (!shown) {
+            // For attendance tutorial, target the header row's RSVP title (always visible)
+            View attendanceTarget = getAttendanceTargetView();
+            shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.attendance, attendanceTarget, false);
+        }
+        if (!shown) {
+            shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.start_pick_teams, makeTeamsButton, false);
+        }
+        if (!shown) {
+            // save_results doesn't have a good target on this screen, show as info dialog if applicable
+            shown = TutorialManager.displayTutorialStepAsDialog(activity, TutorialManager.Tutorials.save_results, false);
+        }
+        if (!shown) {
+            // game_history - target the Games tab
+            View gamesTabTarget = getGamesTabView(activity);
+            shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.game_history, gamesTabTarget, false);
+        }
+        if (!shown) {
+            // cloud - show as dialog since navigation drawer isn't easily targetable
+            shown = TutorialManager.displayTutorialStepAsDialog(activity, TutorialManager.Tutorials.cloud, false);
+        }
     }
     //endregion
+
+    private View getAttendanceTargetView() {
+        // Use the header row's RSVP title as target (always visible)
+        // This is in the player_titles include
+        if (rootView != null) {
+            View headerRow = rootView.findViewById(R.id.player_titles);
+            if (headerRow != null) {
+                View rsvpTitle = headerRow.findViewById(R.id.player_rsvp_title);
+                if (rsvpTitle != null && rsvpTitle.getVisibility() == View.VISIBLE) {
+                    return rsvpTitle;
+                }
+                
+                // Fallback to the checkbox in header if RSVP title is not visible
+                View checkbox = headerRow.findViewById(R.id.player_coming);
+                if (checkbox != null) {
+                    return checkbox;
+                }
+            }
+        }
+        
+        // Fallback to first player's checkbox if header not available
+        if (playersList != null && playersList.getChildCount() > 0) {
+            View firstItem = playersList.getChildAt(0);
+            if (firstItem != null) {
+                return firstItem.findViewById(R.id.player_coming);
+            }
+        }
+        
+        return null;
+    }
+
+    private View getGamesTabView(Activity activity) {
+        // Get the Games tab (index 1) from the TabLayout
+        TabLayout tabLayout = activity.findViewById(R.id.main_tab);
+        if (tabLayout != null) {
+            TabLayout.Tab gamesTab = tabLayout.getTabAt(1); // Index 1 = Games tab
+            if (gamesTab != null) {
+                return gamesTab.view;
+            }
+        }
+        return null;
+    }
 
     final OnBackPressedCallback backPress = new OnBackPressedCallback(true) {
         @Override
@@ -232,7 +244,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     public void onResume() {
         super.onResume();
         backPress.setEnabled(handleBackPress());
-        showTutorials();
+        
+        // Delay tutorial showing to ensure views are ready
+        if (rootView != null) {
+            rootView.post(this::showTutorials);
+        }
 
         Log.i("Coming", "resume " + playerComingChanged);
 
@@ -299,8 +315,6 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void setComingPlayersCount() {
         ((Button) rootView.findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, DbHelper.getComingPlayersCount(getContext())));
-        // TODO ugly
-        if (progress.getProgress() < 20) showTutorials(); // when attendance is relevant..
     }
 
     private void setActionButtons() {
@@ -605,7 +619,9 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         public void onReceive(Context context, Intent intent) {
             Log.i("Broadcast players", "new data");
             refreshPlayers();
-            showTutorials();
+            if (rootView != null) {
+                rootView.post(() -> showTutorials());
+            }
         }
     }
     //endregion

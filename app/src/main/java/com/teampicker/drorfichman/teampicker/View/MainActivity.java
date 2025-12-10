@@ -86,10 +86,6 @@ public class MainActivity extends AppCompatActivity
                 String.valueOf(DbHelper.getPlayers(this).size()));
 
         UserProperty.log(FirebaseAnalytics.getInstance(this),
-                UserPropertyType.tutorial_progress,
-                String.valueOf(TutorialManager.getProgress(this)));
-
-        UserProperty.log(FirebaseAnalytics.getInstance(this),
                 UserPropertyType.tutorial_dismissed,
                 String.valueOf(TutorialManager.isSkipAllTutorials(this)));
     }

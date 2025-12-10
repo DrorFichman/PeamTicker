@@ -4,8 +4,9 @@ import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialMana
 import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.NotApplicable;
 import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.ToDo;
 
+import android.app.Activity;
 import android.content.Context;
-import android.view.Gravity;
+import android.view.View;
 
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.R;
@@ -26,10 +27,10 @@ public class TutorialStartPickTeams extends AbstractTutorialStep {
     }
 
     @Override
-    public void display(Context ctx, boolean forceShow) {
-        TutorialManager.showTutorialDialog(ctx, prefKey(),
-                forceShow, ctx.getString(R.string.tutorial_start_pick_teams_title),
-                ctx.getString(R.string.tutorial_start_pick_teams_message), Gravity.CENTER);
+    public void display(Activity activity, View targetView, boolean forceShow) {
+        TutorialManager.showSpotlight(activity, targetView, prefKey(),
+                forceShow, activity.getString(R.string.tutorial_start_pick_teams_title),
+                activity.getString(R.string.tutorial_start_pick_teams_message));
     }
 
     @Override

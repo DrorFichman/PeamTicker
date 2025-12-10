@@ -150,7 +150,7 @@ public class PlayerDetailsFragment extends Fragment {
         if (player != null) {
             if (!player.mName.equals(name)) {
                 if (!DbHelper.updatePlayerName(getContext(), player, name)) {
-                    Toast.makeText(getContext(), "Player name is already taken", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Player name is already in use", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
@@ -158,7 +158,7 @@ public class PlayerDetailsFragment extends Fragment {
         } else {
             Player p = new Player(name, grade);
             if (!DbHelper.insertPlayer(getContext(), p)) {
-                Toast.makeText(getContext(), "Player name is already taken", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Player name is already in use", Toast.LENGTH_SHORT).show();
                 return false;
             }
             player = p;

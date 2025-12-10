@@ -5,8 +5,9 @@ import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialMana
 import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.ToDo;
 import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialUserAction.clicked_teams;
 
+import android.app.Activity;
 import android.content.Context;
-import android.view.Gravity;
+import android.view.View;
 
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.R;
@@ -27,10 +28,10 @@ public class TutorialSaveResults extends AbstractTutorialStep {
     }
 
     @Override
-    public void display(Context ctx, boolean forceShow) {
-        TutorialManager.showTutorialDialog(ctx, prefKey(),
-                forceShow, ctx.getString(R.string.tutorial_save_results_title),
-                ctx.getString(R.string.tutorial_save_results_message), Gravity.CENTER);
+    public void display(Activity activity, View targetView, boolean forceShow) {
+        TutorialManager.showSpotlight(activity, targetView, prefKey(),
+                forceShow, activity.getString(R.string.tutorial_save_results_title),
+                activity.getString(R.string.tutorial_save_results_message));
     }
 
     @Override

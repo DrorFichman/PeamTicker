@@ -3,8 +3,9 @@ package com.teampicker.drorfichman.teampicker.tools.tutorials;
 import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.Done;
 import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.ToDo;
 
+import android.app.Activity;
 import android.content.Context;
-import android.view.Gravity;
+import android.view.View;
 
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.R;
@@ -17,14 +18,14 @@ public class TutorialNewPlayer extends AbstractTutorialStep {
     public TutorialManager.TutorialStepStatus shouldBeDisplayed(Context ctx) {
         // true if no player currently exist
         boolean hasPlayers = DbHelper.getPlayers(ctx, 0, false).size() > 0;
-        if (!hasPlayers) return ToDo;
-        else return Done;
+        return hasPlayers ? Done : ToDo;
     }
 
-    public void display(Context ctx, boolean forceShow) {
-        TutorialManager.showTutorialDialog(ctx, prefKey(),
-                forceShow, ctx.getString(R.string.tutorial_create_player_title),
-                ctx.getString(R.string.tutorial_create_player_message), Gravity.BOTTOM);
+    @Override
+    public void display(Activity activity, View targetView, boolean forceShow) {
+        TutorialManager.showSpotlight(activity, targetView, prefKey(),
+                forceShow, activity.getString(R.string.tutorial_create_player_title),
+                activity.getString(R.string.tutorial_create_player_message));
     }
 
     @Override

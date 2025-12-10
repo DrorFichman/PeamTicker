@@ -3,15 +3,20 @@ package com.teampicker.drorfichman.teampicker.tools.tutorials;
 import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.Done;
 import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialStepStatus.ToDo;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.view.Gravity;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
+import androidx.annotation.IdRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Adapter.TutorialStepsAdapter;
 import com.teampicker.drorfichman.teampicker.R;
@@ -35,10 +40,10 @@ public class TutorialManager {
         team_shuffle_stats(TutorialShuffleAI.instance),
         team_analysis(TutorialTeamAnalysis.instance);
 
-        public AbstractTutorialStep dialog;
+        public AbstractTutorialStep step;
 
         Tutorials(AbstractTutorialStep i) {
-            dialog = i;
+            step = i;
         }
     }
 
@@ -63,37 +68,126 @@ public class TutorialManager {
         NotApplicable
     }
 
-    public enum TutorialDisplayState {
-        Displayed,
-        NotDisplayed,
-        AnotherDialogDisplayed
+    private static boolean isSpotlightDisplayed = false;
+
+    /**
+     * Shows a spotlight hint on a toolbar menu item using TapTargetView
+     */
+    public static void showSpotlightOnToolbarMenuItem(Activity activity, Toolbar toolbar, 
+                                                       @IdRes int menuItemId, String prefKey,
+                                                       boolean forceShow, String title, String description) {
+        if (toolbar == null) {
+            return;
+        }
+
+        isSpotlightDisplayed = true;
+
+        TapTarget tapTarget = TapTarget.forToolbarMenuItem(toolbar, menuItemId, title, description)
+                .outerCircleColor(R.color.colorPrimary)
+                .outerCircleAlpha(0.9f)
+                .targetCircleColor(android.R.color.white)
+                .titleTextSize(20)
+                .titleTextColor(android.R.color.white)
+                .descriptionTextSize(14)
+                .descriptionTextColor(android.R.color.white)
+                .textColor(android.R.color.white)
+                .dimColor(android.R.color.black)
+                .drawShadow(true)
+                .cancelable(true)
+                .tintTarget(true)
+                .targetRadius(40);
+
+        TapTargetView.showFor(activity, tapTarget, new TapTargetView.Listener() {
+            @Override
+            public void onTargetClick(TapTargetView view) {
+                super.onTargetClick(view);
+                if (!forceShow) {
+                    PreferenceHelper.setSharedPreferenceString(activity, prefKey, "1");
+                }
+                isSpotlightDisplayed = false;
+            }
+
+            @Override
+            public void onTargetLongClick(TapTargetView view) {
+                dismissAllTutorials(activity, true);
+                view.dismiss(true);
+                isSpotlightDisplayed = false;
+            }
+
+            @Override
+            public void onOuterCircleClick(TapTargetView view) {
+                view.dismiss(false);
+                if (!forceShow) {
+                    PreferenceHelper.setSharedPreferenceString(activity, prefKey, "1");
+                }
+                isSpotlightDisplayed = false;
+            }
+
+            @Override
+            public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
+                isSpotlightDisplayed = false;
+            }
+        });
     }
 
-    public static TutorialDisplayState current;
+    /**
+     * Shows a spotlight hint on the target view using TapTargetView
+     */
+    public static void showSpotlight(Activity activity, View targetView, String prefKey,
+                                     boolean forceShow, String title, String description) {
+        if (targetView == null || !targetView.isShown()) {
+            return;
+        }
 
-    public static void showTutorialDialog(Context ctx, String prefKey, boolean forceShow, String title, String message, int location) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
-        alertDialogBuilder.setIcon(R.drawable.information);
+        isSpotlightDisplayed = true;
 
-        alertDialogBuilder.setTitle(title)
-                .setMessage(message)
-                .setCancelable(true)
-                .setOnCancelListener(dialogInterface -> TutorialManager.setCurrentDialogDismissed())
-                .setPositiveButton("OK", (dialog, which) -> {
-                    dialog.dismiss();
-                    TutorialManager.setCurrentDialogDismissed();
-                });
+        TapTarget tapTarget = TapTarget.forView(targetView, title, description)
+                .outerCircleColor(R.color.colorPrimary)
+                .outerCircleAlpha(0.9f)
+                .targetCircleColor(android.R.color.white)
+                .titleTextSize(20)
+                .titleTextColor(android.R.color.white)
+                .descriptionTextSize(14)
+                .descriptionTextColor(android.R.color.white)
+                .textColor(android.R.color.white)
+                .dimColor(android.R.color.black)
+                .drawShadow(true)
+                .cancelable(true)
+                .tintTarget(false)
+                .transparentTarget(true)
+                .targetRadius(60);
 
-        if (!forceShow)
-            alertDialogBuilder.setNeutralButton("Don't show again", (dialogInterface, i) -> {
-                PreferenceHelper.setSharedPreferenceString(ctx, prefKey, "1");
-                TutorialManager.setCurrentDialogDismissed();
-            });
+        TapTargetView.showFor(activity, tapTarget, new TapTargetView.Listener() {
+            @Override
+            public void onTargetClick(TapTargetView view) {
+                super.onTargetClick(view);
+                if (!forceShow) {
+                    PreferenceHelper.setSharedPreferenceString(activity, prefKey, "1");
+                }
+                isSpotlightDisplayed = false;
+            }
 
-        AlertDialog dialog = alertDialogBuilder.create();
-        dialog.setCanceledOnTouchOutside(true);
-        dialog.getWindow().setGravity(forceShow ? Gravity.CENTER : location);
-        dialog.show();
+            @Override
+            public void onTargetLongClick(TapTargetView view) {
+                dismissAllTutorials(activity, true);
+                view.dismiss(true);
+                isSpotlightDisplayed = false;
+            }
+
+            @Override
+            public void onOuterCircleClick(TapTargetView view) {
+                view.dismiss(false);
+                if (!forceShow) {
+                    PreferenceHelper.setSharedPreferenceString(activity, prefKey, "1");
+                }
+                isSpotlightDisplayed = false;
+            }
+
+            @Override
+            public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
+                isSpotlightDisplayed = false;
+            }
+        });
     }
 
     public static void displayTutorialFlow(Context ctx, DialogInterface.OnCancelListener onCancel) {
@@ -115,25 +209,145 @@ public class TutorialManager {
         dialog.show();
     }
 
-    public static TutorialDisplayState displayTutorialStep(Context ctx, Tutorials step, boolean forceShow) {
-        if (current == TutorialDisplayState.AnotherDialogDisplayed) {
-            return TutorialDisplayState.AnotherDialogDisplayed;
+    /**
+     * Displays a tutorial step spotlight on the provided target view
+     * @return true if the spotlight was displayed, false otherwise
+     */
+    public static boolean displayTutorialStep(Activity activity, Tutorials tutorial, View targetView, boolean forceShow) {
+        if (isSpotlightDisplayed) {
+            return false;
         }
 
-        AbstractTutorialStep dialog = step.dialog;
-        if (forceShow ||
-                (dialog.shouldBeDisplayed(ctx) == ToDo &&
-                        !dialog.isDialogDismissedByUser(ctx) && !isSkipAllTutorials(ctx))) {
-            dialog.display(ctx, forceShow);
-            current = TutorialDisplayState.AnotherDialogDisplayed;
-            return TutorialDisplayState.AnotherDialogDisplayed;
-        } else {
-            return TutorialDisplayState.NotDisplayed;
+        AbstractTutorialStep step = tutorial.step;
+        TutorialStepStatus status = step.shouldBeDisplayed(activity);
+        boolean isDismissed = step.isDialogDismissedByUser(activity);
+        boolean isSkipAll = isSkipAllTutorials(activity);
+
+        if (forceShow || (status == ToDo && !isDismissed && !isSkipAll)) {
+            step.display(activity, targetView, forceShow);
+            return true;
         }
+        return false;
     }
 
-    public static void setCurrentDialogDismissed() {
-        current = TutorialManager.TutorialDisplayState.NotDisplayed;
+    /**
+     * Displays a tutorial step spotlight on a toolbar menu item
+     * @return true if the spotlight was displayed, false otherwise
+     */
+    public static boolean displayTutorialStepOnMenuItem(Activity activity, Tutorials tutorial, 
+                                                         Toolbar toolbar, @IdRes int menuItemId, 
+                                                         boolean forceShow) {
+        if (isSpotlightDisplayed || toolbar == null) {
+            return false;
+        }
+
+        AbstractTutorialStep step = tutorial.step;
+        TutorialStepStatus status = step.shouldBeDisplayed(activity);
+        boolean isDismissed = step.isDialogDismissedByUser(activity);
+        boolean isSkipAll = isSkipAllTutorials(activity);
+
+        if (forceShow || (status == ToDo && !isDismissed && !isSkipAll)) {
+            String title = step.name();
+            String description = getTutorialDescription(activity, tutorial);
+            showSpotlightOnToolbarMenuItem(activity, toolbar, menuItemId, step.prefKey(), 
+                    forceShow, title, description);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if a spotlight is currently displayed
+     */
+    public static boolean isSpotlightDisplayed() {
+        return isSpotlightDisplayed;
+    }
+
+    /**
+     * Shows a simple dialog with tutorial information (fallback when no target view is available)
+     * Used primarily from the "Getting Started" menu
+     */
+    public static void showTutorialInfoDialog(Context ctx, String title, String description) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setIcon(R.drawable.information)
+                .setTitle(title)
+                .setMessage(description)
+                .setCancelable(true)
+                .setPositiveButton("Got it", (dialog, which) -> dialog.dismiss());
+        builder.create().show();
+    }
+
+    /**
+     * Display a tutorial step - used from the Getting Started menu
+     * Shows info dialog since there's no target view in menu context
+     */
+    public static void displayTutorialFromMenu(Context ctx, Tutorials tutorial) {
+        AbstractTutorialStep step = tutorial.step;
+        showTutorialInfoDialog(ctx, step.name(), getTutorialDescription(ctx, tutorial));
+    }
+
+    /**
+     * Displays a tutorial step as a simple dialog (for tutorials without good target views)
+     * @return true if the dialog was displayed, false otherwise
+     */
+    public static boolean displayTutorialStepAsDialog(Activity activity, Tutorials tutorial, boolean forceShow) {
+        if (isSpotlightDisplayed) {
+            return false;
+        }
+
+        AbstractTutorialStep step = tutorial.step;
+        TutorialStepStatus status = step.shouldBeDisplayed(activity);
+        boolean isDismissed = step.isDialogDismissedByUser(activity);
+        boolean isSkipAll = isSkipAllTutorials(activity);
+
+        if (forceShow || (status == ToDo && !isDismissed && !isSkipAll)) {
+            String title = step.name();
+            String description = getTutorialDescription(activity, tutorial);
+            
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setIcon(R.drawable.information)
+                    .setTitle(title)
+                    .setMessage(description)
+                    .setCancelable(true)
+                    .setPositiveButton("Got it", (dialog, which) -> {
+                        if (!forceShow) {
+                            PreferenceHelper.setSharedPreferenceString(activity, step.prefKey(), "1");
+                        }
+                        dialog.dismiss();
+                    })
+                    .setNegativeButton("Don't show hints", (dialog, which) -> {
+                        dismissAllTutorials(activity, true);
+                        dialog.dismiss();
+                    });
+            builder.create().show();
+            return true;
+        }
+        return false;
+    }
+
+    private static String getTutorialDescription(Context ctx, Tutorials tutorial) {
+        switch (tutorial) {
+            case players:
+                return ctx.getString(R.string.tutorial_create_player_message);
+            case attendance:
+                return ctx.getString(R.string.tutorial_attendance_message);
+            case start_pick_teams:
+                return ctx.getString(R.string.tutorial_start_pick_teams_message);
+            case pick_teams:
+                return ctx.getString(R.string.tutorial_pick_teams_message);
+            case save_results:
+                return ctx.getString(R.string.tutorial_save_results_message);
+            case game_history:
+                return ctx.getString(R.string.tutorial_game_history_message);
+            case cloud:
+                return ctx.getString(R.string.tutorial_cloud_message);
+            case team_shuffle_stats:
+                return ctx.getString(R.string.tutorial_team_shuffle_stats_message);
+            case team_analysis:
+                return ctx.getString(R.string.tutorial_team_analysis_message);
+            default:
+                return "";
+        }
     }
 
     public static void dismissAllTutorials(Context ctx, boolean dismiss) {
@@ -159,21 +373,8 @@ public class TutorialManager {
             PreferenceHelper.getSharedPreference(ctx).edit().remove(a.prefKey).commit();
         }
         for (Tutorials a : Tutorials.values()) {
-            PreferenceHelper.getSharedPreference(ctx).edit().remove(a.dialog.prefKey()).commit();
+            PreferenceHelper.getSharedPreference(ctx).edit().remove(a.step.prefKey()).commit();
         }
         PreferenceHelper.getSharedPreference(ctx).edit().remove(PreferenceHelper.pref_skip_all_tutorial).commit();
-    }
-
-    public static int getProgress(Context context) {
-        int total = Tutorials.values().length;
-        int completed = 0;
-
-        for (Tutorials t : Tutorials.values()) {
-            if (t.dialog.shouldBeDisplayed(context) == Done) {
-                completed += 1;
-            }
-        }
-
-        return completed * 100 / total;
     }
 }

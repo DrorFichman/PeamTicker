@@ -1,7 +1,5 @@
 package com.teampicker.drorfichman.teampicker.View;
 
-import static com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager.TutorialDisplayState.NotDisplayed;
-
 import android.app.DatePickerDialog;
 import android.content.ClipData;
 import android.content.Context;
@@ -27,6 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.util.Pair;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -102,6 +101,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private View buttonsLayout;
     private View shuffleLayout, moveLayout, saveLayout;
 
+    private Toolbar toolbar;
     private Button shuffleView, moveView, saveView;
     private Button shuffleOptions, moveOptions;
     private CheckBox saveSyncToCloudCheckbox;
@@ -140,6 +140,12 @@ public class MakeTeamsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_make_teams_activity);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         teamStatsLayout = findViewById(R.id.internal_stats_layout);
         teamData1 = findViewById(R.id.total_list1);
@@ -222,8 +228,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         initialTeams();
 
-        // TODO tutorials drag and drop
-        showTutorials();
+        // Delay tutorial showing to ensure views are ready
+        shuffleView.post(this::showTutorials);
     }
 
     @Override
@@ -275,11 +281,20 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void showTutorials() {
-        TutorialManager.TutorialDisplayState show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.pick_teams, false);
-        if (show == NotDisplayed)
-            show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_shuffle_stats, false);
-        if (show == NotDisplayed)
-            show = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_analysis, false);
+        if (TutorialManager.isSkipAllTutorials(this)) {
+            return;
+        }
+
+        // Show tutorials in sequence - only one will show at a time
+        boolean shown = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.pick_teams, shuffleView, false);
+        if (!shown) {
+            shown = TutorialManager.displayTutorialStep(this, TutorialManager.Tutorials.team_shuffle_stats, shuffleOptions, false);
+        }
+        if (!shown) {
+            // team_analysis tutorial targets the analysis menu item in the toolbar
+            shown = TutorialManager.displayTutorialStepOnMenuItem(this, 
+                    TutorialManager.Tutorials.team_analysis, toolbar, R.id.action_analysis, false);
+        }
     }
 
     //region initial teams
@@ -288,7 +303,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         int currGame = DbHelper.getActiveGame(this);
         mSetResult = getIntent().getBooleanExtra(SET_RESULT, false);
         if (currGame < 0) {
-            Toast.makeText(this, "Initial teams", Toast.LENGTH_SHORT).show();
             divideComingPlayers(selectedDivision);
         } else {
             players1 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team1, RECENT_GAMES);
@@ -381,10 +395,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         int totalPlayers = comingPlayers.size();
         int teamSize = totalPlayers / 2;
         Log.d("teams", "Total " + totalPlayers + ", team " + teamSize);
-
-        if (totalPlayers == 0) {
-            Toast.makeText(this, "Why you wanna play alone?!?", Toast.LENGTH_LONG).show();
-        }
 
         TeamDivision.dividePlayers(this, comingPlayers, players1, players2, selectedDivision,
                 this::updateAnalysisProgress);
@@ -495,7 +505,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
             Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.save_results);
             LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
 
-            Toast.makeText(this, "Results saved", Toast.LENGTH_SHORT).show();
             finish();
         }
     }

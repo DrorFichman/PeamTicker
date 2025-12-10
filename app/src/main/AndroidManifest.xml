@@ -55,7 +55,7 @@
             android:exported="true"
             android:label="Pick Teams"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity
             android:name=".View.PlayerChemistryActivity"
