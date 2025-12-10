@@ -101,6 +101,8 @@
     <string name="setting_summary_color_scheme">Teams visualization - select color scheme</string>
     <string name="setting_title_clear_tutorial">Reset Tutorials</string>
     <string name="setting_summary_clear_tutorial">Reset tutorials skipped steps</string>
+    <string name="setting_title_show_hints">Show Hints</string>
+    <string name="setting_summary_show_hints">Display tutorial hints when navigating the app</string>
     <string name="setting_title_show_grades">Show Grades</string>
     <string name="setting_summary_show_grades">Show players grades</string>
     <string name="setting_title_auto_sync_games">Auto Sync</string>

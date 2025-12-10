@@ -18,7 +18,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Appearance">
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:icon="@drawable/nav_setting"
             android:key="show_grades"
@@ -48,6 +48,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Tutorials">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/nav_setting"
+            android:key="pref_skip_all_tutorial"
+            android:summary="@string/setting_summary_show_hints"
+            android:title="@string/setting_title_show_hints" />
 
         <Preference
             android:icon="@drawable/nav_setting"

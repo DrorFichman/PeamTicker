@@ -21,6 +21,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Adapter.TutorialStepsAdapter;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
+import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 
@@ -314,10 +315,6 @@ public class TutorialManager {
                             PreferenceHelper.setSharedPreferenceString(activity, step.prefKey(), "1");
                         }
                         dialog.dismiss();
-                    })
-                    .setNegativeButton("Don't show hints", (dialog, which) -> {
-                        dismissAllTutorials(activity, true);
-                        dialog.dismiss();
                     });
             builder.create().show();
             return true;
@@ -357,6 +354,17 @@ public class TutorialManager {
     }
 
     public static boolean isSkipAllTutorials(Context ctx) {
+        // Check new settings preference first (default shared prefs)
+        // If it exists, use its value (true = show hints, false = skip)
+        android.content.SharedPreferences defaultPrefs = 
+                androidx.preference.PreferenceManager.getDefaultSharedPreferences(ctx);
+        if (defaultPrefs.contains(PreferenceHelper.pref_skip_all_tutorial)) {
+            // Switch is "Show Hints" - true means show, false means skip
+            return !defaultPrefs.getBoolean(PreferenceHelper.pref_skip_all_tutorial, true);
+        }
+        
+        // Fall back to old custom preference (for backward compatibility)
+        // Old system: presence of key means skip tutorials
         return PreferenceHelper.getSharedPreference(ctx).contains(PreferenceHelper.pref_skip_all_tutorial);
     }
 

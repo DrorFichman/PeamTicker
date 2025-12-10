@@ -26,6 +26,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setDivisionAttemptsPreference();
         setDivisionGradePercentage();
         setTutorialsReset();
+        setShowHints();
         setShowGrade();
         setColorScheme();
     }
@@ -55,6 +56,27 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             LocalNotifications.sendNotification(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION);
             Toast.makeText(getContext(), "Tutorial reset", Toast.LENGTH_SHORT).show();
             Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.settings_changed_tutorial_reset);
+            return true;
+        });
+    }
+
+    private void setShowHints() {
+        androidx.preference.SwitchPreferenceCompat showHints = findPreference(SettingsHelper.SETTING_SHOW_HINTS);
+        
+        // Initialize switch based on old preference if new preference not yet set
+        android.content.SharedPreferences defaultPrefs = 
+                androidx.preference.PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (!defaultPrefs.contains(SettingsHelper.SETTING_SHOW_HINTS)) {
+            // Check old custom preference - if key exists, user had dismissed tutorials
+            boolean oldSkipAll = com.teampicker.drorfichman.teampicker.tools.PreferenceHelper
+                    .getSharedPreference(getContext())
+                    .contains(com.teampicker.drorfichman.teampicker.tools.PreferenceHelper.pref_skip_all_tutorial);
+            // Switch is "Show Hints" - set to false if user had previously dismissed
+            showHints.setChecked(!oldSkipAll);
+        }
+        
+        showHints.setOnPreferenceChangeListener((preference, newValue) -> {
+            Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.settings_changed_show_hints);
             return true;
         });
     }
