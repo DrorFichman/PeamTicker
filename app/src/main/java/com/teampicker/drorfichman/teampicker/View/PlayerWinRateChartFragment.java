@@ -19,10 +19,13 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import androidx.cardview.widget.CardView;
+
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.PlayerGameStat;
 import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
+import com.teampicker.drorfichman.teampicker.Data.StreakInfo;
 import com.teampicker.drorfichman.teampicker.R;
 
 import java.text.SimpleDateFormat;
@@ -41,6 +44,8 @@ public class PlayerWinRateChartFragment extends Fragment {
     private Player player;
     private LineChart chart;
     private TextView emptyMessage;
+    private CardView unbeatenRunCard;
+    private TextView unbeatenRunValue;
 
     private ArrayList<PlayerGameStat> gameHistory;
     private static final int WINDOW_SIZE = 50;
@@ -73,8 +78,11 @@ public class PlayerWinRateChartFragment extends Fragment {
         
         chart = root.findViewById(R.id.insights_chart);
         emptyMessage = root.findViewById(R.id.insights_empty_message);
+        unbeatenRunCard = root.findViewById(R.id.unbeaten_run_card);
+        unbeatenRunValue = root.findViewById(R.id.unbeaten_run_value);
 
         loadDataAndSetupChart();
+        updateLongestUnbeatenRun();
 
         return root;
     }
@@ -297,6 +305,18 @@ public class PlayerWinRateChartFragment extends Fragment {
         dataSet.setCubicIntensity(0.2f);
 
         return dataSet;
+    }
+
+    private void updateLongestUnbeatenRun() {
+        if (player != null && getContext() != null) {
+            StreakInfo streak = DbHelper.getLongestUnbeatenRun(getContext(), player.mName);
+            if (streak.length > 0) {
+                unbeatenRunValue.setText(String.format("%d games (%d days)", streak.length, streak.days));
+                unbeatenRunCard.setVisibility(View.VISIBLE);
+            } else {
+                unbeatenRunCard.setVisibility(View.GONE);
+            }
+        }
     }
 
     /**

@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -23,6 +24,7 @@ import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.PlayerGameStat;
 import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
+import com.teampicker.drorfichman.teampicker.Data.StreakInfo;
 import com.teampicker.drorfichman.teampicker.R;
 
 import java.util.ArrayList;
@@ -49,6 +51,8 @@ public class PlayerParticipationChartFragment extends Fragment {
     private LineChart chart;
     private TextView emptyMessage;
     private TextView chartTitle;
+    private CardView consecutiveAttendanceCard;
+    private TextView consecutiveAttendanceValue;
 
     private ArrayList<PlayerGameStat> gameHistory;
     private ArrayList<Game> allGames;
@@ -82,8 +86,11 @@ public class PlayerParticipationChartFragment extends Fragment {
         chart = root.findViewById(R.id.participation_chart);
         emptyMessage = root.findViewById(R.id.participation_empty_message);
         chartTitle = root.findViewById(R.id.participation_chart_title);
+        consecutiveAttendanceCard = root.findViewById(R.id.consecutive_attendance_card);
+        consecutiveAttendanceValue = root.findViewById(R.id.consecutive_attendance_value);
 
         loadDataAndSetupChart();
+        updateConsecutiveAttendance();
 
         return root;
     }
@@ -333,5 +340,17 @@ public class PlayerParticipationChartFragment extends Fragment {
         int quarter = (cal.get(Calendar.MONTH) / 3) + 1;
         int year = cal.get(Calendar.YEAR) % 100;
         return "Q" + quarter + " " + String.format(Locale.getDefault(), "%02d", year);
+    }
+
+    private void updateConsecutiveAttendance() {
+        if (player != null && getContext() != null) {
+            StreakInfo streak = DbHelper.getConsecutiveAttendance(getContext(), player.mName);
+            if (streak.length > 0) {
+                consecutiveAttendanceValue.setText(String.format("%d games (%d days period)", streak.length, streak.days));
+                consecutiveAttendanceCard.setVisibility(View.VISIBLE);
+            } else {
+                consecutiveAttendanceCard.setVisibility(View.GONE);
+            }
+        }
     }
 }

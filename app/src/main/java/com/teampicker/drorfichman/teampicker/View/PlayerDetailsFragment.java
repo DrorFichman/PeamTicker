@@ -9,19 +9,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.textfield.TextInputEditText;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
-import com.teampicker.drorfichman.teampicker.Data.StreakInfo;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
@@ -37,17 +36,14 @@ public class PlayerDetailsFragment extends Fragment {
     private String createFromIdentifier;
     private PlayerUpdated updateListener = null;
 
-    private EditText vName;
-    private EditText vGrade;
-    private TextView vBirth;
-    private TextView vLongestUnbeatenRun;
-    private TextView vConsecutiveAttendance;
-    private CheckBox isGK;
-    // private CheckBox isInjured;
-    private CheckBox isDefender;
-    private CheckBox isPlaymaker;
-    private CheckBox isUnbreakable;
-    private CheckBox isExtra;
+    private TextInputEditText vName;
+    private TextInputEditText vGrade;
+    private Button vBirth;
+    private Chip isGK;
+    private Chip isDefender;
+    private Chip isPlaymaker;
+    private Chip isUnbreakable;
+    private Chip isExtra;
 
     public PlayerDetailsFragment() {
         super(R.layout.player_crad_fragment);
@@ -69,11 +65,8 @@ public class PlayerDetailsFragment extends Fragment {
         vName = root.findViewById(R.id.edit_player_name);
         vGrade = root.findViewById(R.id.edit_player_grade);
         vBirth = root.findViewById(R.id.edit_player_birthday);
-        vLongestUnbeatenRun = root.findViewById(R.id.longest_unbeaten_run);
-        vConsecutiveAttendance = root.findViewById(R.id.consecutive_attendance);
         vBirth.setOnClickListener(this::showBirthdayPicker);
 
-        // isInjured = root.findViewById(R.id.player_is_injured);
         isGK = root.findViewById(R.id.player_is_gk);
         isDefender = root.findViewById(R.id.player_is_defender);
         isPlaymaker = root.findViewById(R.id.player_is_playmaker);
@@ -85,8 +78,6 @@ public class PlayerDetailsFragment extends Fragment {
             vGrade.setText(String.valueOf(player.mGrade));
             initBirthdayView(player);
             initPlayerAttributesView();
-            updateLongestUnbeatenRun();
-            updateConsecutiveAttendance();
         } else if (createFromIdentifier != null) {
             vName.setText(createFromIdentifier);
         } else {
@@ -194,7 +185,6 @@ public class PlayerDetailsFragment extends Fragment {
         player.isPlaymaker = isPlaymaker.isChecked();
         player.isUnbreakable = isUnbreakable.isChecked();
         player.isExtra = isExtra.isChecked();
-        // player.isInjured = isInjured.isChecked();
         DbHelper.updatePlayerAttributes(getContext(), player);
     }
 
@@ -205,7 +195,6 @@ public class PlayerDetailsFragment extends Fragment {
         isPlaymaker.setChecked(player.isPlaymaker);
         isUnbreakable.setChecked(player.isUnbreakable);
         isExtra.setChecked(player.isExtra);
-        // isInjured.setChecked(player.isInjured);
     }
 
     public void showBirthdayPicker(View view) {
@@ -227,30 +216,6 @@ public class PlayerDetailsFragment extends Fragment {
         if (p.getAge() > 0) {
             vBirth.setText(String.valueOf(p.getAge()));
             vBirth.setTag(p.mBirthDay + "/" + p.mBirthMonth + "/" + p.mBirthYear);
-        }
-    }
-
-    private void updateLongestUnbeatenRun() {
-        if (player != null && getContext() != null) {
-            StreakInfo streak = DbHelper.getLongestUnbeatenRun(getContext(), player.mName);
-            if (streak.length > 0) {
-                vLongestUnbeatenRun.setText(String.format("%d games\n(%d days)", streak.length, streak.days));
-                vLongestUnbeatenRun.setVisibility(View.VISIBLE);
-            } else {
-                vLongestUnbeatenRun.setVisibility(View.GONE);
-            }
-        }
-    }
-
-    private void updateConsecutiveAttendance() {
-        if (player != null && getContext() != null) {
-            StreakInfo streak = DbHelper.getConsecutiveAttendance(getContext(), player.mName);
-            if (streak.length > 0) {
-                vConsecutiveAttendance.setText(String.format("%d games\n(%d days)", streak.length, streak.days));
-                vConsecutiveAttendance.setVisibility(View.VISIBLE);
-            } else {
-                vConsecutiveAttendance.setVisibility(View.GONE);
-            }
         }
     }
     //endregion
