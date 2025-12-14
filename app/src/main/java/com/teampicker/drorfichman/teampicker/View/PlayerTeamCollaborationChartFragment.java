@@ -51,7 +51,7 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
     private static final String ARG_OPPOSING_TEAM = "opposing_team";
     private static final String ARG_RECENT_GAMES = "recent_games";
     private static final int MIN_GAMES_THRESHOLD = 3;
-    private static final float MARKER_SIZE = 40f;  // Fixed pixel size for all markers
+    private static final float MARKER_SIZE = 50f;  // Fixed pixel size for all markers
     private static final int EXTREME_LABELS_COUNT = 5;  // Show labels only for top/bottom N players
 
     private Player player;
@@ -407,7 +407,7 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
     
     private void configureDataSet(ScatterDataSet dataSet, ValueFormatter formatter) {
         dataSet.setDrawValues(true);
-        dataSet.setValueTextSize(8f);
+        dataSet.setValueTextSize(10f);
         dataSet.setValueTextColor(Color.DKGRAY);
         dataSet.setValueFormatter(formatter);
     }
