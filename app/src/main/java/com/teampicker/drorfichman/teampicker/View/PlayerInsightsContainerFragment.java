@@ -52,7 +52,8 @@ public class PlayerInsightsContainerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
-        
+
+        assert root != null;
         viewPager = root.findViewById(R.id.insights_view_pager);
         tabGroup = root.findViewById(R.id.insights_tab_group);
 
@@ -83,9 +84,9 @@ public class PlayerInsightsContainerFragment extends Fragment {
         tabGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.tab_win_rate) {
                 viewPager.setCurrentItem(0, true);
-            } else if (checkedId == R.id.tab_chemistry) {
-                viewPager.setCurrentItem(1, true);
             } else if (checkedId == R.id.tab_activity) {
+                viewPager.setCurrentItem(1, true);
+            } else if (checkedId == R.id.tab_chemistry) {
                 viewPager.setCurrentItem(2, true);
             }
         });
@@ -97,10 +98,10 @@ public class PlayerInsightsContainerFragment extends Fragment {
                 tabGroup.check(R.id.tab_win_rate);
                 break;
             case 1:
-                tabGroup.check(R.id.tab_chemistry);
+                tabGroup.check(R.id.tab_activity);
                 break;
             case 2:
-                tabGroup.check(R.id.tab_activity);
+                tabGroup.check(R.id.tab_chemistry);
                 break;
         }
     }
@@ -118,9 +119,9 @@ public class PlayerInsightsContainerFragment extends Fragment {
                 case 0:
                     return PlayerWinRateChartFragment.newInstance(player);
                 case 1:
-                    return PlayerCollaborationChartFragment.newInstance(player);
-                case 2:
                     return PlayerParticipationChartFragment.newInstance(player);
+                case 2:
+                    return PlayerCollaborationChartFragment.newInstance(player);
                 default:
                     return PlayerWinRateChartFragment.newInstance(player);
             }

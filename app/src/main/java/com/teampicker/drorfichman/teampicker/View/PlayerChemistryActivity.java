@@ -90,7 +90,7 @@ public class PlayerChemistryActivity extends AppCompatActivity {
                         DbHelper.getPlayer(this, pPlayer.mName), blue, orange, recentGames);
             } else {
                 // Show chemistry list fragment
-                fragment = PlayerChemistryFragment.newInstance(
+                fragment = PlayerTeamFragment.newInstance(
                         DbHelper.getPlayer(this, pPlayer.mName), blue, orange);
             }
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

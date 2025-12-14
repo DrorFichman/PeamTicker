@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,11 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import android.view.MotionEvent;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
@@ -53,9 +59,11 @@ public class PlayerParticipationChartFragment extends Fragment {
     private Player player;
     private LineChart chart;
     private TextView emptyMessage;
-    private TextView chartTitle;
     private CardView consecutiveAttendanceCard;
     private TextView consecutiveAttendanceValue;
+    private LinearLayout infoPanel;
+    private TextView selectedPeriod;
+    private TextView selectedStats;
 
     private ArrayList<PlayerGameStat> gameHistory;
     private ArrayList<Game> allGames;
@@ -64,6 +72,10 @@ public class PlayerParticipationChartFragment extends Fragment {
     // Streak highlight fields
     private StreakInfo currentStreak;
     private boolean isStreakHighlighted = false;
+    
+    // Threshold for showing labels - show when this many or fewer points are visible
+    private static final int SHOW_LABELS_THRESHOLD = 8;
+    
 
     public PlayerParticipationChartFragment() {
         super(R.layout.fragment_player_participation_chart);
@@ -90,11 +102,15 @@ public class PlayerParticipationChartFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
 
+        assert root != null;
         chart = root.findViewById(R.id.participation_chart);
         emptyMessage = root.findViewById(R.id.participation_empty_message);
-        chartTitle = root.findViewById(R.id.participation_chart_title);
+        TextView chartTitle = root.findViewById(R.id.participation_chart_title);
         consecutiveAttendanceCard = root.findViewById(R.id.consecutive_attendance_card);
         consecutiveAttendanceValue = root.findViewById(R.id.consecutive_attendance_value);
+        infoPanel = root.findViewById(R.id.participation_info_panel);
+        selectedPeriod = root.findViewById(R.id.participation_selected_period);
+        selectedStats = root.findViewById(R.id.participation_selected_stats);
 
         loadDataAndSetupChart();
         updateConsecutiveAttendance();
@@ -152,9 +168,10 @@ public class PlayerParticipationChartFragment extends Fragment {
         chart.setBackgroundColor(Color.WHITE);
         chart.setClipValuesToContent(false);
         chart.setClipToPadding(false);
-        chart.setExtraTopOffset(70f);  // Extra space for marker at 100%
-        chart.setExtraRightOffset(30f);
-        chart.setExtraBottomOffset(15f);
+        
+        // Enable highlight by drag - allows swiping through data points
+        chart.setHighlightPerDragEnabled(true);
+        chart.setHighlightPerTapEnabled(true);
 
         // Configure X-axis
         XAxis xAxis = chart.getXAxis();
@@ -184,6 +201,101 @@ public class PlayerParticipationChartFragment extends Fragment {
 
         // Configure legend
         chart.getLegend().setEnabled(false);
+        
+        // Set up selection listener to update info panel
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int index = (int) e.getX();
+                if (index >= 0 && index < quarterDataList.size()) {
+                    ParticipationMarkerView.QuarterData data = quarterDataList.get(index);
+                    updateInfoPanel(data);
+                }
+            }
+
+            @Override
+            public void onNothingSelected() {
+                hideInfoPanel();
+            }
+        });
+        
+        // Set up gesture listener to show/hide labels based on zoom level
+        chart.setOnChartGestureListener(new OnChartGestureListener() {
+            @Override
+            public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {}
+
+            @Override
+            public void onChartGestureEnd(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
+                updateLabelsVisibility();
+            }
+
+            @Override
+            public void onChartLongPressed(MotionEvent me) {}
+
+            @Override
+            public void onChartDoubleTapped(MotionEvent me) {
+                // Double tap resets zoom, update labels after
+                chart.postDelayed(() -> updateLabelsVisibility(), 100);
+            }
+
+            @Override
+            public void onChartSingleTapped(MotionEvent me) {}
+
+            @Override
+            public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {}
+
+            @Override
+            public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
+                updateLabelsVisibility();
+            }
+
+            @Override
+            public void onChartTranslate(MotionEvent me, float dX, float dY) {}
+        });
+    }
+    
+    private void updateLabelsVisibility() {
+        if (chart == null || chart.getData() == null) return;
+        
+        // Calculate how many data points are currently visible
+        float visibleRange = chart.getVisibleXRange();
+        
+        LineDataSet dataSet = (LineDataSet) chart.getData().getDataSetByIndex(0);
+        if (dataSet == null) return;
+        
+        // Show labels when zoomed in enough (few points visible)
+        boolean shouldShowLabels = visibleRange <= SHOW_LABELS_THRESHOLD;
+        
+        if (dataSet.isDrawValuesEnabled() != shouldShowLabels) {
+            dataSet.setDrawValues(shouldShowLabels);
+            if (shouldShowLabels) {
+                dataSet.setValueTextSize(10f);
+                dataSet.setValueTextColor(Color.DKGRAY);
+                dataSet.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+                        return String.format(Locale.getDefault(), "%.0f%%", value);
+                    }
+                });
+            }
+            chart.invalidate();
+        }
+    }
+    
+    private void updateInfoPanel(ParticipationMarkerView.QuarterData data) {
+        infoPanel.setVisibility(View.VISIBLE);
+        selectedPeriod.setText(data.periodLabel);
+        
+        String stats = String.format(Locale.getDefault(),
+                "%.0f%% (%d/%d games)", data.participationRate, data.playerGames, data.totalGames);
+        if (data.playerGames > 0) {
+            stats += String.format(Locale.getDefault(), " — W:%d T:%d L:%d", data.wins, data.ties, data.losses);
+        }
+        selectedStats.setText(stats);
+    }
+    
+    private void hideInfoPanel() {
+        infoPanel.setVisibility(View.INVISIBLE);
     }
 
     private void updateChart() {
@@ -223,6 +335,8 @@ public class PlayerParticipationChartFragment extends Fragment {
         dataSet.setFillAlpha(30);
         dataSet.setHighLightColor(Color.rgb(255, 193, 7)); // Amber highlight
         dataSet.setHighlightLineWidth(2f);
+        dataSet.setDrawVerticalHighlightIndicator(true); // Show vertical line on selection
+        dataSet.setDrawHorizontalHighlightIndicator(false); // No horizontal line
 
         // Set X-axis labels
         chart.getXAxis().setValueFormatter(new ValueFormatter() {
@@ -236,10 +350,6 @@ public class PlayerParticipationChartFragment extends Fragment {
             }
         });
         chart.getXAxis().setLabelCount(Math.min(quarterDataList.size(), 10), false);
-
-        // Set marker view
-        ParticipationMarkerView markerView = new ParticipationMarkerView(requireContext(), quarterDataList);
-        chart.setMarker(markerView);
 
         LineData lineData = new LineData(dataSet);
         chart.setData(lineData);
@@ -396,6 +506,7 @@ public class PlayerParticipationChartFragment extends Fragment {
         xAxis.removeAllLimitLines();
         
         // Add vertical limit lines at start and end of streak
+        // Position labels at different heights to avoid overlap
         LimitLine startLine = new LimitLine(startIndex, formatDateForDisplay(currentStreak.startDate));
         startLine.setLineColor(Color.rgb(33, 150, 243)); // Blue
         startLine.setLineWidth(2f);
@@ -408,14 +519,11 @@ public class PlayerParticipationChartFragment extends Fragment {
         LimitLine endLine = new LimitLine(endIndex, formatDateForDisplay(currentStreak.endDate));
         endLine.setLineColor(Color.rgb(33, 150, 243)); // Blue
         endLine.setLineWidth(2f);
-        endLine.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+        endLine.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_BOTTOM); // Bottom to avoid overlap
         endLine.setTextSize(10f);
         endLine.setTextColor(Color.rgb(25, 118, 210)); // Darker blue
         endLine.enableDashedLine(10f, 5f, 0f);
         xAxis.addLimitLine(endLine);
-        
-        // Add filled area dataset for the streak period
-        addStreakHighlightDataset(startIndex, endIndex);
         
         // Update card appearance to show it's active
         consecutiveAttendanceCard.setCardBackgroundColor(Color.rgb(187, 222, 251)); // Darker blue
@@ -480,34 +588,4 @@ public class PlayerParticipationChartFragment extends Fragment {
         }
     }
     
-    private void addStreakHighlightDataset(int startIndex, int endIndex) {
-        if (chart.getData() == null) {
-            return;
-        }
-        
-        // Create entries for the highlight area (full height of chart)
-        ArrayList<Entry> highlightEntries = new ArrayList<>();
-        for (int i = startIndex; i <= endIndex; i++) {
-            highlightEntries.add(new Entry(i, 100f)); // Top of chart
-        }
-        
-        if (highlightEntries.isEmpty()) {
-            return;
-        }
-        
-        LineDataSet highlightDataSet = new LineDataSet(highlightEntries, "Attendance Streak");
-        highlightDataSet.setColor(Color.TRANSPARENT);
-        highlightDataSet.setDrawCircles(false);
-        highlightDataSet.setDrawValues(false);
-        highlightDataSet.setDrawFilled(true);
-        highlightDataSet.setFillColor(Color.rgb(33, 150, 243)); // Blue
-        highlightDataSet.setFillAlpha(50); // Semi-transparent
-        highlightDataSet.setHighlightEnabled(false);
-        
-        // Get existing data and add the highlight dataset
-        LineData lineData = chart.getData();
-        lineData.addDataSet(highlightDataSet);
-        
-        chart.notifyDataSetChanged();
-    }
 }

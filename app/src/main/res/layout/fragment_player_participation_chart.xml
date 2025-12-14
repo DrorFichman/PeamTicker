@@ -20,6 +20,36 @@
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />
 
+    <!-- Selected data point info panel -->
+    <LinearLayout
+        android:id="@+id/participation_info_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
+        android:background="#F5F5F5"
+        android:visibility="invisible">
+
+        <TextView
+            android:id="@+id/participation_selected_period"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#333333" />
+
+        <TextView
+            android:id="@+id/participation_selected_stats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textSize="14sp"
+            android:textColor="#555555" />
+
+    </LinearLayout>
+
     <!-- Consecutive Attendance Stat Card -->
     <androidx.cardview.widget.CardView
         android:id="@+id/consecutive_attendance_card"

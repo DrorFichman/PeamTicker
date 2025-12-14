@@ -3,8 +3,10 @@ package com.teampicker.drorfichman.teampicker.View;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +21,11 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.teampicker.drorfichman.teampicker.Data.BuilderPlayerCollaborationStatistics;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
@@ -28,7 +34,6 @@ import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 import com.teampicker.drorfichman.teampicker.R;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,14 +48,18 @@ public class PlayerCollaborationChartFragment extends Fragment {
 
     private static final String ARG_PLAYER = "player";
     private static final int MIN_GAMES_THRESHOLD = 3;
-    private static final int PLAYERS_COUNT = 25;
+    private static final int PLAYERS_COUNT = 40;
     private static final float MARKER_SIZE = 50f;  // Fixed pixel size for all markers
+    private static final float HIGHLIGHT_SIZE = 80f;  // Size of highlight ring around selected dot
     private static final int EXTREME_LABELS_COUNT = 5;  // Show labels only for top/bottom N players
+    private static final float SHOW_ALL_LABELS_THRESHOLD = 40f;  // Show all labels when X range is this or smaller
 
     private Player player;
     private ScatterChart chart;
     private TextView emptyMessage;
-    private TextView chartTitle;
+    private LinearLayout infoPanel;
+    private TextView selectedName;
+    private TextView selectedStats;
     
     // Player's overall success rate for the horizontal reference line
     private int playerOverallSuccess = 0;
@@ -60,6 +69,12 @@ public class PlayerCollaborationChartFragment extends Fragment {
     
     // Indices of entries that should show labels (extreme values)
     private java.util.Set<Integer> extremeIndices;
+    
+    // Highlight dataset for showing selection ring
+    private ScatterDataSet highlightDataSet;
+    
+    // Track whether all labels are currently shown
+    private boolean showingAllLabels = false;
 
     /**
      * Data class to hold collaboration entry info
@@ -103,9 +118,13 @@ public class PlayerCollaborationChartFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
 
+        assert root != null;
         chart = root.findViewById(R.id.collaboration_chart);
         emptyMessage = root.findViewById(R.id.collaboration_empty_message);
-        chartTitle = root.findViewById(R.id.collaboration_chart_title);
+        TextView chartTitle = root.findViewById(R.id.collaboration_chart_title);
+        infoPanel = root.findViewById(R.id.collaboration_info_panel);
+        selectedName = root.findViewById(R.id.collaboration_selected_name);
+        selectedStats = root.findViewById(R.id.collaboration_selected_stats);
 
         loadDataAndSetupChart();
 
@@ -192,8 +211,6 @@ public class PlayerCollaborationChartFragment extends Fragment {
         chart.setPinchZoom(true);
         chart.setDrawBorders(true);
         chart.setBackgroundColor(Color.WHITE);
-        chart.setExtraTopOffset(70f);
-        chart.setExtraRightOffset(30f);
         chart.setExtraBottomOffset(15f);
 
         // Configure X-axis (Number of games)
@@ -241,9 +258,118 @@ public class PlayerCollaborationChartFragment extends Fragment {
         // Hide legend - colors explained in title
         chart.getLegend().setEnabled(false);
 
-        // Set marker view for detailed info on tap
-        CollaborationChartMarkerView markerView = new CollaborationChartMarkerView(requireContext(), allEntries);
-        chart.setMarker(markerView);
+        // Enable highlight by drag - allows swiping through dots
+        chart.setHighlightPerDragEnabled(true);
+        chart.setHighlightPerTapEnabled(true);
+        
+        // Set up selection listener to update info panel and highlight ring
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                Object data = e.getData();
+                if (data != null) {
+                    int index = (int) data;
+                    if (index >= 0 && index < allEntries.size()) {
+                        CollaborationEntry entry = allEntries.get(index);
+                        updateInfoPanel(entry);
+                        updateHighlightRing(e.getX(), e.getY(), entry.isWith);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected() {
+                hideInfoPanel();
+                clearHighlightRing();
+            }
+        });
+        
+        // Set up gesture listener to show/hide labels based on zoom level
+        chart.setOnChartGestureListener(new OnChartGestureListener() {
+            @Override
+            public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {}
+
+            @Override
+            public void onChartGestureEnd(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
+                updateLabelsVisibility();
+            }
+
+            @Override
+            public void onChartLongPressed(MotionEvent me) {}
+
+            @Override
+            public void onChartDoubleTapped(MotionEvent me) {
+                chart.postDelayed(() -> updateLabelsVisibility(), 100);
+            }
+
+            @Override
+            public void onChartSingleTapped(MotionEvent me) {}
+
+            @Override
+            public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {}
+
+            @Override
+            public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
+                updateLabelsVisibility();
+            }
+
+            @Override
+            public void onChartTranslate(MotionEvent me, float dX, float dY) {}
+        });
+    }
+    
+    private void updateLabelsVisibility() {
+        if (chart == null || chart.getData() == null) return;
+        
+        float visibleXRange = chart.getVisibleXRange();
+        boolean shouldShowAllLabels = visibleXRange <= SHOW_ALL_LABELS_THRESHOLD;
+        
+        if (showingAllLabels != shouldShowAllLabels) {
+            showingAllLabels = shouldShowAllLabels;
+            // Rebuild chart to update label visibility
+            updateChart();
+        }
+    }
+    
+    private void updateHighlightRing(float x, float y, boolean isWith) {
+        if (highlightDataSet == null || chart.getData() == null) return;
+        
+        highlightDataSet.clear();
+        highlightDataSet.addEntry(new Entry(x, y));
+        
+        // Match the color of the highlighted dot (green for "with", red for "against")
+        int color = isWith ? 
+                Color.argb(80, 76, 175, 80) :   // Semi-transparent green
+                Color.argb(80, 244, 67, 54);    // Semi-transparent red
+        highlightDataSet.setColor(color);
+        
+        chart.getData().notifyDataChanged();
+        chart.notifyDataSetChanged();
+        chart.invalidate();
+    }
+    
+    private void clearHighlightRing() {
+        if (highlightDataSet == null || chart.getData() == null) return;
+        
+        highlightDataSet.clear();
+        chart.getData().notifyDataChanged();
+        chart.notifyDataSetChanged();
+        chart.invalidate();
+    }
+    
+    private void updateInfoPanel(CollaborationEntry entry) {
+        infoPanel.setVisibility(View.VISIBLE);
+        selectedName.setText(entry.playerName);
+        
+        String sign = entry.success >= 0 ? "+" : "";
+        String relationship = entry.isWith ? "With" : "Vs";
+        selectedStats.setText(String.format(java.util.Locale.getDefault(),
+                "%s: %d games, %s%d success",
+                relationship, entry.games, sign, entry.success));
+    }
+    
+    private void hideInfoPanel() {
+        infoPanel.setVisibility(View.INVISIBLE);
     }
 
     private void updateChart() {
@@ -266,7 +392,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
         // Set axis ranges
         float xMax = maxGames + 5;
         chart.getXAxis().setAxisMaximum(xMax);
-        float yRange = Math.max(maxAbsSuccess + 3, 15);
+        float yRange = Math.max(maxAbsSuccess + 3, 10);
         chart.getAxisLeft().setAxisMinimum(-yRange);
         chart.getAxisLeft().setAxisMaximum(yRange);
 
@@ -276,7 +402,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
         for (int i = 0; i < allEntries.size(); i++) {
             sortedBySuccess.add(i);
         }
-        Collections.sort(sortedBySuccess, (a, b) -> 
+        sortedBySuccess.sort((a, b) ->
                 Integer.compare(allEntries.get(b).success, allEntries.get(a).success));
         
         // Add top N (highest success)
@@ -310,15 +436,29 @@ public class PlayerCollaborationChartFragment extends Fragment {
 
         ArrayList<IScatterDataSet> dataSets = new ArrayList<>();
         
-        // Value formatter for showing player names (only for extreme values)
+        // Create highlight dataset (empty initially, will be filled when a point is selected)
+        ArrayList<Entry> highlightEntries = new ArrayList<>();
+        highlightDataSet = new ScatterDataSet(highlightEntries, "Highlight");
+        highlightDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+        highlightDataSet.setScatterShapeSize(HIGHLIGHT_SIZE);
+        highlightDataSet.setColor(Color.argb(80, 100, 100, 100));
+        highlightDataSet.setDrawValues(false);
+        highlightDataSet.setHighlightEnabled(false);  // Don't allow selecting the highlight ring itself
+        dataSets.add(highlightDataSet);
+        
+        // Value formatter for showing player names
+        // Shows all labels when zoomed in, only extreme values when zoomed out
         ValueFormatter nameFormatter = new ValueFormatter() {
             @Override
             public String getPointLabel(Entry entry) {
                 Object data = entry.getData();
                 if (data != null) {
                     int index = (int) data;
-                    if (index >= 0 && index < allEntries.size() && extremeIndices.contains(index)) {
-                        return allEntries.get(index).playerName;
+                    if (index >= 0 && index < allEntries.size()) {
+                        // Show all labels when zoomed in, or only extreme values when zoomed out
+                        if (showingAllLabels || extremeIndices.contains(index)) {
+                            return allEntries.get(index).playerName;
+                        }
                     }
                 }
                 return "";
@@ -327,7 +467,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
 
         // Green for "with" success
         if (!withEntries.isEmpty()) {
-            Collections.sort(withEntries, new EntryXComparator());
+            withEntries.sort(new EntryXComparator());
             ScatterDataSet withDataSet = new ScatterDataSet(withEntries, "With");
             withDataSet.setColor(Color.argb(200, 76, 175, 80)); // Green
             withDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
@@ -338,7 +478,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
         
         // Orange/Red for "against" success
         if (!againstEntries.isEmpty()) {
-            Collections.sort(againstEntries, new EntryXComparator());
+            againstEntries.sort(new EntryXComparator());
             ScatterDataSet againstDataSet = new ScatterDataSet(againstEntries, "Against");
             againstDataSet.setColor(Color.argb(200, 244, 67, 54)); // Red
             againstDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
@@ -351,7 +491,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
         chart.setData(scatterData);
         
         // Offset to prevent label clipping at edges
-        chart.setExtraOffsets(10, 70, 30, 15);
+        chart.setExtraOffsets(10, 20, 20, 15);
         
         chart.invalidate();
     }
@@ -361,5 +501,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
         dataSet.setValueTextSize(10f);
         dataSet.setValueTextColor(Color.DKGRAY);
         dataSet.setValueFormatter(formatter);
+        // Disable crosshair highlight indicators
+        dataSet.setDrawHighlightIndicators(false);
     }
 }

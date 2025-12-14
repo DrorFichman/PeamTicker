@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import androidx.cardview.widget.CardView;
 
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
@@ -46,14 +49,18 @@ public class PlayerWinRateChartFragment extends Fragment {
     private TextView emptyMessage;
     private CardView unbeatenRunCard;
     private TextView unbeatenRunValue;
+    private LinearLayout infoPanel;
+    private TextView selectedDate;
+    private TextView selectedValue;
 
     private ArrayList<PlayerGameStat> gameHistory;
     private static final int WINDOW_SIZE = 50;
-    private ChartMarkerView markerView;
+    private SimpleDateFormat dateFormat;
     
     // Streak highlight fields
     private StreakInfo currentStreak;
     private boolean isStreakHighlighted = false;
+    
 
     public PlayerWinRateChartFragment() {
         super(R.layout.fragment_player_insights);
@@ -79,11 +86,15 @@ public class PlayerWinRateChartFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
-        
+
+        assert root != null;
         chart = root.findViewById(R.id.insights_chart);
         emptyMessage = root.findViewById(R.id.insights_empty_message);
         unbeatenRunCard = root.findViewById(R.id.unbeaten_run_card);
         unbeatenRunValue = root.findViewById(R.id.unbeaten_run_value);
+        infoPanel = root.findViewById(R.id.insights_info_panel);
+        selectedDate = root.findViewById(R.id.insights_selected_date);
+        selectedValue = root.findViewById(R.id.insights_selected_value);
 
         loadDataAndSetupChart();
         updateLongestUnbeatenRun();
@@ -108,8 +119,8 @@ public class PlayerWinRateChartFragment extends Fragment {
         // Games are sorted DESC (newest first), we need oldest first for chronological chart
         Collections.reverse(gameHistory);
         
-        // Create marker view for touch data display
-        markerView = new ChartMarkerView(requireContext(), gameHistory);
+        // Create date formatter for info panel
+        dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
         
         setupChart();
         updateChart();
@@ -136,9 +147,10 @@ public class PlayerWinRateChartFragment extends Fragment {
         chart.setBackgroundColor(Color.WHITE);
         chart.setClipValuesToContent(false);
         chart.setClipToPadding(false);
-        chart.setExtraTopOffset(70f);
-        chart.setExtraRightOffset(30f);
-        chart.setExtraBottomOffset(15f);
+        
+        // Enable highlight by drag - allows swiping through data points
+        chart.setHighlightPerDragEnabled(true);
+        chart.setHighlightPerTapEnabled(true);
         
         // Configure X-axis
         XAxis xAxis = chart.getXAxis();
@@ -225,11 +237,43 @@ public class PlayerWinRateChartFragment extends Fragment {
         chart.getLegend().setHorizontalAlignment(com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER);
         chart.getLegend().setOrientation(com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL);
         chart.getLegend().setDrawInside(false);
+        
+        // Set up selection listener to update info panel
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int index = (int) e.getX();
+                float winRate = e.getY();
+                updateInfoPanel(index, winRate);
+            }
 
-        // Set marker view for touch data display
-        if (markerView != null) {
-            chart.setMarker(markerView);
+            @Override
+            public void onNothingSelected() {
+                hideInfoPanel();
+            }
+        });
+    }
+    
+    private void updateInfoPanel(int gameIndex, float winRate) {
+        infoPanel.setVisibility(View.VISIBLE);
+        
+        // Get date from game history
+        if (gameIndex >= 0 && gameIndex < gameHistory.size()) {
+            Date gameDate = gameHistory.get(gameIndex).getDate();
+            if (gameDate != null) {
+                selectedDate.setText(dateFormat.format(gameDate));
+            } else {
+                selectedDate.setText("Game " + (gameIndex + 1));
+            }
+        } else {
+            selectedDate.setText("Game " + (gameIndex + 1));
         }
+        
+        selectedValue.setText(String.format(Locale.getDefault(), "Win Rate: %.1f%%", winRate));
+    }
+    
+    private void hideInfoPanel() {
+        infoPanel.setVisibility(View.INVISIBLE);
     }
 
     private void updateChart() {
@@ -283,6 +327,10 @@ public class PlayerWinRateChartFragment extends Fragment {
         dataSet.setDrawValues(false);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER); // Smoother curve
         dataSet.setCubicIntensity(0.2f);
+        dataSet.setHighLightColor(Color.rgb(255, 193, 7)); // Amber highlight
+        dataSet.setHighlightLineWidth(2f);
+        dataSet.setDrawVerticalHighlightIndicator(true);
+        dataSet.setDrawHorizontalHighlightIndicator(false);
 
         return dataSet;
     }
@@ -307,6 +355,10 @@ public class PlayerWinRateChartFragment extends Fragment {
         dataSet.setDrawValues(false);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER); // Smoother curve
         dataSet.setCubicIntensity(0.2f);
+        dataSet.setHighLightColor(Color.rgb(255, 193, 7)); // Amber highlight
+        dataSet.setHighlightLineWidth(2f);
+        dataSet.setDrawVerticalHighlightIndicator(true);
+        dataSet.setDrawHorizontalHighlightIndicator(false);
 
         return dataSet;
     }
@@ -358,6 +410,7 @@ public class PlayerWinRateChartFragment extends Fragment {
         xAxis.removeAllLimitLines();
         
         // Add vertical limit lines at start and end of streak
+        // Position labels at different heights to avoid overlap
         LimitLine startLine = new LimitLine(startIndex, formatDateForDisplay(currentStreak.startDate));
         startLine.setLineColor(Color.rgb(76, 175, 80)); // Green
         startLine.setLineWidth(2f);
@@ -370,14 +423,11 @@ public class PlayerWinRateChartFragment extends Fragment {
         LimitLine endLine = new LimitLine(endIndex, formatDateForDisplay(currentStreak.endDate));
         endLine.setLineColor(Color.rgb(76, 175, 80)); // Green
         endLine.setLineWidth(2f);
-        endLine.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+        endLine.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_BOTTOM); // Bottom to avoid overlap
         endLine.setTextSize(10f);
         endLine.setTextColor(Color.rgb(56, 142, 60)); // Darker green
         endLine.enableDashedLine(10f, 5f, 0f);
         xAxis.addLimitLine(endLine);
-        
-        // Add filled area dataset for the streak period
-        addStreakHighlightDataset(startIndex, endIndex);
         
         // Update card appearance to show it's active
         unbeatenRunCard.setCardBackgroundColor(Color.rgb(200, 230, 201)); // Darker green
@@ -424,37 +474,6 @@ public class PlayerWinRateChartFragment extends Fragment {
         }
     }
     
-    private void addStreakHighlightDataset(int startIndex, int endIndex) {
-        if (chart.getData() == null) {
-            return;
-        }
-        
-        // Create entries for the highlight area (full height of chart)
-        ArrayList<Entry> highlightEntries = new ArrayList<>();
-        for (int i = startIndex; i <= endIndex; i++) {
-            highlightEntries.add(new Entry(i, 100f)); // Top of chart
-        }
-        
-        if (highlightEntries.isEmpty()) {
-            return;
-        }
-        
-        LineDataSet highlightDataSet = new LineDataSet(highlightEntries, "Unbeaten Period");
-        highlightDataSet.setColor(Color.TRANSPARENT);
-        highlightDataSet.setDrawCircles(false);
-        highlightDataSet.setDrawValues(false);
-        highlightDataSet.setDrawFilled(true);
-        highlightDataSet.setFillColor(Color.rgb(76, 175, 80)); // Green
-        highlightDataSet.setFillAlpha(50); // Semi-transparent
-        highlightDataSet.setHighlightEnabled(false);
-        
-        // Get existing data and add the highlight dataset
-        LineData lineData = chart.getData();
-        lineData.addDataSet(highlightDataSet);
-        
-        chart.notifyDataSetChanged();
-    }
-
     /**
      * Calculate win rate for games in range [startIndex, endIndex)
      * Formula: (sum of results + count) / (2 * count) * 100

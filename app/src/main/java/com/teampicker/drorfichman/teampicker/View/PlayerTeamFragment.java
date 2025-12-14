@@ -41,33 +41,31 @@ import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PlayerChemistryFragment extends Fragment implements Sorting.sortingCallbacks {
+public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallbacks {
 
-    private ArrayList<PlayerChemistry> players = new ArrayList<>();
+    private final ArrayList<PlayerChemistry> players = new ArrayList<>();
     private PlayerChemistryAdapter playersAdapter;
     private Player pPlayer;
 
     private ArrayList<Player> blue;
     private ArrayList<Player> orange;
-    private int[] teamsIcons;
 
     private int games = 50;
-    private Sorting sorting = new Sorting(this::sortingChanged, SortType.gamesWith);
+    private final Sorting sorting = new Sorting(this, SortType.gamesWith);
 
     private ListView playersList;
     private View titles;
     private TextView name;
     private FilterView filterView;
-    private View gameCountSelection;
     private View chip50Games;
 
-    public PlayerChemistryFragment() {
+    public PlayerTeamFragment() {
         super(R.layout.layout_chemistry_fragment);
     }
 
-    public static PlayerChemistryFragment newInstance(Player p,
-                                                      ArrayList<Player> blueTeam, ArrayList<Player> orangeTeam) {
-        PlayerChemistryFragment fragment = new PlayerChemistryFragment();
+    public static PlayerTeamFragment newInstance(Player p,
+                                                 ArrayList<Player> blueTeam, ArrayList<Player> orangeTeam) {
+        PlayerTeamFragment fragment = new PlayerTeamFragment();
         fragment.pPlayer = p;
         fragment.orange = orangeTeam;
         fragment.blue = blueTeam;
@@ -80,12 +78,13 @@ public class PlayerChemistryFragment extends Fragment implements Sorting.sorting
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
 
+        assert root != null;
         playersList = root.findViewById(R.id.players_participation_list);
         playersList.setOnItemClickListener(onPlayerClick);
 
         titles = root.findViewById(R.id.titles);
         name = root.findViewById(R.id.player_name);
-        gameCountSelection = root.findViewById(R.id.participation_chip_games);
+        View gameCountSelection = root.findViewById(R.id.participation_chip_games);
         chip50Games = root.findViewById(R.id.participation_chip_50_games);
 
         setTeamIcon(root);
@@ -144,7 +143,7 @@ public class PlayerChemistryFragment extends Fragment implements Sorting.sorting
         filterView = new FilterView(view, value -> {
             playersAdapter.setFilter(value);
             playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem(() ->
-                    Snackbar.make(getContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));
+                    Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));
             backPress.setEnabled(handleBackPress());
         });
         if (playersAdapter != null) playersAdapter.setFilter(null);
@@ -162,7 +161,7 @@ public class PlayerChemistryFragment extends Fragment implements Sorting.sorting
 
     private void setTeamIcon(View root) {
 
-        teamsIcons = ColorHelper.getTeamsIcons(getActivity());
+        int[] teamsIcons = ColorHelper.getTeamsIcons(getActivity());
 
         ImageView teamIcon = root.findViewById(R.id.team_icon);
         if (orange != null && orange.contains(pPlayer)) {
@@ -177,7 +176,7 @@ public class PlayerChemistryFragment extends Fragment implements Sorting.sorting
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.statisctics_menu, menu);
         setSearchView((SearchView) menu.findItem(R.id.action_stat_search_players).getActionView());
         super.onCreateOptionsMenu(menu, inflater);
@@ -194,8 +193,8 @@ public class PlayerChemistryFragment extends Fragment implements Sorting.sorting
         return super.onOptionsItemSelected(item);
     }
 
-    private AdapterView.OnItemClickListener onPlayerClick = (parent, view, position, id) -> {
-        Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.player_collaboration_clicked);
+    private final AdapterView.OnItemClickListener onPlayerClick = (parent, view, position, id) -> {
+        Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.player_collaboration_clicked);
         String selected = ((PlayerChemistry) parent.getItemAtPosition(position)).mName;
         Intent gameActivityIntent = GamesActivity.getGameActivityIntent(getContext(), pPlayer.mName, selected, false);
         startActivity(gameActivityIntent);

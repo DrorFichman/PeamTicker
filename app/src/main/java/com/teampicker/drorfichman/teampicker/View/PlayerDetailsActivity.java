@@ -21,7 +21,6 @@ import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
-import com.teampicker.drorfichman.teampicker.tools.analytics.ParameterType;
 
 public class PlayerDetailsActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYER = "existing_player";
@@ -156,9 +155,9 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             } else if (position == 1) {
                 return "Games";
             } else if (position == 2) {
-                return "Insights";
-            } else {
                 return "Team";
+            } else {
+                return "Insights";
             }
         }
 
@@ -170,9 +169,9 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             } else if (position == 1) {
                 return GamesFragment.newInstance(p.mName, null, false, null);
             } else if (position == 2) {
-                return PlayerInsightsContainerFragment.newInstance(p);
+                return PlayerTeamFragment.newInstance(p, null, null);
             } else {
-                return PlayerChemistryFragment.newInstance(p, null, null);
+                return PlayerInsightsContainerFragment.newInstance(p);
             }
         }
     }
