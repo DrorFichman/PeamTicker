@@ -104,7 +104,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private Button shuffleView, moveView, saveView;
     private Button shuffleOptions, moveOptions;
-    private CheckBox saveSyncToCloudCheckbox;
 
     private View scoreDisplayContainer;
     private TextView team1ScoreDisplay, team2ScoreDisplay;
@@ -187,7 +186,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         saveView = findViewById(R.id.save_results);
         saveView.setOnClickListener(view -> saveResultsClicked());
-        saveSyncToCloudCheckbox = findViewById(R.id.save_auto_sync_checkbox);
 
         shuffleView = findViewById(R.id.shuffle);
         shuffleView.setOnClickListener(v -> shuffleClicked());
@@ -207,15 +205,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         weatherTemperature = findViewById(R.id.weather_temperature);
         weatherTimeRange = findViewById(R.id.weather_time_range);
         weatherDate = findViewById(R.id.weather_date);
-
-        // Show/hide weather based on configuration
-        if (Configurations.isWeatherFeatureEnabled()) {
-            weatherDisplay.setOnClickListener(v -> showWeatherSettingsDialog());
-            weatherDisplay.setVisibility(View.VISIBLE);
-            fetchWeatherData();
-        } else {
-            weatherDisplay.setVisibility(View.GONE);
-        }
+        setWeatherData(true);
 
         area1.setOnDragListener(playerMoveDragListener);
         area2.setOnDragListener(playerMoveDragListener);
@@ -230,6 +220,17 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         // Delay tutorial showing to ensure views are ready
         shuffleView.post(this::showTutorials);
+    }
+
+    private void setWeatherData(boolean show) {
+        // Show/hide weather based on configuration
+        if (show && Configurations.isWeatherFeatureEnabled()) {
+            weatherDisplay.setOnClickListener(v -> showWeatherSettingsDialog());
+            weatherDisplay.setVisibility(View.VISIBLE);
+            fetchWeatherData();
+        } else {
+            weatherDisplay.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -493,15 +494,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
             // TODO Improve above - can set the results when inserting the teams
             DbHelper.insertGame(this, game);
 
-            if (saveSyncToCloudCheckbox.isChecked()) {
-                // TODO set auto sync setting
-                // SettingsHelper.setAutoSyncCloud(this, true);
-
-                // TODO FirebaseHelper.syncGame(this, game)
-                // FirebaseHelper.fetchConfigurations(); syncGame(this, game)
-                // TODO initCollaboration(); and print / keep expected winner?
-            }
-
             Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.save_results);
             LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
 
@@ -567,9 +559,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private void displayResultsViews(boolean enterResults) {
         mSetResult = enterResults;
         saveView.setText(enterResults ? R.string.save : R.string.enter_results);
-
-        saveSyncToCloudCheckbox.setChecked(SettingsHelper.getAutoSyncCloud(this));
-        // TODO saveSyncToCloudCheckbox.setVisibility(enterResults ? View.VISIBLE : View.INVISIBLE);
 
         teamStatsLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         moveLayout.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
@@ -1152,6 +1141,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         teamStatsLayout.setVisibility(View.INVISIBLE);
         buttonsLayout.setVisibility(View.INVISIBLE);
         benchListLayout.setVisibility(View.INVISIBLE);
+        setWeatherData(false);
 
         list1.setAdapter(null);
         list2.setAdapter(null);
@@ -1162,6 +1152,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         progressBarTeamDivision.setVisibility(View.GONE);
         teamStatsLayout.setVisibility(View.VISIBLE);
         buttonsLayout.setVisibility(View.VISIBLE);
+        setWeatherData(true);
     }
     //endregion
 

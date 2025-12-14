@@ -27,6 +27,9 @@ import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
 import com.teampicker.drorfichman.teampicker.Data.StreakInfo;
 import com.teampicker.drorfichman.teampicker.R;
 
+import com.github.mikephil.charting.components.LimitLine;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -57,6 +60,10 @@ public class PlayerParticipationChartFragment extends Fragment {
     private ArrayList<PlayerGameStat> gameHistory;
     private ArrayList<Game> allGames;
     private List<ParticipationMarkerView.QuarterData> quarterDataList;
+    
+    // Streak highlight fields
+    private StreakInfo currentStreak;
+    private boolean isStreakHighlighted = false;
 
     public PlayerParticipationChartFragment() {
         super(R.layout.fragment_player_participation_chart);
@@ -344,13 +351,163 @@ public class PlayerParticipationChartFragment extends Fragment {
 
     private void updateConsecutiveAttendance() {
         if (player != null && getContext() != null) {
-            StreakInfo streak = DbHelper.getConsecutiveAttendance(getContext(), player.mName);
-            if (streak.length > 0) {
-                consecutiveAttendanceValue.setText(String.format("%d games (%d days period)", streak.length, streak.days));
+            currentStreak = DbHelper.getConsecutiveAttendance(getContext(), player.mName);
+            if (currentStreak.length > 0) {
+                consecutiveAttendanceValue.setText(String.format("%d games (%d days period)", currentStreak.length, currentStreak.days));
                 consecutiveAttendanceCard.setVisibility(View.VISIBLE);
+                
+                // Add click listener to highlight the streak period on the chart
+                consecutiveAttendanceCard.setOnClickListener(v -> toggleStreakHighlight());
             } else {
                 consecutiveAttendanceCard.setVisibility(View.GONE);
             }
         }
+    }
+    
+    private void toggleStreakHighlight() {
+        if (quarterDataList == null || quarterDataList.isEmpty() || currentStreak == null || currentStreak.length == 0) {
+            return;
+        }
+        
+        isStreakHighlighted = !isStreakHighlighted;
+        
+        if (isStreakHighlighted) {
+            highlightStreakPeriod();
+        } else {
+            clearStreakHighlight();
+        }
+    }
+    
+    private void highlightStreakPeriod() {
+        if (currentStreak.startDate == null || currentStreak.endDate == null) {
+            return;
+        }
+        
+        // Find the quarter indices that contain the streak dates
+        int startIndex = findQuarterIndexByDate(currentStreak.startDate);
+        int endIndex = findQuarterIndexByDate(currentStreak.endDate);
+        
+        if (startIndex < 0 || endIndex < 0) {
+            return;
+        }
+        
+        // Clear existing limit lines and add new ones for streak boundaries
+        XAxis xAxis = chart.getXAxis();
+        xAxis.removeAllLimitLines();
+        
+        // Add vertical limit lines at start and end of streak
+        LimitLine startLine = new LimitLine(startIndex, formatDateForDisplay(currentStreak.startDate));
+        startLine.setLineColor(Color.rgb(33, 150, 243)); // Blue
+        startLine.setLineWidth(2f);
+        startLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+        startLine.setTextSize(10f);
+        startLine.setTextColor(Color.rgb(25, 118, 210)); // Darker blue
+        startLine.enableDashedLine(10f, 5f, 0f);
+        xAxis.addLimitLine(startLine);
+        
+        LimitLine endLine = new LimitLine(endIndex, formatDateForDisplay(currentStreak.endDate));
+        endLine.setLineColor(Color.rgb(33, 150, 243)); // Blue
+        endLine.setLineWidth(2f);
+        endLine.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+        endLine.setTextSize(10f);
+        endLine.setTextColor(Color.rgb(25, 118, 210)); // Darker blue
+        endLine.enableDashedLine(10f, 5f, 0f);
+        xAxis.addLimitLine(endLine);
+        
+        // Add filled area dataset for the streak period
+        addStreakHighlightDataset(startIndex, endIndex);
+        
+        // Update card appearance to show it's active
+        consecutiveAttendanceCard.setCardBackgroundColor(Color.rgb(187, 222, 251)); // Darker blue
+        
+        chart.invalidate();
+    }
+    
+    private void clearStreakHighlight() {
+        // Remove limit lines from X axis
+        XAxis xAxis = chart.getXAxis();
+        xAxis.removeAllLimitLines();
+        
+        // Rebuild chart without the highlight dataset
+        updateChart();
+        
+        // Reset card appearance
+        consecutiveAttendanceCard.setCardBackgroundColor(Color.parseColor("#E3F2FD")); // Original light blue
+        
+        chart.invalidate();
+    }
+    
+    private int findQuarterIndexByDate(String dateString) {
+        if (dateString == null || quarterDataList == null) {
+            return -1;
+        }
+        
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date date = inputFormat.parse(dateString);
+            if (date == null) return -1;
+            
+            String quarterKey = getQuarterDisplayLabel(date);
+            
+            for (int i = 0; i < quarterDataList.size(); i++) {
+                if (quarterKey.equals(quarterDataList.get(i).periodLabel)) {
+                    return i;
+                }
+            }
+        } catch (Exception e) {
+            // Fall through
+        }
+        return -1;
+    }
+    
+    private String getQuarterDisplayLabel(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int quarter = (cal.get(Calendar.MONTH) / 3) + 1;
+        int year = cal.get(Calendar.YEAR) % 100;
+        return "Q" + quarter + " '" + String.format(Locale.getDefault(), "%02d", year);
+    }
+    
+    private String formatDateForDisplay(String dateString) {
+        if (dateString == null) return "";
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
+            Date date = inputFormat.parse(dateString);
+            return date != null ? outputFormat.format(date) : dateString;
+        } catch (Exception e) {
+            return dateString;
+        }
+    }
+    
+    private void addStreakHighlightDataset(int startIndex, int endIndex) {
+        if (chart.getData() == null) {
+            return;
+        }
+        
+        // Create entries for the highlight area (full height of chart)
+        ArrayList<Entry> highlightEntries = new ArrayList<>();
+        for (int i = startIndex; i <= endIndex; i++) {
+            highlightEntries.add(new Entry(i, 100f)); // Top of chart
+        }
+        
+        if (highlightEntries.isEmpty()) {
+            return;
+        }
+        
+        LineDataSet highlightDataSet = new LineDataSet(highlightEntries, "Attendance Streak");
+        highlightDataSet.setColor(Color.TRANSPARENT);
+        highlightDataSet.setDrawCircles(false);
+        highlightDataSet.setDrawValues(false);
+        highlightDataSet.setDrawFilled(true);
+        highlightDataSet.setFillColor(Color.rgb(33, 150, 243)); // Blue
+        highlightDataSet.setFillAlpha(50); // Semi-transparent
+        highlightDataSet.setHighlightEnabled(false);
+        
+        // Get existing data and add the highlight dataset
+        LineData lineData = chart.getData();
+        lineData.addDataSet(highlightDataSet);
+        
+        chart.notifyDataSetChanged();
     }
 }

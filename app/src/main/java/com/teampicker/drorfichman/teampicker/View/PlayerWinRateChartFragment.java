@@ -50,6 +50,10 @@ public class PlayerWinRateChartFragment extends Fragment {
     private ArrayList<PlayerGameStat> gameHistory;
     private static final int WINDOW_SIZE = 50;
     private ChartMarkerView markerView;
+    
+    // Streak highlight fields
+    private StreakInfo currentStreak;
+    private boolean isStreakHighlighted = false;
 
     public PlayerWinRateChartFragment() {
         super(R.layout.fragment_player_insights);
@@ -309,14 +313,146 @@ public class PlayerWinRateChartFragment extends Fragment {
 
     private void updateLongestUnbeatenRun() {
         if (player != null && getContext() != null) {
-            StreakInfo streak = DbHelper.getLongestUnbeatenRun(getContext(), player.mName);
-            if (streak.length > 0) {
-                unbeatenRunValue.setText(String.format("%d games (%d days)", streak.length, streak.days));
+            currentStreak = DbHelper.getLongestUnbeatenRun(getContext(), player.mName);
+            if (currentStreak.length > 0) {
+                unbeatenRunValue.setText(String.format("%d games (%d days)", currentStreak.length, currentStreak.days));
                 unbeatenRunCard.setVisibility(View.VISIBLE);
+                
+                // Add click listener to highlight the streak period on the chart
+                unbeatenRunCard.setOnClickListener(v -> toggleStreakHighlight());
             } else {
                 unbeatenRunCard.setVisibility(View.GONE);
             }
         }
+    }
+    
+    private void toggleStreakHighlight() {
+        if (gameHistory == null || gameHistory.isEmpty() || currentStreak == null || currentStreak.length == 0) {
+            return;
+        }
+        
+        isStreakHighlighted = !isStreakHighlighted;
+        
+        if (isStreakHighlighted) {
+            highlightStreakPeriod();
+        } else {
+            clearStreakHighlight();
+        }
+    }
+    
+    private void highlightStreakPeriod() {
+        if (currentStreak.startDate == null || currentStreak.endDate == null) {
+            return;
+        }
+        
+        // Find the indices in gameHistory that match the streak dates
+        int startIndex = findGameIndexByDate(currentStreak.startDate);
+        int endIndex = findGameIndexByDate(currentStreak.endDate);
+        
+        if (startIndex < 0 || endIndex < 0) {
+            return;
+        }
+        
+        // Clear existing limit lines and add new ones for streak boundaries
+        XAxis xAxis = chart.getXAxis();
+        xAxis.removeAllLimitLines();
+        
+        // Add vertical limit lines at start and end of streak
+        LimitLine startLine = new LimitLine(startIndex, formatDateForDisplay(currentStreak.startDate));
+        startLine.setLineColor(Color.rgb(76, 175, 80)); // Green
+        startLine.setLineWidth(2f);
+        startLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+        startLine.setTextSize(10f);
+        startLine.setTextColor(Color.rgb(56, 142, 60)); // Darker green
+        startLine.enableDashedLine(10f, 5f, 0f);
+        xAxis.addLimitLine(startLine);
+        
+        LimitLine endLine = new LimitLine(endIndex, formatDateForDisplay(currentStreak.endDate));
+        endLine.setLineColor(Color.rgb(76, 175, 80)); // Green
+        endLine.setLineWidth(2f);
+        endLine.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+        endLine.setTextSize(10f);
+        endLine.setTextColor(Color.rgb(56, 142, 60)); // Darker green
+        endLine.enableDashedLine(10f, 5f, 0f);
+        xAxis.addLimitLine(endLine);
+        
+        // Add filled area dataset for the streak period
+        addStreakHighlightDataset(startIndex, endIndex);
+        
+        // Update card appearance to show it's active
+        unbeatenRunCard.setCardBackgroundColor(Color.rgb(200, 230, 201)); // Darker green
+        
+        chart.invalidate();
+    }
+    
+    private void clearStreakHighlight() {
+        // Remove limit lines from X axis
+        XAxis xAxis = chart.getXAxis();
+        xAxis.removeAllLimitLines();
+        
+        // Rebuild chart without the highlight dataset
+        updateChart();
+        
+        // Reset card appearance
+        unbeatenRunCard.setCardBackgroundColor(Color.parseColor("#E8F5E9")); // Original light green
+        
+        chart.invalidate();
+    }
+    
+    private int findGameIndexByDate(String dateString) {
+        if (dateString == null || gameHistory == null) {
+            return -1;
+        }
+        
+        for (int i = 0; i < gameHistory.size(); i++) {
+            if (dateString.equals(gameHistory.get(i).gameDateString)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    private String formatDateForDisplay(String dateString) {
+        if (dateString == null) return "";
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
+            Date date = inputFormat.parse(dateString);
+            return date != null ? outputFormat.format(date) : dateString;
+        } catch (Exception e) {
+            return dateString;
+        }
+    }
+    
+    private void addStreakHighlightDataset(int startIndex, int endIndex) {
+        if (chart.getData() == null) {
+            return;
+        }
+        
+        // Create entries for the highlight area (full height of chart)
+        ArrayList<Entry> highlightEntries = new ArrayList<>();
+        for (int i = startIndex; i <= endIndex; i++) {
+            highlightEntries.add(new Entry(i, 100f)); // Top of chart
+        }
+        
+        if (highlightEntries.isEmpty()) {
+            return;
+        }
+        
+        LineDataSet highlightDataSet = new LineDataSet(highlightEntries, "Unbeaten Period");
+        highlightDataSet.setColor(Color.TRANSPARENT);
+        highlightDataSet.setDrawCircles(false);
+        highlightDataSet.setDrawValues(false);
+        highlightDataSet.setDrawFilled(true);
+        highlightDataSet.setFillColor(Color.rgb(76, 175, 80)); // Green
+        highlightDataSet.setFillAlpha(50); // Semi-transparent
+        highlightDataSet.setHighlightEnabled(false);
+        
+        // Get existing data and add the highlight dataset
+        LineData lineData = chart.getData();
+        lineData.addDataSet(highlightDataSet);
+        
+        chart.notifyDataSetChanged();
     }
 
     /**
