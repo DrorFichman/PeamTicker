@@ -62,7 +62,7 @@
             android:exported="true"
             android:label="Player's success with/vs teammates"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
             android:name=".Provider.ShareTeamProvider"

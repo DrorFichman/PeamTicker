@@ -30,20 +30,27 @@ import com.teampicker.drorfichman.teampicker.R;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * Scatter chart showing player collaboration statistics.
+ * Scatter chart showing player collaboration in the context of current teams.
+ * 
+ * For teammates: shows success WITH (games played together)
+ * For opponents: shows success AGAINST (games played against each other)
+ * 
  * X-axis: Number of games
  * Y-axis: Success rate (wins - losses)
- * Color: Green for "with" success, Red/Orange for "against" success
- * Shows top 30 players by absolute success value.
+ * Color: Team color based on which team the player belongs to
  */
-public class PlayerCollaborationChartFragment extends Fragment {
+public class PlayerTeamCollaborationChartFragment extends Fragment {
 
     private static final String ARG_PLAYER = "player";
+    private static final String ARG_PLAYER_TEAM = "player_team";
+    private static final String ARG_OPPOSING_TEAM = "opposing_team";
+    private static final String ARG_RECENT_GAMES = "recent_games";
     private static final int MIN_GAMES_THRESHOLD = 3;
-    private static final int PLAYERS_COUNT = 25;
     private static final float MARKER_SIZE = 40f;  // Fixed pixel size for all markers
     private static final int EXTREME_LABELS_COUNT = 5;  // Show labels only for top/bottom N players
 
@@ -52,40 +59,58 @@ public class PlayerCollaborationChartFragment extends Fragment {
     private TextView emptyMessage;
     private TextView chartTitle;
     
+    // Team data
+    private Set<String> playerTeamNames;
+    private Set<String> opposingTeamNames;
+    
+    // Number of recent games to use for statistics
+    private int recentGames = 50;
+    
     // Player's overall success rate for the horizontal reference line
     private int playerOverallSuccess = 0;
     
-    // Data for marker view and chart
-    private List<CollaborationEntry> allEntries;
+    // Data for marker view
+    private List<TeamCollaborationEntry> allEntries;
     
     // Indices of entries that should show labels (extreme values)
-    private java.util.Set<Integer> extremeIndices;
+    private Set<Integer> extremeIndices;
+
+    public PlayerTeamCollaborationChartFragment() {
+        super(R.layout.fragment_player_team_collaboration_chart);
+    }
 
     /**
-     * Data class to hold collaboration entry info
+     * Data class to hold collaboration entry info for the marker view
      */
-    static class CollaborationEntry {
+    static class TeamCollaborationEntry {
         String playerName;
         int games;
         int success;
-        boolean isWith; // true = "with" stats, false = "against" stats
+        boolean isTeammate;
         
-        CollaborationEntry(String name, int games, int success, boolean isWith) {
+        TeamCollaborationEntry(String name, int games, int success, boolean isTeammate) {
             this.playerName = name;
             this.games = games;
             this.success = success;
-            this.isWith = isWith;
+            this.isTeammate = isTeammate;
         }
     }
 
-    public PlayerCollaborationChartFragment() {
-        super(R.layout.fragment_player_collaboration_chart);
-    }
-
-    public static PlayerCollaborationChartFragment newInstance(Player player) {
-        PlayerCollaborationChartFragment fragment = new PlayerCollaborationChartFragment();
+    /**
+     * Creates a new instance for showing team collaboration.
+     * 
+     * @param player The player whose collaboration to show
+     * @param playerTeam Players on the same team as the clicked player
+     * @param opposingTeam Players on the opposing team
+     */
+    public static PlayerTeamCollaborationChartFragment newInstance(Player player,
+            ArrayList<Player> playerTeam, ArrayList<Player> opposingTeam, int recentGames) {
+        PlayerTeamCollaborationChartFragment fragment = new PlayerTeamCollaborationChartFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PLAYER, player);
+        args.putSerializable(ARG_PLAYER_TEAM, playerTeam);
+        args.putSerializable(ARG_OPPOSING_TEAM, opposingTeam);
+        args.putInt(ARG_RECENT_GAMES, recentGames);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,6 +120,26 @@ public class PlayerCollaborationChartFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             player = (Player) getArguments().getSerializable(ARG_PLAYER);
+            recentGames = getArguments().getInt(ARG_RECENT_GAMES, 50);
+            
+            @SuppressWarnings("unchecked")
+            ArrayList<Player> playerTeam = (ArrayList<Player>) getArguments().getSerializable(ARG_PLAYER_TEAM);
+            @SuppressWarnings("unchecked")
+            ArrayList<Player> opposingTeam = (ArrayList<Player>) getArguments().getSerializable(ARG_OPPOSING_TEAM);
+            
+            playerTeamNames = new HashSet<>();
+            if (playerTeam != null) {
+                for (Player p : playerTeam) {
+                    playerTeamNames.add(p.mName);
+                }
+            }
+            
+            opposingTeamNames = new HashSet<>();
+            if (opposingTeam != null) {
+                for (Player p : opposingTeam) {
+                    opposingTeamNames.add(p.mName);
+                }
+            }
         }
     }
 
@@ -103,9 +148,9 @@ public class PlayerCollaborationChartFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
 
-        chart = root.findViewById(R.id.collaboration_chart);
-        emptyMessage = root.findViewById(R.id.collaboration_empty_message);
-        chartTitle = root.findViewById(R.id.collaboration_chart_title);
+        chart = root.findViewById(R.id.team_collaboration_chart);
+        emptyMessage = root.findViewById(R.id.team_collaboration_empty_message);
+        chartTitle = root.findViewById(R.id.team_collaboration_chart_title);
 
         loadDataAndSetupChart();
 
@@ -114,60 +159,64 @@ public class PlayerCollaborationChartFragment extends Fragment {
 
     private void loadDataAndSetupChart() {
         if (player == null || getContext() == null) {
-            showEmptyState();
+            showEmptyState("No player data available");
             return;
         }
 
-        // Load player with statistics to get overall success rate
-        Player playerWithStats = DbHelper.getPlayer(getContext(), player.mName, -1);
+        // Load player with statistics to get overall success rate (using recentGames)
+        Player playerWithStats = DbHelper.getPlayer(getContext(), player.mName, recentGames);
         if (playerWithStats != null && playerWithStats.statistics != null) {
             playerOverallSuccess = playerWithStats.statistics.successRate;
         }
 
-        // Get collaboration statistics for all games
+        // Set title with number of games
+        chartTitle.setText(getString(R.string.team_collaboration_chart_title_with_games, player.mName, recentGames));
+
+        // Get collaboration statistics for recent games (same as used for team division)
         HashMap<String, PlayerChemistry> collaborations = DbHelper.getPlayersParticipationStatistics(
                 getContext(), player.mName,
-                new BuilderPlayerCollaborationStatistics().setGames(-1));
+                new BuilderPlayerCollaborationStatistics().setGames(recentGames));
 
         if (collaborations == null || collaborations.isEmpty()) {
-            showEmptyState();
+            showEmptyState("No collaboration data available");
             return;
         }
 
-        // Build entries list - include both "with" and "against" stats
-        List<CollaborationEntry> tempEntries = new ArrayList<>();
+        // Build entries list - only include players from current teams
+        allEntries = new ArrayList<>();
         
         for (PlayerChemistry pc : collaborations.values()) {
-            // Add "with" entry if enough games
-            if (pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD) {
-                tempEntries.add(new CollaborationEntry(
-                        pc.mName,
-                        pc.statisticsWith.gamesCount,
-                        pc.statisticsWith.successRate,
-                        true));
+            // Skip the player themselves
+            if (pc.mName.equals(player.mName)) {
+                continue;
             }
             
-            // Add "against" entry if enough games
-            if (pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
-                tempEntries.add(new CollaborationEntry(
-                        pc.mName,
-                        pc.statisticsVs.gamesCount,
-                        pc.statisticsVs.successRate,
-                        false));
+            boolean isTeammate = playerTeamNames.contains(pc.mName);
+            boolean isOpponent = opposingTeamNames.contains(pc.mName);
+            
+            if (isTeammate) {
+                // For teammates: use "with" statistics
+                if (pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD) {
+                    allEntries.add(new TeamCollaborationEntry(
+                            pc.mName,
+                            pc.statisticsWith.gamesCount,
+                            pc.statisticsWith.successRate,
+                            true));
+                }
+            } else if (isOpponent) {
+                // For opponents: use "against" statistics
+                if (pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
+                    allEntries.add(new TeamCollaborationEntry(
+                            pc.mName,
+                            pc.statisticsVs.gamesCount,
+                            pc.statisticsVs.successRate,
+                            false));
+                }
             }
-        }
-
-        // Sort by absolute success value (descending) and keep top players
-        tempEntries.sort((a, b) -> Integer.compare(Math.abs(b.success), Math.abs(a.success)));
-
-        if (tempEntries.size() > PLAYERS_COUNT) {
-            allEntries = new ArrayList<>(tempEntries.subList(0, PLAYERS_COUNT));
-        } else {
-            allEntries = tempEntries;
         }
 
         if (allEntries.isEmpty()) {
-            showEmptyState();
+            showEmptyState(getString(R.string.team_collaboration_no_data, MIN_GAMES_THRESHOLD));
             return;
         }
 
@@ -175,10 +224,10 @@ public class PlayerCollaborationChartFragment extends Fragment {
         updateChart();
     }
 
-    private void showEmptyState() {
+    private void showEmptyState(String message) {
         chart.setVisibility(View.GONE);
         emptyMessage.setVisibility(View.VISIBLE);
-        emptyMessage.setText(getString(R.string.insights_collaboration_no_data, MIN_GAMES_THRESHOLD));
+        emptyMessage.setText(message);
     }
 
     private void setupChart() {
@@ -206,10 +255,10 @@ public class PlayerCollaborationChartFragment extends Fragment {
         xAxis.setAxisMinimum(0f);
         xAxis.setGranularity(1f);
         
-        // X-axis label via chart description
+        // Use chart description for X-axis label (positioned at bottom)
         chart.getDescription().setEnabled(true);
         chart.getDescription().setText(getString(R.string.team_collaboration_x_axis_label));
-        chart.getDescription().setTextSize(11f);
+        chart.getDescription().setTextSize(12f);
         chart.getDescription().setTextColor(Color.DKGRAY);
 
         // Configure Y-axis (Success rate)
@@ -226,8 +275,8 @@ public class PlayerCollaborationChartFragment extends Fragment {
         leftAxis.addLimitLine(yZeroLine);
         
         // Add horizontal line showing player's overall success rate
-        LimitLine playerSuccessLine = new LimitLine(playerOverallSuccess, player.mName + " overall success");
-        playerSuccessLine.setLineColor(Color.parseColor("#9C27B0")); // Purple
+        LimitLine playerSuccessLine = new LimitLine(playerOverallSuccess, player.mName + " recent success");
+        playerSuccessLine.setLineColor(Color.parseColor("#9C27B0")); // Purple color to stand out
         playerSuccessLine.setLineWidth(2f);
         playerSuccessLine.enableDashedLine(10f, 5f, 0f);
         playerSuccessLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
@@ -238,11 +287,11 @@ public class PlayerCollaborationChartFragment extends Fragment {
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
 
-        // Hide legend - colors explained in title
+        // Hide legend - colors are self-explanatory from team context
         chart.getLegend().setEnabled(false);
 
         // Set marker view for detailed info on tap
-        CollaborationChartMarkerView markerView = new CollaborationChartMarkerView(requireContext(), allEntries);
+        TeamCollaborationMarkerView markerView = new TeamCollaborationMarkerView(requireContext(), allEntries);
         chart.setMarker(markerView);
     }
 
@@ -255,7 +304,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
         int maxGames = 0;
         float maxAbsSuccess = 0;
         
-        for (CollaborationEntry entry : allEntries) {
+        for (TeamCollaborationEntry entry : allEntries) {
             if (entry.games > maxGames) maxGames = entry.games;
             maxAbsSuccess = Math.max(maxAbsSuccess, Math.abs(entry.success));
         }
@@ -271,7 +320,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
         chart.getAxisLeft().setAxisMaximum(yRange);
 
         // Find extreme entries (top N positive and top N negative success)
-        extremeIndices = new java.util.HashSet<>();
+        extremeIndices = new HashSet<>();
         List<Integer> sortedBySuccess = new ArrayList<>();
         for (int i = 0; i < allEntries.size(); i++) {
             sortedBySuccess.add(i);
@@ -288,12 +337,12 @@ public class PlayerCollaborationChartFragment extends Fragment {
             extremeIndices.add(sortedBySuccess.get(sortedBySuccess.size() - 1 - i));
         }
 
-        // Create separate entry lists for "with" and "against"
-        ArrayList<Entry> withEntries = new ArrayList<>();
-        ArrayList<Entry> againstEntries = new ArrayList<>();
+        // Create separate entry lists for each team
+        ArrayList<Entry> teammateEntries = new ArrayList<>();
+        ArrayList<Entry> opponentEntries = new ArrayList<>();
 
         for (int i = 0; i < allEntries.size(); i++) {
-            CollaborationEntry entry = allEntries.get(i);
+            TeamCollaborationEntry entry = allEntries.get(i);
 
             float x = entry.games;       // X: number of games
             float y = entry.success;     // Y: success rate
@@ -301,10 +350,10 @@ public class PlayerCollaborationChartFragment extends Fragment {
             Entry scatterEntry = new Entry(x, y);
             scatterEntry.setData(i); // Store index for marker lookup
             
-            if (entry.isWith) {
-                withEntries.add(scatterEntry);
+            if (entry.isTeammate) {
+                teammateEntries.add(scatterEntry);
             } else {
-                againstEntries.add(scatterEntry);
+                opponentEntries.add(scatterEntry);
             }
         }
 
@@ -325,33 +374,33 @@ public class PlayerCollaborationChartFragment extends Fragment {
             }
         };
 
-        // Green for "with" success
-        if (!withEntries.isEmpty()) {
-            Collections.sort(withEntries, new EntryXComparator());
-            ScatterDataSet withDataSet = new ScatterDataSet(withEntries, "With");
-            withDataSet.setColor(Color.argb(200, 76, 175, 80)); // Green
-            withDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
-            withDataSet.setScatterShapeSize(MARKER_SIZE);
-            configureDataSet(withDataSet, nameFormatter);
-            dataSets.add(withDataSet);
+        // Create dataset for teammates - green for "with"
+        if (!teammateEntries.isEmpty()) {
+            Collections.sort(teammateEntries, new EntryXComparator());
+            ScatterDataSet teammateDataSet = new ScatterDataSet(teammateEntries, "With");
+            teammateDataSet.setColor(Color.argb(200, 76, 175, 80)); // Green
+            teammateDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+            teammateDataSet.setScatterShapeSize(MARKER_SIZE);
+            configureDataSet(teammateDataSet, nameFormatter);
+            dataSets.add(teammateDataSet);
         }
         
-        // Orange/Red for "against" success
-        if (!againstEntries.isEmpty()) {
-            Collections.sort(againstEntries, new EntryXComparator());
-            ScatterDataSet againstDataSet = new ScatterDataSet(againstEntries, "Against");
-            againstDataSet.setColor(Color.argb(200, 244, 67, 54)); // Red
-            againstDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
-            againstDataSet.setScatterShapeSize(MARKER_SIZE);
-            configureDataSet(againstDataSet, nameFormatter);
-            dataSets.add(againstDataSet);
+        // Create dataset for opponents - red for "against"
+        if (!opponentEntries.isEmpty()) {
+            Collections.sort(opponentEntries, new EntryXComparator());
+            ScatterDataSet opponentDataSet = new ScatterDataSet(opponentEntries, "Against");
+            opponentDataSet.setColor(Color.argb(200, 244, 67, 54)); // Red
+            opponentDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+            opponentDataSet.setScatterShapeSize(MARKER_SIZE);
+            configureDataSet(opponentDataSet, nameFormatter);
+            dataSets.add(opponentDataSet);
         }
 
         ScatterData scatterData = new ScatterData(dataSets);
         chart.setData(scatterData);
         
-        // Offset to prevent label clipping at edges
-        chart.setExtraOffsets(10, 70, 30, 15);
+        // Offset to prevent label clipping at edges (left, top, right, bottom)
+        chart.setExtraOffsets(10, 90, 30, 15);
         
         chart.invalidate();
     }

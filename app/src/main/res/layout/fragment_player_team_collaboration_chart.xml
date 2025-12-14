@@ -8,15 +8,15 @@
     android:paddingTop="8dp"
     android:paddingBottom="48dp">
 
-    <!-- Chart Title -->
+    <!-- Chart Title showing player name -->
     <TextView
-        android:id="@+id/collaboration_chart_title"
+        android:id="@+id/team_collaboration_chart_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/insights_collaboration_title"
         android:textSize="16sp"
         android:textStyle="bold"
+        android:layout_marginTop="48dp"
         android:layout_marginBottom="8dp" />
 
     <!-- Chart container with Y-axis label -->
@@ -27,13 +27,13 @@
 
         <!-- Scatter Chart -->
         <com.github.mikephil.charting.charts.ScatterChart
-            android:id="@+id/collaboration_chart"
+            android:id="@+id/team_collaboration_chart"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
         <!-- Y-axis label (rotated, overlaid on left side) -->
         <TextView
-            android:id="@+id/collaboration_y_axis_label"
+            android:id="@+id/team_collaboration_y_axis_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
@@ -48,7 +48,7 @@
 
     <!-- Empty State Message -->
     <TextView
-        android:id="@+id/collaboration_empty_message"
+        android:id="@+id/team_collaboration_empty_message"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

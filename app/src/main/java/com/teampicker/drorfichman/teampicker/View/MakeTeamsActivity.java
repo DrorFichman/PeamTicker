@@ -854,8 +854,19 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
             } else {
 
-                Intent intent = PlayerChemistryActivity.getPlayerParticipationActivity(
-                        MakeTeamsActivity.this, player.mName, players2, players1);
+                // Determine which team the clicked player is on
+                ArrayList<Player> playerTeam;
+                ArrayList<Player> opposingTeam;
+                if (players1.contains(player)) {
+                    playerTeam = players1;
+                    opposingTeam = players2;
+                } else {
+                    playerTeam = players2;
+                    opposingTeam = players1;
+                }
+                
+                Intent intent = PlayerChemistryActivity.getPlayerCollaborationChartActivity(
+                        MakeTeamsActivity.this, player.mName, playerTeam, opposingTeam, RECENT_GAMES);
                 startActivity(intent);
             }
         }
