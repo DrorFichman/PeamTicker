@@ -12,9 +12,10 @@ import androidx.annotation.NonNull;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by drorfichman on 7/30/16.
@@ -155,6 +156,7 @@ public class DbHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+    @SuppressWarnings("resource") // DbHelper is intentionally kept open for the app's lifetime
     public static SQLiteDatabase getSqLiteDatabase(Context context) {
         // Gets the data repository in write mode
         if (writableDatabase == null) {
@@ -215,8 +217,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public static Player getPlayer(Context context, String name, int gameCount) {
         final Player player = PlayerDbHelper.getPlayer(getSqLiteDatabase(context), name);
         if (player != null) {
-            ArrayList<Player> players = new ArrayList<>(Arrays.asList(player));
-            addLastGameStats(context, gameCount, players, true);
+            addLastGameStats(context, gameCount, Collections.singletonList(player), true);
         }
         return player;
     }
@@ -320,7 +321,7 @@ public class DbHelper extends SQLiteOpenHelper {
         return currTeam;
     }
 
-    private static void addLastGameStats(Context context, int countLastGames, ArrayList<Player> currTeam, boolean statistics) {
+    private static void addLastGameStats(Context context, int countLastGames, List<Player> currTeam, boolean statistics) {
 
         for (Player p : currTeam) {
             if (playersHistory.containsKey(p.mName + countLastGames)) {
