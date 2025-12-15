@@ -22,9 +22,12 @@ import com.teampicker.drorfichman.teampicker.R;
 public class PlayerInsightsContainerFragment extends Fragment {
 
     private static final String ARG_PLAYER = "player";
+    private static final String ARG_HIGHLIGHT_PLAYER = "highlight_player";
     private static final int NUM_CHARTS = 3;
+    private static final int CHEMISTRY_TAB_INDEX = 2;
 
     private Player player;
+    private String highlightPlayer;
     private ViewPager2 viewPager;
     private RadioGroup tabGroup;
 
@@ -33,9 +36,14 @@ public class PlayerInsightsContainerFragment extends Fragment {
     }
 
     public static PlayerInsightsContainerFragment newInstance(Player player) {
+        return newInstance(player, null);
+    }
+
+    public static PlayerInsightsContainerFragment newInstance(Player player, String highlightPlayer) {
         PlayerInsightsContainerFragment fragment = new PlayerInsightsContainerFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PLAYER, player);
+        args.putString(ARG_HIGHLIGHT_PLAYER, highlightPlayer);
         fragment.setArguments(args);
         return fragment;
     }
@@ -45,6 +53,7 @@ public class PlayerInsightsContainerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             player = (Player) getArguments().getSerializable(ARG_PLAYER);
+            highlightPlayer = getArguments().getString(ARG_HIGHLIGHT_PLAYER);
         }
     }
 
@@ -78,6 +87,11 @@ public class PlayerInsightsContainerFragment extends Fragment {
                 updateTabSelection(position);
             }
         });
+        
+        // Navigate to chemistry tab if a highlight player is specified
+        if (highlightPlayer != null && !highlightPlayer.isEmpty()) {
+            viewPager.setCurrentItem(CHEMISTRY_TAB_INDEX, false);
+        }
     }
 
     private void setupTabNavigation() {
@@ -121,7 +135,7 @@ public class PlayerInsightsContainerFragment extends Fragment {
                 case 1:
                     return PlayerParticipationChartFragment.newInstance(player);
                 case 2:
-                    return PlayerCollaborationChartFragment.newInstance(player);
+                    return PlayerCollaborationChartFragment.newInstance(player, highlightPlayer);
                 default:
                     return PlayerWinRateChartFragment.newInstance(player);
             }

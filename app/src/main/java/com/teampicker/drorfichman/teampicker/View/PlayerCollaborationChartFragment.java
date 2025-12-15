@@ -1,5 +1,6 @@
 package com.teampicker.drorfichman.teampicker.View;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -47,14 +48,16 @@ import java.util.List;
 public class PlayerCollaborationChartFragment extends Fragment {
 
     private static final String ARG_PLAYER = "player";
-    private static final int MIN_GAMES_THRESHOLD = 3;
-    private static final int PLAYERS_COUNT = 40;
+    private static final String ARG_INITIAL_HIGHLIGHT_PLAYER = "initial_highlight_player";
+    private static final int MIN_GAMES_THRESHOLD = 5;
+    private static final int PLAYERS_COUNT = 150;
     private static final float MARKER_SIZE = 50f;  // Fixed pixel size for all markers
     private static final float HIGHLIGHT_SIZE = 80f;  // Size of highlight ring around selected dot
     private static final int EXTREME_LABELS_COUNT = 5;  // Show labels only for top/bottom N players
     private static final float SHOW_ALL_LABELS_THRESHOLD = 40f;  // Show all labels when X range is this or smaller
 
     private Player player;
+    private String initialHighlightPlayer;  // Player to auto-highlight on chart load
     private ScatterChart chart;
     private TextView emptyMessage;
     private LinearLayout infoPanel;
@@ -75,6 +78,9 @@ public class PlayerCollaborationChartFragment extends Fragment {
     
     // Track whether all labels are currently shown
     private boolean showingAllLabels = false;
+    
+    // Track currently highlighted entry to restore after chart rebuild
+    private CollaborationEntry highlightedEntry = null;
 
     /**
      * Data class to hold collaboration entry info
@@ -98,9 +104,14 @@ public class PlayerCollaborationChartFragment extends Fragment {
     }
 
     public static PlayerCollaborationChartFragment newInstance(Player player) {
+        return newInstance(player, null);
+    }
+
+    public static PlayerCollaborationChartFragment newInstance(Player player, String initialHighlightPlayer) {
         PlayerCollaborationChartFragment fragment = new PlayerCollaborationChartFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PLAYER, player);
+        args.putString(ARG_INITIAL_HIGHLIGHT_PLAYER, initialHighlightPlayer);
         fragment.setArguments(args);
         return fragment;
     }
@@ -110,6 +121,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             player = (Player) getArguments().getSerializable(ARG_PLAYER);
+            initialHighlightPlayer = getArguments().getString(ARG_INITIAL_HIGHLIGHT_PLAYER);
         }
     }
 
@@ -125,10 +137,29 @@ public class PlayerCollaborationChartFragment extends Fragment {
         infoPanel = root.findViewById(R.id.collaboration_info_panel);
         selectedName = root.findViewById(R.id.collaboration_selected_name);
         selectedStats = root.findViewById(R.id.collaboration_selected_stats);
+        
+        // Initialize with placeholder text to establish 2-line height
+        selectedStats.setText(" \n ");
+        
+        // Click on info panel to navigate to the highlighted player's chemistry chart
+        infoPanel.setOnClickListener(v -> navigateToHighlightedPlayer());
 
         loadDataAndSetupChart();
 
         return root;
+    }
+    
+    private void navigateToHighlightedPlayer() {
+        if (highlightedEntry == null || player == null || getContext() == null) {
+            return;
+        }
+        
+        // Navigate to the highlighted player's activity, with the current player highlighted
+        Intent intent = PlayerDetailsActivity.getPlayerChemistryIntent(
+                getContext(), 
+                highlightedEntry.playerName,  // The player whose chart to show
+                player.mName);                 // The player to highlight in that chart
+        startActivity(intent);
     }
 
     private void loadDataAndSetupChart() {
@@ -154,12 +185,12 @@ public class PlayerCollaborationChartFragment extends Fragment {
         }
 
         // Build entries list - include both "with" and "against" stats
-        List<CollaborationEntry> tempEntries = new ArrayList<>();
+        allEntries = new ArrayList<>();
         
         for (PlayerChemistry pc : collaborations.values()) {
             // Add "with" entry if enough games
             if (pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD) {
-                tempEntries.add(new CollaborationEntry(
+                allEntries.add(new CollaborationEntry(
                         pc.mName,
                         pc.statisticsWith.gamesCount,
                         pc.statisticsWith.successRate,
@@ -168,21 +199,12 @@ public class PlayerCollaborationChartFragment extends Fragment {
             
             // Add "against" entry if enough games
             if (pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
-                tempEntries.add(new CollaborationEntry(
+                allEntries.add(new CollaborationEntry(
                         pc.mName,
                         pc.statisticsVs.gamesCount,
                         pc.statisticsVs.successRate,
                         false));
             }
-        }
-
-        // Sort by absolute success value (descending) and keep top players
-        tempEntries.sort((a, b) -> Integer.compare(Math.abs(b.success), Math.abs(a.success)));
-
-        if (tempEntries.size() > PLAYERS_COUNT) {
-            allEntries = new ArrayList<>(tempEntries.subList(0, PLAYERS_COUNT));
-        } else {
-            allEntries = tempEntries;
         }
 
         if (allEntries.isEmpty()) {
@@ -192,6 +214,25 @@ public class PlayerCollaborationChartFragment extends Fragment {
 
         setupChart();
         updateChart();
+        
+        // Auto-highlight initial player if specified
+        highlightInitialPlayer();
+    }
+    
+    private void highlightInitialPlayer() {
+        if (initialHighlightPlayer == null || initialHighlightPlayer.isEmpty() || allEntries == null) {
+            return;
+        }
+        
+        // Find the first entry for the initial highlight player
+        for (CollaborationEntry entry : allEntries) {
+            if (entry.playerName.equals(initialHighlightPlayer)) {
+                highlightedEntry = entry;
+                updateInfoPanel(entry);
+                updateHighlightRing(entry);
+                break;
+            }
+        }
     }
 
     private void showEmptyState() {
@@ -271,14 +312,16 @@ public class PlayerCollaborationChartFragment extends Fragment {
                     int index = (int) data;
                     if (index >= 0 && index < allEntries.size()) {
                         CollaborationEntry entry = allEntries.get(index);
+                        highlightedEntry = entry;
                         updateInfoPanel(entry);
-                        updateHighlightRing(e.getX(), e.getY(), entry.isWith);
+                        updateHighlightRing(entry);
                     }
                 }
             }
 
             @Override
             public void onNothingSelected() {
+                highlightedEntry = null;
                 hideInfoPanel();
                 clearHighlightRing();
             }
@@ -331,16 +374,24 @@ public class PlayerCollaborationChartFragment extends Fragment {
         }
     }
     
-    private void updateHighlightRing(float x, float y, boolean isWith) {
-        if (highlightDataSet == null || chart.getData() == null) return;
+    private void updateHighlightRing(CollaborationEntry selectedEntry) {
+        if (highlightDataSet == null || chart.getData() == null || selectedEntry == null) return;
         
         highlightDataSet.clear();
-        highlightDataSet.addEntry(new Entry(x, y));
+        highlightDataSet.addEntry(new Entry(selectedEntry.games, selectedEntry.success));
         
-        // Match the color of the highlighted dot (green for "with", red for "against")
-        int color = isWith ? 
-                Color.argb(80, 76, 175, 80) :   // Semi-transparent green
-                Color.argb(80, 244, 67, 54);    // Semi-transparent red
+        // Find and highlight the related entry (same player, opposite relationship)
+        for (int i = 0; i < allEntries.size(); i++) {
+            CollaborationEntry entry = allEntries.get(i);
+            if (entry.playerName.equals(selectedEntry.playerName) && entry.isWith != selectedEntry.isWith) {
+                // Found the related entry, add it to highlight
+                highlightDataSet.addEntry(new Entry(entry.games, entry.success));
+                break;
+            }
+        }
+        
+        // Use a neutral color since we may be highlighting both green and red dots
+        int color = Color.argb(100, 100, 100, 100);  // Semi-transparent gray
         highlightDataSet.setColor(color);
         
         chart.getData().notifyDataChanged();
@@ -351,6 +402,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
     private void clearHighlightRing() {
         if (highlightDataSet == null || chart.getData() == null) return;
         
+        highlightedEntry = null;
         highlightDataSet.clear();
         chart.getData().notifyDataChanged();
         chart.notifyDataSetChanged();
@@ -363,9 +415,25 @@ public class PlayerCollaborationChartFragment extends Fragment {
         
         String sign = entry.success >= 0 ? "+" : "";
         String relationship = entry.isWith ? "With" : "Vs";
-        selectedStats.setText(String.format(java.util.Locale.getDefault(),
+        String mainStats = String.format(java.util.Locale.getDefault(),
                 "%s: %d games, %s%d success",
-                relationship, entry.games, sign, entry.success));
+                relationship, entry.games, sign, entry.success);
+        
+        // Find and display the related entry (same player, opposite relationship)
+        // Always show 2 lines to avoid view resizing
+        String relatedStats = "\n ";  // Empty second line as default
+        for (CollaborationEntry other : allEntries) {
+            if (other.playerName.equals(entry.playerName) && other.isWith != entry.isWith) {
+                String otherSign = other.success >= 0 ? "+" : "";
+                String otherRelationship = other.isWith ? "With" : "Vs";
+                relatedStats = String.format(java.util.Locale.getDefault(),
+                        "\n%s: %d games, %s%d success",
+                        otherRelationship, other.games, otherSign, other.success);
+                break;
+            }
+        }
+        
+        selectedStats.setText(mainStats + relatedStats);
     }
     
     private void hideInfoPanel() {
@@ -492,6 +560,11 @@ public class PlayerCollaborationChartFragment extends Fragment {
         
         // Offset to prevent label clipping at edges
         chart.setExtraOffsets(10, 20, 20, 15);
+        
+        // Restore highlight if there was a highlighted entry before chart rebuild
+        if (highlightedEntry != null) {
+            updateHighlightRing(highlightedEntry);
+        }
         
         chart.invalidate();
     }

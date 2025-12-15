@@ -25,9 +25,15 @@ import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 public class PlayerDetailsActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYER = "existing_player";
     private static final String EXTRA_PLAYER_IDENTIFIER = "new_player_identifier";
+    private static final String EXTRA_HIGHLIGHT_PLAYER = "highlight_player";
+    private static final String EXTRA_START_TAB = "start_tab";
+    
+    private static final int TAB_INSIGHTS = 3;
 
     Player pPlayer;
     private String createFromIdentifier;
+    private String highlightPlayer;
+    private int startTab = 0;
 
     PlayerViewAdapter mAdapter;
     ViewPager mPager;
@@ -53,6 +59,22 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         return new Intent(context, PlayerDetailsActivity.class);
     }
 
+    /**
+     * Creates an intent to open a player's chemistry chart and highlight another player's dots.
+     * @param context The context
+     * @param playerName The player whose chemistry chart to show
+     * @param highlightPlayerName The player to highlight in the chart (the source player)
+     * @return Intent to start this activity at the Insights/Chemistry tab
+     */
+    @NonNull
+    public static Intent getPlayerChemistryIntent(Context context, String playerName, String highlightPlayerName) {
+        Intent intent = new Intent(context, PlayerDetailsActivity.class);
+        intent.putExtra(PlayerDetailsActivity.EXTRA_PLAYER, playerName);
+        intent.putExtra(PlayerDetailsActivity.EXTRA_HIGHLIGHT_PLAYER, highlightPlayerName);
+        intent.putExtra(PlayerDetailsActivity.EXTRA_START_TAB, TAB_INSIGHTS);
+        return intent;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +90,8 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         }
 
         createFromIdentifier = getIntent().getStringExtra(EXTRA_PLAYER_IDENTIFIER);
+        highlightPlayer = getIntent().getStringExtra(EXTRA_HIGHLIGHT_PLAYER);
+        startTab = getIntent().getIntExtra(EXTRA_START_TAB, 0);
 
         refreshData(getIntent().getStringExtra(EXTRA_PLAYER));
     }
@@ -86,14 +110,14 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             setTitle("New Player");
         }
 
-        mAdapter = new PlayerViewAdapter(getSupportFragmentManager(), pPlayer, createFromIdentifier, this::finish);
+        mAdapter = new PlayerViewAdapter(getSupportFragmentManager(), pPlayer, createFromIdentifier, highlightPlayer, this::finish);
         mPager = findViewById(R.id.player_pager);
         mPager.setAdapter(mAdapter);
 
         TabLayout tabLayout = findViewById(R.id.player_tabs);
         tabLayout.setupWithViewPager(mPager);
 
-        mPager.setCurrentItem(0);
+        mPager.setCurrentItem(startTab);
 
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -128,12 +152,14 @@ public class PlayerDetailsActivity extends AppCompatActivity {
 
         Player p;
         private final String createFromIdentifier;
+        private final String highlightPlayer;
         private final PlayerDetailsFragment.PlayerUpdated updateListener;
 
-        PlayerViewAdapter(FragmentManager fm, Player player, String createFromIdentifier, PlayerDetailsFragment.PlayerUpdated listener) {
+        PlayerViewAdapter(FragmentManager fm, Player player, String createFromIdentifier, String highlightPlayer, PlayerDetailsFragment.PlayerUpdated listener) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             p = player;
             this.createFromIdentifier = createFromIdentifier;
+            this.highlightPlayer = highlightPlayer;
             updateListener = listener;
         }
 
@@ -171,7 +197,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             } else if (position == 2) {
                 return PlayerTeamFragment.newInstance(p, null, null);
             } else {
-                return PlayerInsightsContainerFragment.newInstance(p);
+                return PlayerInsightsContainerFragment.newInstance(p, highlightPlayer);
             }
         }
     }

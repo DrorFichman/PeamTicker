@@ -89,6 +89,9 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
     
     // Track whether all labels are currently shown
     private boolean showingAllLabels = false;
+    
+    // Track currently highlighted entry to restore after chart rebuild
+    private TeamCollaborationEntry highlightedEntry = null;
 
     public PlayerTeamCollaborationChartFragment() {
         super(R.layout.fragment_player_team_collaboration_chart);
@@ -320,14 +323,16 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
                     int index = (int) data;
                     if (index >= 0 && index < allEntries.size()) {
                         TeamCollaborationEntry entry = allEntries.get(index);
+                        highlightedEntry = entry;
                         updateInfoPanel(entry);
-                        updateHighlightRing(e.getX(), e.getY(), entry.isTeammate);
+                        updateHighlightRing(entry);
                     }
                 }
             }
 
             @Override
             public void onNothingSelected() {
+                highlightedEntry = null;
                 hideInfoPanel();
                 clearHighlightRing();
             }
@@ -380,14 +385,14 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
         }
     }
     
-    private void updateHighlightRing(float x, float y, boolean isTeammate) {
-        if (highlightDataSet == null || chart.getData() == null) return;
+    private void updateHighlightRing(TeamCollaborationEntry selectedEntry) {
+        if (highlightDataSet == null || chart.getData() == null || selectedEntry == null) return;
         
         highlightDataSet.clear();
-        highlightDataSet.addEntry(new Entry(x, y));
+        highlightDataSet.addEntry(new Entry(selectedEntry.games, selectedEntry.success));
         
         // Match the color of the highlighted dot (green for teammate, red for opponent)
-        int color = isTeammate ? 
+        int color = selectedEntry.isTeammate ? 
                 Color.argb(80, 76, 175, 80) :   // Semi-transparent green
                 Color.argb(80, 244, 67, 54);    // Semi-transparent red
         highlightDataSet.setColor(color);
@@ -400,6 +405,7 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
     private void clearHighlightRing() {
         if (highlightDataSet == null || chart.getData() == null) return;
         
+        highlightedEntry = null;
         highlightDataSet.clear();
         chart.getData().notifyDataChanged();
         chart.notifyDataSetChanged();
@@ -541,6 +547,11 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
         
         // Offset to prevent label clipping at edges (left, top, right, bottom)
         chart.setExtraOffsets(10, 20, 20, 15);
+        
+        // Restore highlight if there was a highlighted entry before chart rebuild
+        if (highlightedEntry != null) {
+            updateHighlightRing(highlightedEntry);
+        }
         
         chart.invalidate();
     }

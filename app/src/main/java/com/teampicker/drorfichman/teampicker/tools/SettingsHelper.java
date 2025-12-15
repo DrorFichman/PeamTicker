@@ -37,7 +37,7 @@ public class SettingsHelper {
     }
 
     public static int getDivideAttemptsCount(Context ctx) {
-        int divideAttempts = getPreferenceValue(ctx, SETTING_DIVIDE_ATTEMPTS, 50);
+        int divideAttempts = getPreferenceValue(ctx, SETTING_DIVIDE_ATTEMPTS, 200);
         return MathTools.getLimitedValue(divideAttempts, 1, 200);
     }
 
