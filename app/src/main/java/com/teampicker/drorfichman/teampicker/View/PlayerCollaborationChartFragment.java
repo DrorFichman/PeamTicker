@@ -50,9 +50,8 @@ public class PlayerCollaborationChartFragment extends Fragment {
     private static final String ARG_PLAYER = "player";
     private static final String ARG_INITIAL_HIGHLIGHT_PLAYER = "initial_highlight_player";
     private static final int MIN_GAMES_THRESHOLD = 5;
-    private static final int PLAYERS_COUNT = 150;
-    private static final float MARKER_SIZE = 50f;  // Fixed pixel size for all markers
-    private static final float HIGHLIGHT_SIZE = 80f;  // Size of highlight ring around selected dot
+    private static final float MARKER_SIZE = 40f;  // Fixed pixel size for all markers
+    private static final float HIGHLIGHT_SIZE = 100f;  // Size of highlight ring around selected dot
     private static final int EXTREME_LABELS_COUNT = 5;  // Show labels only for top/bottom N players
     private static final float SHOW_ALL_LABELS_THRESHOLD = 40f;  // Show all labels when X range is this or smaller
 
@@ -133,7 +132,6 @@ public class PlayerCollaborationChartFragment extends Fragment {
         assert root != null;
         chart = root.findViewById(R.id.collaboration_chart);
         emptyMessage = root.findViewById(R.id.collaboration_empty_message);
-        TextView chartTitle = root.findViewById(R.id.collaboration_chart_title);
         infoPanel = root.findViewById(R.id.collaboration_info_panel);
         selectedName = root.findViewById(R.id.collaboration_selected_name);
         selectedStats = root.findViewById(R.id.collaboration_selected_stats);
@@ -179,7 +177,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
                 getContext(), player.mName,
                 new BuilderPlayerCollaborationStatistics().setGames(-1));
 
-        if (collaborations == null || collaborations.isEmpty()) {
+        if (collaborations.isEmpty()) {
             showEmptyState();
             return;
         }
@@ -433,7 +431,7 @@ public class PlayerCollaborationChartFragment extends Fragment {
             }
         }
         
-        selectedStats.setText(mainStats + relatedStats);
+        selectedStats.setText(String.format("%s%s", mainStats, relatedStats));
     }
     
     private void hideInfoPanel() {

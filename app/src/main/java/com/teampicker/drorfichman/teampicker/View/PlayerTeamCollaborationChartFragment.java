@@ -3,6 +3,7 @@ package com.teampicker.drorfichman.teampicker.View;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -25,7 +26,6 @@ import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import android.view.MotionEvent;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.teampicker.drorfichman.teampicker.Data.BuilderPlayerCollaborationStatistics;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
@@ -34,7 +34,6 @@ import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 import com.teampicker.drorfichman.teampicker.R;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +55,7 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
     private static final String ARG_RECENT_GAMES = "recent_games";
     private static final int MIN_GAMES_THRESHOLD = 3;
     private static final float MARKER_SIZE = 50f;  // Fixed pixel size for all markers
-    private static final float HIGHLIGHT_SIZE = 80f;  // Size of highlight ring around selected dot
+    private static final float HIGHLIGHT_SIZE = 100f;  // Size of highlight ring around selected dot
     private static final int EXTREME_LABELS_COUNT = 5;  // Show labels only for top/bottom N players
     private static final float SHOW_ALL_LABELS_THRESHOLD = 15f;  // Show all labels when X range is this or smaller
 
@@ -199,7 +198,7 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
                 getContext(), player.mName,
                 new BuilderPlayerCollaborationStatistics().setGames(recentGames));
 
-        if (collaborations == null || collaborations.isEmpty()) {
+        if (collaborations.isEmpty()) {
             showEmptyState("No collaboration data available");
             return;
         }

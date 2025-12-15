@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
@@ -72,6 +74,7 @@ public class PlayerGamesDbHelper {
                 values);
     }
 
+    @NonNull
     public static ArrayList<Player> getCurrTeam(SQLiteDatabase db, int currGame, TeamEnum team) {
 
         String[] projection = {
@@ -153,6 +156,7 @@ public class PlayerGamesDbHelper {
         Log.d("teams", "deleted games players " + n);
     }
 
+    @NonNull
     public static ArrayList<PlayerGame> getPlayersGames(SQLiteDatabase db) {
 
         ArrayList<PlayerGame> playersGames = new ArrayList<>();
@@ -207,6 +211,7 @@ public class PlayerGamesDbHelper {
         return playersGames;
     }
 
+    @NonNull
     public static ArrayList<PlayerGameStat> getPlayerLastGames(SQLiteDatabase db, Player player, int countLastGames) {
 
         ArrayList<PlayerGameStat> results = new ArrayList<>();
@@ -320,6 +325,7 @@ public class PlayerGamesDbHelper {
         return 0 < DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerGameEntry.TABLE_NAME);
     }
 
+    @NonNull
     public static ArrayList<Player> getPlayersStatistics(SQLiteDatabase db, int gameCount) {
         return getStatistics(db, gameCount, null);
     }
@@ -422,6 +428,7 @@ public class PlayerGamesDbHelper {
         return p;
     }
 
+    @NonNull
     public static HashMap<String, PlayerChemistry> getParticipationStatistics(SQLiteDatabase db, int gameCount, GamesPlayersCache cache, Date upTo, String name) {
 
         String limitGamesCount = "";
@@ -567,6 +574,7 @@ public class PlayerGamesDbHelper {
      * @param playerName Name of the player to check
      * @return The length of the longest unbeaten run
      */
+    @NonNull
     public static StreakInfo getLongestUnbeatenRun(SQLiteDatabase db, String playerName) {
 
         try (Cursor c = db.rawQuery(
@@ -620,6 +628,7 @@ public class PlayerGamesDbHelper {
         return new StreakInfo(0, null, null);
     }
 
+    @NonNull
     public static StreakInfo getConsecutiveAttendance(SQLiteDatabase db, String playerName) {
         // First get all unique game dates
         try (Cursor gamesDates = db.rawQuery(

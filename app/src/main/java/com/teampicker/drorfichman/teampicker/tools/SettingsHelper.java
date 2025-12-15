@@ -15,7 +15,6 @@ public class SettingsHelper {
     public static final String SETTING_RESET_TUTORIALS = "setting_clear_tutorial";
     public static final String SETTING_SHOW_HINTS = "pref_skip_all_tutorial";
     public static final String SETTING_SHOW_GRADES = "show_grades";
-    public static final String SETTING_AUTO_SYNC_CLOUD = "auto_sync_cloud";
 
     private static int getPreferenceValue(Context ctx, String preferenceKey, int defaultValue) {
         try {
@@ -56,17 +55,5 @@ public class SettingsHelper {
 
     public static boolean getShowGrades(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_SHOW_GRADES, true);
-    }
-
-    public static boolean getAutoSyncCloud(Context ctx) {
-        return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_AUTO_SYNC_CLOUD, false);
-    }
-
-    public static void setAutoSyncCloud(Context ctx, boolean set) {
-        PreferenceHelper.setSharedPreferenceBoolean(ctx, SETTING_AUTO_SYNC_CLOUD, set); // TODO check
-    }
-
-    public static boolean getShowHints(Context ctx) {
-        return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_SHOW_HINTS, true);
     }
 }

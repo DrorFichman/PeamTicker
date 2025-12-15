@@ -89,6 +89,7 @@ public class GameDbHelper {
         return getGames(c, -1).get(0);
     }
 
+    @NonNull
     public static ArrayList<Game> getGames(SQLiteDatabase db, String name) {
 
         Cursor c = db.rawQuery("select " +
@@ -106,6 +107,7 @@ public class GameDbHelper {
         return getGames(c, -1);
     }
 
+    @NonNull
     public static ArrayList<Game> getGames(SQLiteDatabase db, String name, String another) {
         Cursor c = db.rawQuery("select " +
                         " game_index, g.date as date, " +
@@ -122,6 +124,7 @@ public class GameDbHelper {
         return getGames(c, -1);
     }
 
+    @NonNull
     public static ArrayList<Game> getGames(SQLiteDatabase db, int limit) {
 
         int count = limit > 0 ? limit : -1;

@@ -222,18 +222,22 @@ public class DbHelper extends SQLiteOpenHelper {
         return player;
     }
 
+    @NonNull
     public static ArrayList<Player> getPlayersStatistics(Context context, int games) {
         return PlayerGamesDbHelper.getPlayersStatistics(getSqLiteDatabase(context), games);
     }
 
+    @NonNull
     public static HashMap<String, PlayerChemistry> getPlayersParticipationStatistics(Context context, String name, BuilderPlayerCollaborationStatistics params) {
         return getPlayersParticipationStatistics(context, params.games, params.upTo, params.cache, name);
     }
 
+    @NonNull
     public static HashMap<String, PlayerChemistry> getPlayersParticipationStatistics(Context context, int games, Date upTo, GamesPlayersCache cache, String name) {
         return PlayerGamesDbHelper.getParticipationStatistics(getSqLiteDatabase(context), games, cache, upTo, name);
     }
 
+    @NonNull
     public static ArrayList<Player> getPlayers(Context context) {
         ArrayList<Player> players = PlayerDbHelper.getPlayers(getSqLiteDatabase(context));
         return players;
@@ -246,6 +250,7 @@ public class DbHelper extends SQLiteOpenHelper {
         return players;
     }
 
+    @NonNull
     public static String[] getPlayersNames(Context ctx) {
         ArrayList<Player> players = DbHelper.getPlayers(ctx, 0, false);
         String[] allPlayerNames = new String[players.size()];
@@ -267,6 +272,7 @@ public class DbHelper extends SQLiteOpenHelper {
         return PlayerDbHelper.getComingPlayersCount(getSqLiteDatabase(context));
     }
 
+    @NonNull
     public static ArrayList<Player> getComingPlayers(Context context, int countLastGames) {
         ArrayList<Player> comingPlayers = PlayerDbHelper.getComingPlayers(getSqLiteDatabase(context));
         addLastGameStats(context, countLastGames, comingPlayers, countLastGames > 0);
@@ -298,14 +304,17 @@ public class DbHelper extends SQLiteOpenHelper {
         PlayerGamesDbHelper.addPlayerGame(getSqLiteDatabase(context), pg);
     }
 
+    @NonNull
     public static ArrayList<PlayerGame> getPlayersGames(Context ctx) {
         return PlayerGamesDbHelper.getPlayersGames(getSqLiteDatabase(ctx));
     }
 
+    @NonNull
     public static ArrayList<PlayerGameStat> getPlayerLastGames(Context context, Player player, int countLastGames) {
         return PlayerGamesDbHelper.getPlayerLastGames(getSqLiteDatabase(context), player, countLastGames);
     }
 
+    @NonNull
     public static ArrayList<Player> getCurrTeam(Context context, int currGame, TeamEnum team, int countLastGames) {
         ArrayList<Player> currTeam = PlayerGamesDbHelper.getCurrTeam(getSqLiteDatabase(context), currGame, team);
 
@@ -329,18 +338,22 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
+    @NonNull
     public static ArrayList<Game> getGames(Context context) {
         return GameDbHelper.getGames(getSqLiteDatabase(context), -1);
     }
 
+    @NonNull
     public static ArrayList<Game> getGames(Context context, int limit) {
         return GameDbHelper.getGames(getSqLiteDatabase(context), limit);
     }
 
+    @NonNull
     public static ArrayList<Game> getGames(Context context, String name) {
         return GameDbHelper.getGames(getSqLiteDatabase(context), name);
     }
 
+    @NonNull
     public static ArrayList<Game> getGames(Context context, String name, String another) {
         return GameDbHelper.getGames(getSqLiteDatabase(context), name, another);
     }
@@ -387,10 +400,12 @@ public class DbHelper extends SQLiteOpenHelper {
         return PlayerGamesDbHelper.getActiveGame(getSqLiteDatabase(context));
     }
 
+    @NonNull
     public static StreakInfo getLongestUnbeatenRun(Context context, String playerName) {
         return PlayerGamesDbHelper.getLongestUnbeatenRun(getSqLiteDatabase(context), playerName);
     }
 
+    @NonNull
     public static StreakInfo getConsecutiveAttendance(Context context, String playerName) {
         return PlayerGamesDbHelper.getConsecutiveAttendance(getSqLiteDatabase(context), playerName);
     }
