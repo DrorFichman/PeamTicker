@@ -48,45 +48,16 @@ public class GameDbHelper {
                 values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
-    public static boolean updateGameDate(SQLiteDatabase db, int gameId, String gameDate) {
+    public static void updateGameDate(SQLiteDatabase db, int gameId, String gameDate) {
         ContentValues values = new ContentValues();
         values.put(PlayerContract.GameEntry.DATE, gameDate);
 
         String where = PlayerContract.GameEntry.GAME + " = ? ";
         String[] whereArgs = new String[]{String.valueOf(gameId)};
 
-        return 0 < db.updateWithOnConflict(PlayerContract.GameEntry.TABLE_NAME,
+        db.updateWithOnConflict(PlayerContract.GameEntry.TABLE_NAME,
                 values,
                 where, whereArgs, SQLiteDatabase.CONFLICT_IGNORE);
-    }
-
-    public static Game getGame(SQLiteDatabase db, int gameId) {
-
-        String[] projection = {
-                PlayerContract.GameEntry.ID,
-                PlayerContract.GameEntry.GAME,
-                PlayerContract.GameEntry.DATE,
-                PlayerContract.GameEntry.TEAM_RESULT,
-                PlayerContract.GameEntry.TEAM1_SCORE,
-                PlayerContract.GameEntry.TEAM2_SCORE,
-        };
-
-        String where = PlayerContract.GameEntry.GAME + " = ? ";
-        String[] whereArgs = new String[]{String.valueOf(gameId)};
-
-        String sortOrder = PlayerContract.GameEntry.ID + " DESC";
-
-        Cursor c = db.query(
-                PlayerContract.GameEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                whereArgs,                            // The values for the WHERE clause
-                null,
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
-
-        return getGames(c, -1).get(0);
     }
 
     @NonNull
@@ -163,15 +134,15 @@ public class GameDbHelper {
             if (c.moveToFirst()) {
                 int i = 0;
                 do {
-                    Game g = new Game(c.getInt(c.getColumnIndex(PlayerContract.GameEntry.GAME)),
-                            c.getString(c.getColumnIndex(PlayerContract.GameEntry.DATE)),
-                            c.getInt(c.getColumnIndex(PlayerContract.GameEntry.TEAM1_SCORE)),
-                            c.getInt(c.getColumnIndex(PlayerContract.GameEntry.TEAM2_SCORE)));
+                    Game g = new Game(c.getInt(c.getColumnIndexOrThrow(PlayerContract.GameEntry.GAME)),
+                            c.getString(c.getColumnIndexOrThrow(PlayerContract.GameEntry.DATE)),
+                            c.getInt(c.getColumnIndexOrThrow(PlayerContract.GameEntry.TEAM1_SCORE)),
+                            c.getInt(c.getColumnIndexOrThrow(PlayerContract.GameEntry.TEAM2_SCORE)));
 
                     if (c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT) > 0)
-                        g.playerResult = ResultEnum.getResultFromOrdinal(c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT)));
+                        g.playerResult = ResultEnum.getResultFromOrdinal(c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_RESULT)));
                     if (c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_GRADE) > 0)
-                        g.playerGrade = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
+                        g.playerGrade = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
                     
                     // Check if player was MVP in this game
                     int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);

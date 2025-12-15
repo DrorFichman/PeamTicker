@@ -14,7 +14,6 @@ import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -27,7 +26,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "Players.db";
 
     private static SQLiteDatabase writableDatabase;
-    static HashMap<String, ArrayList<PlayerGameStat>> playersHistory = new HashMap();
+    static HashMap<String, ArrayList<PlayerGameStat>> playersHistory = new HashMap<>();
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -229,18 +228,17 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @NonNull
     public static HashMap<String, PlayerChemistry> getPlayersParticipationStatistics(Context context, String name, BuilderPlayerCollaborationStatistics params) {
-        return getPlayersParticipationStatistics(context, params.games, params.upTo, params.cache, name);
+        return getPlayersParticipationStatistics(context, params.games, params.cache, name);
     }
 
     @NonNull
-    public static HashMap<String, PlayerChemistry> getPlayersParticipationStatistics(Context context, int games, Date upTo, GamesPlayersCache cache, String name) {
-        return PlayerGamesDbHelper.getParticipationStatistics(getSqLiteDatabase(context), games, cache, upTo, name);
+    public static HashMap<String, PlayerChemistry> getPlayersParticipationStatistics(Context context, int games, GamesPlayersCache cache, String name) {
+        return PlayerGamesDbHelper.getParticipationStatistics(getSqLiteDatabase(context), games, cache, name);
     }
 
     @NonNull
     public static ArrayList<Player> getPlayers(Context context) {
-        ArrayList<Player> players = PlayerDbHelper.getPlayers(getSqLiteDatabase(context));
-        return players;
+        return PlayerDbHelper.getPlayers(getSqLiteDatabase(context));
     }
 
     @NonNull
@@ -264,8 +262,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @NonNull
     public static ArrayList<Player> getPlayersByIdentifier(Context context, ArrayList<String> names) {
-        ArrayList<Player> players = PlayerDbHelper.getPlayersByIdentifier(getSqLiteDatabase(context), names);
-        return players;
+        return PlayerDbHelper.getPlayersByIdentifier(getSqLiteDatabase(context), names);
     }
 
     public static int getComingPlayersCount(Context context) {

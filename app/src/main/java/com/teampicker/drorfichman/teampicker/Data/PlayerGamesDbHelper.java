@@ -12,7 +12,6 @@ import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -124,8 +123,8 @@ public class PlayerGamesDbHelper {
                             null, null, PlayerContract.PlayerGameEntry.ATTRIBUTES);
 
                     // age is saved at the time the game was played
-                    p.setAge(c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_AGE)));
-                    p.gameResult = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
+                    p.setAge(c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_AGE)));
+                    p.gameResult = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
                     
                     // Check if player was MVP in this game
                     int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);
@@ -175,7 +174,15 @@ public class PlayerGamesDbHelper {
         String sortOrder = "date(" + PlayerContract.PlayerGameEntry.DATE + ") DESC, " 
                 + PlayerContract.PlayerGameEntry.GAME + " DESC";
 
-        Cursor c = db.query(
+        // The table to query
+        // The columns to return
+        // The columns for the WHERE clause
+        // The values for the WHERE clause
+        // don't group the rows
+        // don't filter by row groups
+        // The sort order
+
+        try (Cursor c = db.query(
                 PlayerContract.PlayerGameEntry.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
@@ -183,29 +190,25 @@ public class PlayerGamesDbHelper {
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
                 sortOrder                                 // The sort order
-        );
-
-        try {
+        )) {
             if (c.moveToFirst()) {
                 do {
                     PlayerGame g = new PlayerGame();
-                    g.playerGrade = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
-                    g.date = c.getString(c.getColumnIndex(PlayerContract.PlayerGameEntry.DATE));
-                    g.playerAge = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_AGE));
+                    g.playerGrade = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
+                    g.date = c.getString(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.DATE));
+                    g.playerAge = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_AGE));
                     g.playerName = FirebaseHelper.sanitizeKey(c.getString(c.getColumnIndex(PlayerContract.PlayerGameEntry.NAME)));
-                    g.gameId = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.GAME));
-                    g.didWin = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.DID_WIN));
+                    g.gameId = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.GAME));
+                    g.didWin = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.DID_WIN));
 
-                    int res = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
+                    int res = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
                     g.result = ResultEnum.getResultFromOrdinal(res);
-                    int team = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.TEAM));
+                    int team = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.TEAM));
                     g.team = TeamEnum.getResultFromOrdinal(team);
 
                     playersGames.add(g);
                 } while (c.moveToNext());
             }
-        } finally {
-            c.close();
         }
 
         return playersGames;
@@ -237,7 +240,15 @@ public class PlayerGamesDbHelper {
                 + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " > ? ";
         String[] whereArgs = new String[]{player.mName, String.valueOf(EMPTY_RESULT)};
 
-        Cursor c = db.query(
+        // The table to query
+        // The columns to return
+        // The columns for the WHERE clause
+        // The values for the WHERE clause
+        // don't group the rows
+        // don't filter by row groups
+        // The sort order
+
+        try (Cursor c = db.query(
                 PlayerContract.PlayerGameEntry.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
                 where,                                // The columns for the WHERE clause
@@ -245,16 +256,14 @@ public class PlayerGamesDbHelper {
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
                 sortOrder                                 // The sort order
-        );
-
-        try {
+        )) {
             if (c.moveToFirst()) {
                 int i = 0;
                 do {
-                    int res = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
-                    int grade = c.getInt(c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
-                    String date = c.getString(c.getColumnIndex(PlayerContract.PlayerGameEntry.DATE));
-                    
+                    int res = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
+                    int grade = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
+                    String date = c.getString(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.DATE));
+
                     // Check if player was MVP in this game
                     boolean isMVP = false;
                     int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);
@@ -262,15 +271,13 @@ public class PlayerGamesDbHelper {
                         String attributes = c.getString(attrIndex);
                         isMVP = attributes != null && attributes.contains(PlayerAttribute.isMVP.displayName);
                     }
-                    
+
                     PlayerGameStat stat = new PlayerGameStat(ResultEnum.getResultFromOrdinal(res), grade, date, isMVP);
 
                     results.add(stat);
                     i++;
-                } while (c.moveToNext() && (i < countLastGames || countLastGames == -1));
+                } while (c.moveToNext() && (i < countLastGames));
             }
-        } finally {
-            c.close();
         }
 
         results.sort(Comparator.comparing(PlayerGameStat::getDate).reversed());
@@ -314,7 +321,7 @@ public class PlayerGamesDbHelper {
         DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerGameEntry.TABLE_NAME);
     }
 
-    public static boolean updateGameDate(SQLiteDatabase db, int gameId, String date) {
+    public static void updateGameDate(SQLiteDatabase db, int gameId, String date) {
 
         ContentValues values = new ContentValues();
         values.put(PlayerContract.PlayerGameEntry.DATE, date);
@@ -322,7 +329,7 @@ public class PlayerGamesDbHelper {
         String where = PlayerContract.PlayerGameEntry.GAME + " = ? ";
         String[] whereArgs = new String[]{String.valueOf(gameId)};
 
-        return 0 < DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerGameEntry.TABLE_NAME);
+        DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerGameEntry.TABLE_NAME);
     }
 
     @NonNull
@@ -332,7 +339,7 @@ public class PlayerGamesDbHelper {
 
     public static StatisticsData getPlayerStatistics(SQLiteDatabase db, int gameCount, String name) {
         ArrayList<Player> playersStatistics = getStatistics(db, gameCount, name);
-        if (playersStatistics.size() > 0) {
+        if (!playersStatistics.isEmpty()) {
             return playersStatistics.get(0).statistics;
         } else {
             Log.w("STAT", "Can't find player stats " + name);
@@ -429,7 +436,7 @@ public class PlayerGamesDbHelper {
     }
 
     @NonNull
-    public static HashMap<String, PlayerChemistry> getParticipationStatistics(SQLiteDatabase db, int gameCount, GamesPlayersCache cache, Date upTo, String name) {
+    public static HashMap<String, PlayerChemistry> getParticipationStatistics(SQLiteDatabase db, int gameCount, GamesPlayersCache cache, String name) {
 
         String limitGamesCount = "";
         if (gameCount > 0) {
@@ -454,7 +461,7 @@ public class PlayerGamesDbHelper {
                         limitGamesCount,
                 new String[]{name}, null);
 
-        HashMap<String, PlayerChemistry> result = new HashMap();
+        HashMap<String, PlayerChemistry> result = new HashMap<>();
 
         // Get teams based on player active games, aggregate player wins with and against teammates
         try {
@@ -533,19 +540,15 @@ public class PlayerGamesDbHelper {
 
     public static int getActiveGame(SQLiteDatabase db) {
 
-        Cursor c = db.rawQuery("select game " +
+        try (Cursor c = db.rawQuery("select game " +
                         " from player_game " +
                         " where " +
                         " result = " + PlayerGamesDbHelper.EMPTY_RESULT +
                         " order by game DESC ",
-                null, null);
-
-        try {
+                null, null)) {
             if (c.moveToFirst()) {
                 return c.getInt(c.getColumnIndex("game"));
             }
-        } finally {
-            c.close();
         }
 
         return -1;
@@ -553,16 +556,12 @@ public class PlayerGamesDbHelper {
 
     public static int getMaxGame(SQLiteDatabase db) {
 
-        Cursor c = db.rawQuery("select max(game) as curr_game " +
+        try (Cursor c = db.rawQuery("select max(game) as curr_game " +
                         " from player_game ",
-                null, null);
-
-        try {
+                null, null)) {
             if (c.moveToFirst()) {
                 return c.getInt(c.getColumnIndex("curr_game"));
             }
-        } finally {
-            c.close();
         }
 
         return 1;
