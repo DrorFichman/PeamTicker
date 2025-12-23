@@ -1,7 +1,6 @@
 package com.teampicker.drorfichman.teampicker.Adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,8 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
@@ -19,7 +20,6 @@ import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class PlayerAdapter extends ArrayAdapter<Player> {
 
-    private static int LAST_GAME_DAYS = 180;
+    private static final int LAST_GAME_DAYS = 180;
 
     public interface onPlayerComingChange {
         void playerComingChanged(boolean coming);
@@ -37,7 +37,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     private final Context context;
     private final List<Player> mAllPlayers;
     private List<Player> mDisplayedPlayers;
-    private onPlayerComingChange handler;
+    private final onPlayerComingChange handler;
     private String filterValue;
     private boolean showIndications = true;
 
@@ -63,8 +63,9 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         this.showIndications = showIndications;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.player_item, parent, false);
         TextView nameView = view.findViewById(R.id.player_name);
         TextView gradeView = view.findViewById(R.id.player_grade);
@@ -77,7 +78,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         final Player player = mDisplayedPlayers.get(position);
         view.setTag(player);
 
-        setName(view, nameView, player);
+        setName(nameView, player);
         setGrade(gradeView, player);
         setAge(ageView, player);
         setPlayerRecentPerformance(recentPerformance, player);
@@ -117,9 +118,9 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         });
     }
 
-    private void setName(View view, TextView name, Player player) {
+    private void setName(TextView name, Player player) {
         if (player.mName != null && isMsgIdentifier(player)) {
-            name.setText(player.mName + " (" + player.msgDisplayName + ")");
+            name.setText(String.format("%s (%s)", player.mName, player.msgDisplayName));
         } else if (player.mName != null) {
             name.setText(player.mName);
         } else if (isMsgIdentifier(player)) {

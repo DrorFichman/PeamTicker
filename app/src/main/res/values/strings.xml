@@ -34,6 +34,7 @@
 
     <!--    Buttons-->
     <string name="save">Save</string>
+    <string name="done">Done</string>
     <string name="cancel">Cancel</string>
     <string name="yes">yes</string>
     <string name="edit">Edit</string>

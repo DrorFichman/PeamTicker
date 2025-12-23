@@ -57,8 +57,7 @@ public class StatisticsFragment extends Fragment {
     }
 
     public static StatisticsFragment newInstance() {
-        StatisticsFragment fragment = new StatisticsFragment();
-        return fragment;
+        return new StatisticsFragment();
     }
 
     @Nullable
@@ -67,6 +66,7 @@ public class StatisticsFragment extends Fragment {
         View root = super.onCreateView(inflater, container, savedInstanceState);
         setHasOptionsMenu(true);
 
+        assert root != null;
         setPlayersList(root);
         setGamesCountSelection(root);
 
@@ -169,7 +169,7 @@ public class StatisticsFragment extends Fragment {
             currentFilterValue = value;
             playersAdapter.setFilter(value);
             playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem(() ->
-                    Snackbar.make(getContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));
+                    Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));
             backPress.setEnabled(handleBackPress());
         });
         if (playersAdapter != null) playersAdapter.setFilter(null);
@@ -193,7 +193,7 @@ public class StatisticsFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.statisctics_menu, menu);
         setSearchView((SearchView) menu.findItem(R.id.action_stat_search_players).getActionView());
         super.onCreateOptionsMenu(menu, inflater);

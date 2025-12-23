@@ -76,6 +76,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     // Tutorial target views
     private View makeTeamsButton;
+    private View exitPastedModeButton;
 
     public PlayersFragment() {
         super(R.layout.layout_players_fragment);
@@ -95,6 +96,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         assert root != null;
         playersList = root.findViewById(R.id.players_list);
         makeTeamsButton = root.findViewById(R.id.main_make_teams);
+        exitPastedModeButton = root.findViewById(R.id.exit_pasted_mode);
 
         refreshPlayers();
 
@@ -142,7 +144,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         }
         if (!shown) {
             // cloud - show as dialog since navigation drawer isn't easily targetable
-            shown = TutorialManager.displayTutorialStepAsDialog(activity, TutorialManager.Tutorials.cloud, false);
+            TutorialManager.displayTutorialStepAsDialog(activity, TutorialManager.Tutorials.cloud, false);
         }
     }
     //endregion
@@ -206,10 +208,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             }
 
             if (showPastedPlayers) {
-                showPastedPlayers = false;
-                mPastedPlayers = null;
-                refreshPlayers();
-                backPress.setEnabled(handleBackPress());
+                exitPastedPlayersMode();
                 return;
             }
 
@@ -326,6 +325,20 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void setActionButtons() {
         rootView.findViewById(R.id.main_make_teams).setOnClickListener(view -> launchMakeTeams());
+        exitPastedModeButton.setOnClickListener(view -> exitPastedPlayersMode());
+    }
+
+    private void exitPastedPlayersMode() {
+        showPastedPlayers = false;
+        mPastedPlayers = null;
+        updatePastedModeUI();
+        refreshPlayers();
+        backPress.setEnabled(handleBackPress());
+    }
+
+    private void updatePastedModeUI() {
+        makeTeamsButton.setVisibility(showPastedPlayers ? View.GONE : View.VISIBLE);
+        exitPastedModeButton.setVisibility(showPastedPlayers ? View.VISIBLE : View.GONE);
     }
 
     private void launchMakeTeams() {
@@ -544,6 +557,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         showPastedPlayers = true;
         mPastedPlayers = pasted;
         backPress.setEnabled(true);
+        updatePastedModeUI();
 
         String[] allPlayerNames = DbHelper.getPlayersNames(getContext());
         AdapterView.OnItemClickListener handler = (parent, view, position, id) -> {
@@ -632,7 +646,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             Log.i("Broadcast players", "new data");
             refreshPlayers();
             if (rootView != null) {
-                rootView.post(() -> showTutorials());
+                rootView.post(PlayersFragment.this::showTutorials);
             }
         }
     }

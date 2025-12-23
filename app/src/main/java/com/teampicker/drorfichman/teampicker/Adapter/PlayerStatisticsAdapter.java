@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.teampicker.drorfichman.teampicker.Controller.Search.FilterView;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
@@ -60,8 +62,9 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
         return mDisplayedPlayers != null ? mDisplayedPlayers.get(position) : null;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.player_statistics_item, parent, false);
 
         TextView nameView = view.findViewById(R.id.player_name);
