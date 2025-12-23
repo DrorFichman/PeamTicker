@@ -50,6 +50,7 @@ public class StatisticsFragment extends Fragment {
     private View gameCountSelection;
     private View chip50Games;
     private FilterView filterView;
+    private String currentFilterValue;
 
     public StatisticsFragment() {
         super(R.layout.layout_statistics_fragment);
@@ -132,6 +133,11 @@ public class StatisticsFragment extends Fragment {
         playersAdapter = new PlayerStatisticsAdapter(getContext(), players, getGamesCountFilter(), showInternalData);
         playersList.setAdapter(playersAdapter);
 
+        // Re-apply filter if active
+        if (currentFilterValue != null && !currentFilterValue.isEmpty()) {
+            playersAdapter.setFilter(currentFilterValue);
+        }
+
         setGameCountValues();
     }
 
@@ -160,6 +166,7 @@ public class StatisticsFragment extends Fragment {
 
     private void setSearchView(SearchView view) {
         filterView = new FilterView(view, value -> {
+            currentFilterValue = value;
             playersAdapter.setFilter(value);
             playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem(() ->
                     Snackbar.make(getContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));

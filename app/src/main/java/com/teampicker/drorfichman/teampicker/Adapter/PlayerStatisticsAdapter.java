@@ -3,7 +3,7 @@ package com.teampicker.drorfichman.teampicker.Adapter;
 import static com.teampicker.drorfichman.teampicker.tools.ColorHelper.setColorAlpha;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +23,8 @@ import java.util.List;
 public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
 
     private final Context context;
-    private final List<Player> mPlayers;
+    private final List<Player> mAllPlayers;
+    private List<Player> mDisplayedPlayers;
     private final int totalGamesCount;
     private final boolean isGradeVisible;
     private String filterName;
@@ -34,7 +35,8 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
     public PlayerStatisticsAdapter(Context ctx, List<Player> players, int gamesCount, boolean showGrades) {
         super(ctx, -1, players);
         context = ctx;
-        mPlayers = players;
+        mAllPlayers = players;
+        mDisplayedPlayers = players;
         isGradeVisible = showGrades;
         totalGamesCount = gamesCount;
 
@@ -49,6 +51,16 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
     }
 
     @Override
+    public int getCount() {
+        return mDisplayedPlayers != null ? mDisplayedPlayers.size() : 0;
+    }
+
+    @Override
+    public Player getItem(int position) {
+        return mDisplayedPlayers != null ? mDisplayedPlayers.get(position) : null;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.player_statistics_item, parent, false);
 
@@ -58,10 +70,9 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
         TextView successView = view.findViewById(R.id.stat_success);
         TextView winRateView = view.findViewById(R.id.stat_wins_percentage);
 
-        Player p = mPlayers.get(position);
+        Player p = mDisplayedPlayers.get(position);
 
         nameView.setText(p.mName);
-        view.setBackgroundColor(FilterView.match(p.mName, filterName) ? Color.GRAY : Color.TRANSPARENT);
 
         if (isGradeVisible && SettingsHelper.getShowGrades(context)) {
             gradeView.setText(String.valueOf(p.mGrade));
@@ -87,10 +98,20 @@ public class PlayerStatisticsAdapter extends ArrayAdapter<Player> {
 
     public void setFilter(String name) {
         filterName = name;
+        if (TextUtils.isEmpty(name)) {
+            mDisplayedPlayers = mAllPlayers;
+        } else {
+            mDisplayedPlayers = mAllPlayers.stream()
+                    .filter(p -> FilterView.match(p.filterBy(), name))
+                    .collect(java.util.stream.Collectors.toList());
+        }
         notifyDataSetChanged();
     }
 
-    public int positionOfFirstFilterItem(FilterView.onFilterNoResults  handler) {
-        return FilterView.positionOfFirstFilterItem(mPlayers, filterName, handler);
+    public int positionOfFirstFilterItem(FilterView.onFilterNoResults handler) {
+        if (mDisplayedPlayers.isEmpty() && !TextUtils.isEmpty(filterName)) {
+            if (handler != null) handler.noFilterResults();
+        }
+        return 0;
     }
 }

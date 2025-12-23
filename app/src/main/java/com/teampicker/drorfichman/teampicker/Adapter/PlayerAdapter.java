@@ -19,6 +19,7 @@ import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +35,8 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     }
 
     private final Context context;
-    private final List<Player> mPlayers;
+    private final List<Player> mAllPlayers;
+    private List<Player> mDisplayedPlayers;
     private onPlayerComingChange handler;
     private String filterValue;
     private boolean showIndications = true;
@@ -42,8 +44,19 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
     public PlayerAdapter(Context ctx, List<Player> players, onPlayerComingChange caller) {
         super(ctx, -1, players);
         context = ctx;
-        mPlayers = players;
+        mAllPlayers = players;
+        mDisplayedPlayers = players;
         handler = caller;
+    }
+
+    @Override
+    public int getCount() {
+        return mDisplayedPlayers != null ? mDisplayedPlayers.size() : 0;
+    }
+
+    @Override
+    public Player getItem(int position) {
+        return mDisplayedPlayers != null ? mDisplayedPlayers.get(position) : null;
     }
 
     public void setShowIndications(boolean showIndications) {
@@ -61,7 +74,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         TextView ageView = view.findViewById(R.id.player_age);
         TextView attributes = view.findViewById(R.id.player_attributes);
 
-        final Player player = mPlayers.get(position);
+        final Player player = mDisplayedPlayers.get(position);
         view.setTag(player);
 
         setName(view, nameView, player);
@@ -114,8 +127,6 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         } else {
             name.setText("");
         }
-
-        view.setBackgroundColor(FilterView.match(player.mName, filterValue) ? Color.GRAY : Color.TRANSPARENT);
     }
 
     private void setAttributes(TextView attributes, Player player) {
@@ -172,10 +183,20 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
 
     public void setFilter(String value) {
         filterValue = value;
+        if (TextUtils.isEmpty(value)) {
+            mDisplayedPlayers = mAllPlayers;
+        } else {
+            mDisplayedPlayers = mAllPlayers.stream()
+                    .filter(p -> FilterView.match(p.filterBy(), value))
+                    .collect(java.util.stream.Collectors.toList());
+        }
         notifyDataSetChanged();
     }
 
-    public int positionOfFirstFilterItem(FilterView.onFilterNoResults  handler) {
-        return FilterView.positionOfFirstFilterItem(mPlayers, filterValue, handler);
+    public int positionOfFirstFilterItem(FilterView.onFilterNoResults handler) {
+        if (mDisplayedPlayers.isEmpty() && !TextUtils.isEmpty(filterValue)) {
+            if (handler != null) handler.noFilterResults();
+        }
+        return 0;
     }
 }

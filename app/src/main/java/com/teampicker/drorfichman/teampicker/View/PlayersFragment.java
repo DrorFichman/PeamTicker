@@ -68,6 +68,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private View rootView;
     private ListView playersList;
     private FilterView filterView;
+    private String currentFilterValue;
 
     private PlayerAdapter playersAdapter;
 
@@ -273,10 +274,16 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void setSearchView(SearchView view) {
         filterView = new FilterView(view, value -> {
-            playersAdapter.setFilter(value);
-            int pos = playersAdapter.positionOfFirstFilterItem(() ->
-                    Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show());
-            playersList.smoothScrollToPosition(pos);
+            currentFilterValue = value;
+            if (TextUtils.isEmpty(value)) {
+                // Refresh the list to apply sorting after search is cleared
+                refreshPlayers();
+            } else {
+                playersAdapter.setFilter(value);
+                int pos = playersAdapter.positionOfFirstFilterItem(() ->
+                        Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show());
+                playersList.smoothScrollToPosition(pos);
+            }
             backPress.setEnabled(handleBackPress());
         });
         if (playersAdapter != null) playersAdapter.setFilter(null);
@@ -373,6 +380,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         setPlayersList(players, null);
 
         sorting.sort(players);
+
+        // Re-apply filter if active
+        if (!TextUtils.isEmpty(currentFilterValue)) {
+            playersAdapter.setFilter(currentFilterValue);
+        }
     }
 
     private void switchArchivedPlayersView() {

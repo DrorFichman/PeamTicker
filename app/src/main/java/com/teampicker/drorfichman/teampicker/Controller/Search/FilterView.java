@@ -45,7 +45,7 @@ public class FilterView {
     }
 
     public static boolean match(String value, String filter) {
-        return (value != null && filter != null && !filter.isEmpty() && value.contains(filter));
+        return (value != null && filter != null && !filter.isEmpty() && value.toLowerCase().contains(filter.toLowerCase()));
     }
 
     public interface onFilterNoResults {
