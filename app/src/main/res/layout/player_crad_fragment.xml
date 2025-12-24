@@ -168,16 +168,23 @@
         <!-- Save Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/save"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="8dp"
+            android:backgroundTint="#4CAF50"
+            android:elevation="4dp"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:text="@string/save"
             android:textAllCaps="false"
-            app:cornerRadius="8dp" />
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:cornerRadius="8dp"
+            app:icon="@drawable/done"
+            app:iconPadding="8dp"
+            app:iconTint="@android:color/white" />
 
     </LinearLayout>
 </ScrollView>
