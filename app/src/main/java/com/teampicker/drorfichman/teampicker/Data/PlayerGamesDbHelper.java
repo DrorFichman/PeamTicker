@@ -146,11 +146,14 @@ public class PlayerGamesDbHelper {
     public static void clearOldGameTeams(SQLiteDatabase db) {
         Log.d("teams", "Clear old Game teams ");
 
-        // Delete only empty result and rows with EMPTY_RESULT = -10 value
+        // Delete empty result (-10), missed result (-9), and null result rows
+        // This ensures missed player records don't create orphaned entries
         int n = db.delete(PlayerContract.PlayerGameEntry.TABLE_NAME,
                 PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NULL OR " +
+                        PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ? OR " +
                         PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ? ",
-                new String[]{String.valueOf(PlayerGamesDbHelper.EMPTY_RESULT)});
+                new String[]{String.valueOf(PlayerGamesDbHelper.EMPTY_RESULT), 
+                        String.valueOf(PlayerGamesDbHelper.MISSED_GAME)});
 
         Log.d("teams", "deleted games players " + n);
     }
@@ -222,41 +225,25 @@ public class PlayerGamesDbHelper {
             return results;
         }
 
-        String[] projection = {
-                PlayerContract.PlayerGameEntry.NAME,
-                PlayerContract.PlayerGameEntry.GAME,
-                PlayerContract.PlayerGameEntry.DATE,
-                PlayerContract.PlayerGameEntry.PLAYER_RESULT,
-                PlayerContract.PlayerGameEntry.PLAYER_GRADE,
-                PlayerContract.PlayerGameEntry.ATTRIBUTES
-        };
+        StringBuilder debugLog = new StringBuilder();
+        debugLog.append("getPlayerLastGames for ").append(player.mName).append(": ");
 
-        // How you want the results sorted in the resulting Cursor
-        // Sort by date first (DESC), then by game ID (DESC) for games on the same date
-        String sortOrder = "date(" + PlayerContract.PlayerGameEntry.DATE + ") DESC, " 
-                + PlayerContract.PlayerGameEntry.GAME + " DESC";
+        // Join with game table to only return results for games that actually exist
+        // This filters out orphaned player_game records from deleted games
+        String query = "SELECT pg." + PlayerContract.PlayerGameEntry.GAME + ", " +
+                "pg." + PlayerContract.PlayerGameEntry.DATE + ", " +
+                "pg." + PlayerContract.PlayerGameEntry.PLAYER_RESULT + ", " +
+                "pg." + PlayerContract.PlayerGameEntry.PLAYER_GRADE + ", " +
+                "pg." + PlayerContract.PlayerGameEntry.ATTRIBUTES +
+                " FROM " + PlayerContract.PlayerGameEntry.TABLE_NAME + " pg " +
+                " INNER JOIN " + PlayerContract.GameEntry.TABLE_NAME + " g " +
+                " ON pg." + PlayerContract.PlayerGameEntry.GAME + " = g." + PlayerContract.GameEntry.GAME +
+                " WHERE pg." + PlayerContract.PlayerGameEntry.NAME + " = ? " +
+                " AND pg." + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " > ? " +
+                " ORDER BY date(pg." + PlayerContract.PlayerGameEntry.DATE + ") DESC, " +
+                "pg." + PlayerContract.PlayerGameEntry.GAME + " DESC";
 
-        String where = PlayerContract.PlayerGameEntry.NAME + " = ? AND "
-                + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " > ? ";
-        String[] whereArgs = new String[]{player.mName, String.valueOf(EMPTY_RESULT)};
-
-        // The table to query
-        // The columns to return
-        // The columns for the WHERE clause
-        // The values for the WHERE clause
-        // don't group the rows
-        // don't filter by row groups
-        // The sort order
-
-        try (Cursor c = db.query(
-                PlayerContract.PlayerGameEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                whereArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        )) {
+        try (Cursor c = db.rawQuery(query, new String[]{player.mName, String.valueOf(EMPTY_RESULT)})) {
             if (c.moveToFirst()) {
                 int i = 0;
                 do {
@@ -272,7 +259,8 @@ public class PlayerGamesDbHelper {
                         isMVP = attributes != null && attributes.contains(PlayerAttribute.isMVP.displayName);
                     }
 
-                    PlayerGameStat stat = new PlayerGameStat(ResultEnum.getResultFromOrdinal(res), grade, date, isMVP);
+                    ResultEnum resultEnum = ResultEnum.getResultFromOrdinal(res);
+                    PlayerGameStat stat = new PlayerGameStat(resultEnum, grade, date, isMVP);
 
                     results.add(stat);
                     i++;

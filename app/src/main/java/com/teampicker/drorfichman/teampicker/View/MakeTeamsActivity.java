@@ -552,6 +552,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private void cancelSetResults() {
         mvpPlayers.clear();
+        missedPlayers.clear();
         displayResultsViews(false);
         setActivityTitle(null);
     }
