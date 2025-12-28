@@ -58,7 +58,6 @@ import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
