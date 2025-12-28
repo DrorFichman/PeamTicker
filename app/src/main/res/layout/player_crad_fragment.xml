@@ -30,7 +30,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:text="Basic Info"
+                    android:text="@string/basic_info"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimary" />
@@ -114,7 +114,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:text="Properties"
+                    android:text="@string/properties"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimary" />
@@ -130,35 +130,35 @@
                         style="@style/PropertyChip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="GK" />
+                        android:text="@string/gk" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/player_is_defender"
                         style="@style/PropertyChip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Defender" />
+                        android:text="@string/defender" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/player_is_playmaker"
                         style="@style/PropertyChip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Playmaker" />
+                        android:text="@string/playmaker" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/player_is_unbreaking"
                         style="@style/PropertyChip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Unbreakable" />
+                        android:text="@string/unbreakable" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/player_is_extra"
                         style="@style/PropertyChip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Extra" />
+                        android:text="@string/extra" />
 
                 </com.google.android.material.chip.ChipGroup>
 

@@ -22,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
@@ -48,7 +49,6 @@ import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.DateHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
-import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 import com.teampicker.drorfichman.teampicker.tools.WeatherService;
 import com.teampicker.drorfichman.teampicker.tools.WeatherSettingsDialog;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
@@ -99,7 +99,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     TextView progressBarTeamDivisionStatus;
     private View teamStatsLayout;
     private View buttonsLayout;
-    private View shuffleLayout, moveLayout, saveLayout;
+    private View shuffleLayout, moveLayout;
 
     private Toolbar toolbar;
     private Button shuffleView, moveView, saveView;
@@ -121,7 +121,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     @Nullable
     public static Intent getIntent(Context ctx) {
         ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(ctx, 0);
-        if (comingPlayers.size() > 0) {
+        if (!comingPlayers.isEmpty()) {
             Event.logEvent(FirebaseAnalytics.getInstance(ctx), EventType.make_teams);
             TutorialManager.userActionTaken(ctx, TutorialManager.TutorialUserAction.clicked_teams);
             return new Intent(ctx, MakeTeamsActivity.class);
@@ -130,9 +130,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
     }
 
-    public static Intent setResult(Intent intent) {
+    public static void setResult(Intent intent) {
         intent.putExtra(MakeTeamsActivity.SET_RESULT, true);
-        return intent;
     }
 
     @Override
@@ -167,7 +166,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
         buttonsLayout = findViewById(R.id.buttons_layout);
         shuffleLayout = findViewById(R.id.shuffle_views);
         moveLayout = findViewById(R.id.move_views);
-        saveLayout = findViewById(R.id.save_views);
         progressBarTeamDivision = findViewById(R.id.calculating_teams_progress);
         progressBarTeamDivisionStatus = findViewById(R.id.calculating_teams_progress_status);
 
@@ -241,16 +239,12 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_analysis:
-                analysisClicked();
-                break;
-            case R.id.action_enter_results:
-                initSetResults();
-                break;
-            case R.id.action_share:
-                onSendClicked();
-                break;
+        if (item.getItemId() == R.id.action_analysis) {
+            analysisClicked();
+        } else if (item.getItemId() == R.id.action_enter_results) {
+            initSetResults();
+        } else if (item.getItemId() == R.id.action_share) {
+            onSendClicked();
         }
 
         return super.onOptionsItemSelected(item);
@@ -293,7 +287,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
         if (!shown) {
             // team_analysis tutorial targets the analysis menu item in the toolbar
-            shown = TutorialManager.displayTutorialStepOnMenuItem(this, 
+            TutorialManager.displayTutorialStepOnMenuItem(this,
                     TutorialManager.Tutorials.team_analysis, toolbar, R.id.action_analysis, false);
         }
     }
@@ -316,12 +310,12 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 benchedPlayers = DbHelper.getCurrTeam(this, currGame, TeamEnum.Bench, RECENT_GAMES);
 
                 boolean changed = handleComingChanges(getPlayers());
-                if (benchedPlayers.size() > 0) {
+                if (!benchedPlayers.isEmpty()) {
                     enterMoveMode();
                     if (changed) {
                         Snackbar.make(this, benchListLayout, "Notice: some players are benched", Snackbar.LENGTH_SHORT).show();
 
-                        new Handler().postDelayed((Runnable) this::showMoveOptions, 300);
+                        new Handler().postDelayed(this::showMoveOptions, 300);
                     }
                 }
 
@@ -331,17 +325,17 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private boolean handleComingChanges(ArrayList<Player> comingPlayers) {
-        boolean isChanged = false;
+        boolean isChanged;
 
         HashMap<String, Player> all = new HashMap<>();
         for (Player coming : comingPlayers) {
             all.put(coming.mName, coming);
         }
 
-        isChanged = removeNonComingPlayers(players1, all) || isChanged;
+        isChanged = removeNonComingPlayers(players1, all);
         isChanged = removeNonComingPlayers(players2, all) || isChanged;
         isChanged = removeNonComingPlayers(benchedPlayers, all) || isChanged;
-        isChanged = isChanged || all.values().size() > 0;
+        isChanged = isChanged || !all.isEmpty();
 
         benchedPlayers.addAll(all.values());
 
@@ -436,23 +430,22 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
     }
 
-    private boolean setShuffleState(TeamDivision.DivisionStrategy state) {
+    private void setShuffleState(TeamDivision.DivisionStrategy state) {
         switch (state) {
             case Age:
                 selectedDivision = TeamDivision.DivisionStrategy.Age;
                 PreferenceHelper.setSharedPreferenceString(MakeTeamsActivity.this, PreferenceHelper.pref_shuffle, selectedDivision.text);
                 shuffleView.setText(getString(R.string.shuffle_age));
-                return true;
+                return;
             case Optimize:
                 selectedDivision = TeamDivision.DivisionStrategy.Optimize;
                 PreferenceHelper.setSharedPreferenceString(MakeTeamsActivity.this, PreferenceHelper.pref_shuffle, selectedDivision.text);
                 shuffleView.setText(getString(R.string.shuffle_stats));
-                return true;
+                return;
             default:
                 selectedDivision = TeamDivision.DivisionStrategy.Grade;
                 PreferenceHelper.setSharedPreferenceString(MakeTeamsActivity.this, PreferenceHelper.pref_shuffle, selectedDivision.text);
                 shuffleView.setText(getString(R.string.shuffle_grade));
-                return true;
         }
     }
 
@@ -460,18 +453,17 @@ public class MakeTeamsActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(MakeTeamsActivity.this, shuffleOptions);
         popup.getMenuInflater().inflate(R.menu.shuffle_options, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.divide_by_age:
-                    setShuffleState(TeamDivision.DivisionStrategy.Age);
-                    return true;
-                case R.id.divide_by_grade:
-                    setShuffleState(TeamDivision.DivisionStrategy.Grade);
-                    return true;
-                case R.id.divide_by_ai:
-                    setShuffleState(TeamDivision.DivisionStrategy.Optimize);
-                    return true;
-                default:
-                    return false;
+            if (item.getItemId() == R.id.divide_by_age) {
+                setShuffleState(TeamDivision.DivisionStrategy.Age);
+                return true;
+            } else if (item.getItemId() == R.id.divide_by_grade) {
+                setShuffleState(TeamDivision.DivisionStrategy.Grade);
+                return true;
+            } else if (item.getItemId() == R.id.divide_by_ai) {
+                setShuffleState(TeamDivision.DivisionStrategy.Optimize);
+                return true;
+            } else {
+                return false;
             }
         });
         popup.show();
@@ -709,8 +701,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions,
-                                           int[] grantResults) {
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == 1) {
@@ -751,7 +743,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         updateStats();
 
-        moveView.setText(benchedPlayers.size() == 0 ?
+        moveView.setText(benchedPlayers.isEmpty() ?
                 getString(R.string.move_players) :
                 getString(R.string.move_players_bench, benchedPlayers.size()));
     }
@@ -811,7 +803,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void sortPlayerNames(ArrayList<Player> playersList) {
-        Collections.sort(playersList, Comparator.comparing(p -> p.mName));
+        playersList.sort(Comparator.comparing(p -> p.mName));
     }
 
     AdapterView.OnItemClickListener playerClicked = new AdapterView.OnItemClickListener() {
@@ -879,7 +871,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         return mMoveMode;
     }
 
-    private View.OnClickListener onMoveClicked = view -> {
+    private final View.OnClickListener onMoveClicked = view -> {
         if (!backFromMove()) { // enter move mode
             // TODO Snackbar.make(list1, R.string.operation_move, Snackbar.LENGTH_SHORT).show();
             enterMoveMode();
@@ -934,7 +926,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private ArrayList<Player> getMovedPlayers() {
-        ArrayList<Player> list = new ArrayList<Player>();
+        ArrayList<Player> list = new ArrayList<>();
         list.addAll(movedPlayers);
         list.addAll(returnFromBenchPlayers);
         return list;
@@ -944,21 +936,20 @@ public class MakeTeamsActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(MakeTeamsActivity.this, moveOptions);
         popup.getMenuInflater().inflate(R.menu.move_options, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.move_empty_bench_left:
-                    clearBench(PlayerTeam.Team1);
-                    return true;
-                case R.id.move_empty_bench_right:
-                    clearBench(PlayerTeam.Team2);
-                    return true;
-                case R.id.move_switch_teams:
-                    ArrayList<Player> temp = players1;
-                    players1 = players2;
-                    players2 = temp;
-                    refreshPlayers();
-                    return true;
-                default:
-                    return false;
+            if (item.getItemId() == R.id.move_empty_bench_left) {
+                clearBench(PlayerTeam.Team1);
+                return true;
+            } else if (item.getItemId() == R.id.move_empty_bench_right) {
+                clearBench(PlayerTeam.Team2);
+                return true;
+            } else if (item.getItemId() == R.id.move_switch_teams) {
+                ArrayList<Player> temp = players1;
+                players1 = players2;
+                players2 = temp;
+                refreshPlayers();
+                return true;
+            } else {
+                return false;
             }
         });
         popup.show();

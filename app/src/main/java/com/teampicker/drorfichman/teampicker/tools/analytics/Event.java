@@ -12,6 +12,7 @@ public class Event {
     EventType eventType;
     Bundle parameters;
 
+    @SafeVarargs
     public Event(EventType event, Pair<ParameterType, String>... values) {
         eventType = event;
         parameters = new Bundle();

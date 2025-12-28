@@ -200,7 +200,7 @@ public class PlayerGamesDbHelper {
                     g.playerGrade = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
                     g.date = c.getString(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.DATE));
                     g.playerAge = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_AGE));
-                    g.playerName = FirebaseHelper.sanitizeKey(c.getString(c.getColumnIndex(PlayerContract.PlayerGameEntry.NAME)));
+                    g.playerName = FirebaseHelper.sanitizeKey(c.getString(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.NAME)));
                     g.gameId = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.GAME));
                     g.didWin = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.DID_WIN));
 
@@ -385,9 +385,9 @@ public class PlayerGamesDbHelper {
                             null, null,
                             "player_attributes");
 
-                    int games = c.getInt(c.getColumnIndex("results_count"));
-                    int success = c.getInt(c.getColumnIndex("results_sum"));
-                    int wins = c.getInt(c.getColumnIndex("results_wins"));
+                    int games = c.getInt(c.getColumnIndexOrThrow("results_count"));
+                    int success = c.getInt(c.getColumnIndexOrThrow("results_sum"));
+                    int wins = c.getInt(c.getColumnIndexOrThrow("results_wins"));
 
                     StatisticsData s = new StatisticsData(games, success, wins);
                     p.setStatistics(s);
@@ -455,9 +455,9 @@ public class PlayerGamesDbHelper {
         try {
             if (c.moveToFirst()) {
                 do {
-                    int currGame = c.getInt(c.getColumnIndex("game"));
-                    ResultEnum gameResult = ResultEnum.getResultFromOrdinal(c.getInt(c.getColumnIndex("result")));
-                    int collaboratorTeam = c.getInt(c.getColumnIndex("team"));
+                    int currGame = c.getInt(c.getColumnIndexOrThrow("game"));
+                    ResultEnum gameResult = ResultEnum.getResultFromOrdinal(c.getInt(c.getColumnIndexOrThrow("result")));
+                    int collaboratorTeam = c.getInt(c.getColumnIndexOrThrow("team"));
 
                     ArrayList<Player> team1;
                     ArrayList<Player> team2;
@@ -535,7 +535,7 @@ public class PlayerGamesDbHelper {
                         " order by game DESC ",
                 null, null)) {
             if (c.moveToFirst()) {
-                return c.getInt(c.getColumnIndex("game"));
+                return c.getInt(c.getColumnIndexOrThrow("game"));
             }
         }
 
@@ -548,7 +548,7 @@ public class PlayerGamesDbHelper {
                         " from player_game ",
                 null, null)) {
             if (c.moveToFirst()) {
-                return c.getInt(c.getColumnIndex("curr_game"));
+                return c.getInt(c.getColumnIndexOrThrow("curr_game"));
             }
         }
 
@@ -583,8 +583,8 @@ public class PlayerGamesDbHelper {
 
             if (c.moveToFirst()) {
                 do {
-                    int result = c.getInt(c.getColumnIndex("player_result"));
-                    String date = c.getString(c.getColumnIndex("date"));
+                    int result = c.getInt(c.getColumnIndexOrThrow("player_result"));
+                    String date = c.getString(c.getColumnIndexOrThrow("date"));
 
                     if (result == LOSE) {
                         // Reset streak on loss
@@ -638,7 +638,7 @@ public class PlayerGamesDbHelper {
                 if (playerGamesCursor.moveToFirst()) {
                     do {
                         playerGameDates.add(
-                                playerGamesCursor.getString(playerGamesCursor.getColumnIndex(PlayerContract.PlayerGameEntry.DATE)));
+                                playerGamesCursor.getString(playerGamesCursor.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.DATE)));
                     } while (playerGamesCursor.moveToNext());
                 }
             }
@@ -651,7 +651,7 @@ public class PlayerGamesDbHelper {
 
             if (gamesDates.moveToFirst()) {
                 do {
-                    String currentGameDate = gamesDates.getString(gamesDates.getColumnIndex(PlayerContract.PlayerGameEntry.DATE));
+                    String currentGameDate = gamesDates.getString(gamesDates.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.DATE));
                     boolean hadGameOnCurrentDate = playerGameDates.contains(currentGameDate);
 
                     if (hadGameOnCurrentDate) {
