@@ -332,6 +332,11 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         setComingPlayersCount();
     }
 
+    private void onPlayerGradeChanged(Player player, int newGrade) {
+        DbHelper.updatePlayerGrade(getContext(), player.mName, newGrade);
+        Log.i("Grade", "Player grade changed: " + player.mName + " -> " + newGrade);
+    }
+
     private void setComingPlayersCount() {
         ((Button) rootView.findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, DbHelper.getComingPlayersCount(getContext())));
     }
@@ -414,6 +419,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         setHeadlines(true);
         playersAdapter = new PlayerAdapter(getContext(), players, this::onPlayerComingChanged);
         playersAdapter.setShowIndications(shouldShowIndications());
+        playersAdapter.setOnPlayerGradeChangeListener(this::onPlayerGradeChanged);
 
         if (clickHandler != null) {
             playersList.setOnItemClickListener(clickHandler);
