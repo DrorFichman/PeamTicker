@@ -28,6 +28,9 @@ import java.util.Calendar;
 
 public class PlayerDetailsFragment extends Fragment {
 
+    private static final String ARG_PLAYER = "player";
+    private static final String ARG_IDENTIFIER = "identifier";
+
     public interface PlayerUpdated {
         void onUpdate(String name);
     }
@@ -51,10 +54,21 @@ public class PlayerDetailsFragment extends Fragment {
 
     public static PlayerDetailsFragment newInstance(Player p, String identifier, PlayerUpdated update) {
         PlayerDetailsFragment playerCardFragment = new PlayerDetailsFragment();
-        playerCardFragment.player = p;
-        playerCardFragment.createFromIdentifier = identifier;
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_PLAYER, p);
+        args.putString(ARG_IDENTIFIER, identifier);
+        playerCardFragment.setArguments(args);
         playerCardFragment.updateListener = update;
         return playerCardFragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            player = (Player) getArguments().getSerializable(ARG_PLAYER);
+            createFromIdentifier = getArguments().getString(ARG_IDENTIFIER);
+        }
     }
 
     @Nullable
@@ -109,7 +123,12 @@ public class PlayerDetailsFragment extends Fragment {
         LocalNotifications.sendNotification(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION);
 
         Toast.makeText(getContext(), "Player saved", Toast.LENGTH_SHORT).show();
-        updateListener.onUpdate(player.mName);
+        if (updateListener != null) {
+            updateListener.onUpdate(player.mName);
+        } else if (getActivity() != null) {
+            // Fallback for process death scenario - just close the activity
+            getActivity().finish();
+        }
     };
 
     private String verifyName() {

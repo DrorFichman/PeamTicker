@@ -65,6 +65,7 @@ public class PlayerChemistryActivity extends AppCompatActivity {
         return intent;
     }
 
+    /** @noinspection unchecked*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
