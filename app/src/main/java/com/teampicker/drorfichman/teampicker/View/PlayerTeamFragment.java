@@ -43,6 +43,10 @@ import java.util.HashMap;
 
 public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallbacks {
 
+    private static final String ARG_PLAYER = "player";
+    private static final String ARG_BLUE_TEAM = "blue_team";
+    private static final String ARG_ORANGE_TEAM = "orange_team";
+
     private final ArrayList<PlayerChemistry> players = new ArrayList<>();
     private PlayerChemistryAdapter playersAdapter;
     private Player pPlayer;
@@ -66,10 +70,11 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
     public static PlayerTeamFragment newInstance(Player p,
                                                  ArrayList<Player> blueTeam, ArrayList<Player> orangeTeam) {
         PlayerTeamFragment fragment = new PlayerTeamFragment();
-        fragment.pPlayer = p;
-        fragment.orange = orangeTeam;
-        fragment.blue = blueTeam;
-
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_PLAYER, p);
+        args.putSerializable(ARG_BLUE_TEAM, blueTeam);
+        args.putSerializable(ARG_ORANGE_TEAM, orangeTeam);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -77,6 +82,12 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
+
+        // Handle case where player data is missing (e.g., after process death with invalid data)
+        if (pPlayer == null && getActivity() != null) {
+            getActivity().finish();
+            return root;
+        }
 
         assert root != null;
         playersList = root.findViewById(R.id.players_participation_list);
@@ -116,9 +127,17 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
                 });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Restore arguments (handles process death recreation)
+        if (getArguments() != null) {
+            pPlayer = (Player) getArguments().getSerializable(ARG_PLAYER);
+            blue = (ArrayList<Player>) getArguments().getSerializable(ARG_BLUE_TEAM);
+            orange = (ArrayList<Player>) getArguments().getSerializable(ARG_ORANGE_TEAM);
+        }
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this, backPress);
         backPress.setEnabled(false);
@@ -202,7 +221,7 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
 
     private void refreshPlayers() {
         Context context = getContext();
-        if (context == null) return;
+        if (context == null || pPlayer == null) return;
 
         HashMap<String, PlayerChemistry> result = DbHelper.getPlayersParticipationStatistics(context, pPlayer.mName,
                 new BuilderPlayerCollaborationStatistics().setGames(games));

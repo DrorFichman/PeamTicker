@@ -79,6 +79,12 @@ public class PlayerChemistryActivity extends AppCompatActivity {
             recentGames = intent.getIntExtra(EXTRA_RECENT_GAMES, 50);
         }
 
+        // Handle case where player couldn't be loaded (e.g., after process death with invalid data)
+        if (pPlayer == null) {
+            finish();
+            return;
+        }
+
         Fragment existingFragment = getSupportFragmentManager().findFragmentById(R.id.collaboration_container);
 
         if (existingFragment == null) {
