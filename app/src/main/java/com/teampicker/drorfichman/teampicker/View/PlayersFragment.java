@@ -64,6 +64,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private boolean showArchivedPlayers = false;
     private boolean showPastedPlayers = false;
     private Set<String> mPastedPlayers;
+    private Set<String> mAutoCreatedPlayers = new HashSet<>(); // Track auto-created players for undo
 
     private View rootView;
     private ListView playersList;
@@ -77,6 +78,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     // Tutorial target views
     private View makeTeamsButton;
     private View exitPastedModeButton;
+    private View cancelPastedModeButton;
 
     public PlayersFragment() {
         super(R.layout.layout_players_fragment);
@@ -97,6 +99,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         playersList = root.findViewById(R.id.players_list);
         makeTeamsButton = root.findViewById(R.id.main_make_teams);
         exitPastedModeButton = root.findViewById(R.id.exit_pasted_mode);
+        cancelPastedModeButton = root.findViewById(R.id.cancel_pasted_mode);
 
         refreshPlayers();
 
@@ -208,7 +211,12 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             }
 
             if (showPastedPlayers) {
-                exitPastedPlayersMode();
+                // If there are auto-created players, cancel (undo) instead of just exiting
+                if (!mAutoCreatedPlayers.isEmpty()) {
+                    cancelPastedPlayersMode();
+                } else {
+                    exitPastedPlayersMode();
+                }
                 return;
             }
 
@@ -325,20 +333,54 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void setActionButtons() {
         rootView.findViewById(R.id.main_make_teams).setOnClickListener(view -> launchMakeTeams());
-        exitPastedModeButton.setOnClickListener(view -> exitPastedPlayersMode());
+        exitPastedModeButton.setOnClickListener(view -> savePastedPlayersMode());
+        cancelPastedModeButton.setOnClickListener(view -> cancelPastedPlayersMode());
     }
 
     private void exitPastedPlayersMode() {
         showPastedPlayers = false;
         mPastedPlayers = null;
+        mAutoCreatedPlayers.clear();
         updatePastedModeUI();
         refreshPlayers();
         backPress.setEnabled(handleBackPress());
     }
 
+    private void savePastedPlayersMode() {
+        // Keep the auto-created players and exit pasted mode
+        mAutoCreatedPlayers.clear();
+        exitPastedPlayersMode();
+    }
+
+    private void cancelPastedPlayersMode() {
+        // Delete all auto-created players (undo)
+        for (String playerName : mAutoCreatedPlayers) {
+            DbHelper.deletePlayer(getContext(), playerName);
+        }
+        // Uncheck attendance for pasted players that weren't auto-created
+        if (mPastedPlayers != null) {
+            ArrayList<Player> existingPasted = DbHelper.getPlayersByIdentifier(getContext(), new ArrayList<>(mPastedPlayers));
+            for (Player p : existingPasted) {
+                if (!mAutoCreatedPlayers.contains(p.mName)) {
+                    DbHelper.updatePlayerComing(getContext(), p.mName, false);
+                }
+            }
+        }
+        exitPastedPlayersMode();
+    }
+
     private void updatePastedModeUI() {
         makeTeamsButton.setVisibility(showPastedPlayers ? View.GONE : View.VISIBLE);
+        // Show "Save" button text when there are auto-created players, otherwise "Done"
+        Button exitButton = (Button) exitPastedModeButton;
+        if (showPastedPlayers && !mAutoCreatedPlayers.isEmpty()) {
+            exitButton.setText(R.string.save);
+        } else {
+            exitButton.setText(R.string.done);
+        }
         exitPastedModeButton.setVisibility(showPastedPlayers ? View.VISIBLE : View.GONE);
+        // Only show cancel button if there are auto-created players
+        cancelPastedModeButton.setVisibility(showPastedPlayers && !mAutoCreatedPlayers.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void launchMakeTeams() {
@@ -523,6 +565,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
             if (!pasted.isEmpty()) {
                 Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.paste_players);
+                // Clear auto-created players from previous paste
+                mAutoCreatedPlayers.clear();
                 displayPastedIdentifiers(pasted);
             } else {
                 Toast.makeText(getContext(), "Paste multiple messages", Toast.LENGTH_SHORT).show();
@@ -543,16 +587,52 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             unknownPastedSet.remove(known.msgDisplayName);
         }
 
-        ArrayList<Player> unknownPasted = new ArrayList<>();
+        // Auto-create missing players with default 80 grade
+        ArrayList<String> archivedPlayers = new ArrayList<>();
         for (String identifier : unknownPastedSet) {
-            Player unknownPastedPlayer = new Player(null, -1);
-            unknownPastedPlayer.msgDisplayName = identifier;
-            unknownPasted.add(unknownPastedPlayer);
+            // Use the identifier as the player name (contact name)
+            String playerName = identifier;
+            // Only create if not already in auto-created set
+            if (!mAutoCreatedPlayers.contains(playerName)) {
+                // Check if player already exists (possibly archived)
+                Player existingPlayer = DbHelper.getPlayer(getContext(), playerName);
+                if (existingPlayer != null) {
+                    if (existingPlayer.archived) {
+                        archivedPlayers.add(playerName);
+                        Log.i("Identify", "Player " + playerName + " exists in archive, skipping creation");
+                    }
+                    // Player exists (archived or not), skip creation
+                    continue;
+                }
+                
+                Player newPlayer = new Player(playerName, 80);
+                newPlayer.msgDisplayName = identifier;
+                if (DbHelper.insertPlayer(getContext(), newPlayer)) {
+                    DbHelper.setPlayerIdentifier(getContext(), playerName, identifier);
+                    mAutoCreatedPlayers.add(playerName);
+                    Log.i("Identify", "Auto-created player: " + playerName + " with grade 80");
+                }
+            }
+        }
+        
+        // Show message for archived players that couldn't be auto-created
+        if (!archivedPlayers.isEmpty()) {
+            String message = archivedPlayers.size() == 1 
+                ? "Player \"" + archivedPlayers.get(0) + "\" exists in archive. Unarchive to use."
+                : archivedPlayers.size() + " players exist in archive: " + TextUtils.join(", ", archivedPlayers);
+            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         }
 
-        ArrayList<Player> pastedPlayers = new ArrayList<>();
-        pastedPlayers.addAll(knownPasted);
-        pastedPlayers.addAll(unknownPasted);
+        // Re-fetch all known pasted players (including newly created ones)
+        knownPasted = DbHelper.getPlayersByIdentifier(getContext(), pastedArray);
+
+        // Mark all pasted players as coming by default
+        for (Player player : knownPasted) {
+            if (!player.isComing) {
+                DbHelper.updatePlayerComing(getContext(), player.mName, true);
+                player.isComing = true;
+            }
+        }
 
         showPastedPlayers = true;
         mPastedPlayers = pasted;
@@ -567,8 +647,9 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         };
 
         // Filter the players list only to the pasted players identifiers
-        setPlayersList(pastedPlayers, handler);
+        setPlayersList(knownPasted, handler);
         setHeadlines(false);
+        setComingPlayersCount();
     }
 
     private void setComingPlayerIdentity(String currPlayer, String identity, Set<String> comingSet, String[] playerNames) {
