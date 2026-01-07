@@ -95,7 +95,6 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
 
         titles = root.findViewById(R.id.titles);
         name = root.findViewById(R.id.player_name);
-        View gameCountSelection = root.findViewById(R.id.participation_chip_games);
         chip50Games = root.findViewById(R.id.participation_chip_50_games);
 
         setTeamIcon(root);

@@ -39,6 +39,13 @@
     <string name="unbreakable">Unbreakable</string>
     <string name="extra">Extra</string>
 
+    <!--    Empty State-->
+    <string name="empty_players_icon">No players</string>
+    <string name="empty_players_title">No Players Yet</string>
+    <string name="empty_players_message">Copy messages from your WhatsApp group and paste them here to quickly add players based on contact names.</string>
+    <string name="empty_players_paste_button">Paste from WhatsApp</string>
+    <string name="empty_players_or_add">Or tap + above to add players manually</string>
+
     <!--    Buttons-->
     <string name="save">Save</string>
     <string name="done">Done</string>

@@ -79,6 +79,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private View makeTeamsButton;
     private View exitPastedModeButton;
     private View cancelPastedModeButton;
+    private View emptyStateContainer;
 
     public PlayersFragment() {
         super(R.layout.layout_players_fragment);
@@ -100,6 +101,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         makeTeamsButton = root.findViewById(R.id.main_make_teams);
         exitPastedModeButton = root.findViewById(R.id.exit_pasted_mode);
         cancelPastedModeButton = root.findViewById(R.id.cancel_pasted_mode);
+        emptyStateContainer = root.findViewById(R.id.empty_state_container);
+        
+        // Set up empty state paste button
+        root.findViewById(R.id.empty_state_paste_button).setOnClickListener(v -> pasteComingPlayers());
 
         refreshPlayers();
 
@@ -399,6 +404,12 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private void setPlayersList(List<Player> players, AdapterView.OnItemClickListener clickHandler) {
         boolean hasPlayers = (players != null && !players.isEmpty());
         playersList.setVisibility(hasPlayers ? View.VISIBLE : View.GONE);
+        
+        // Show empty state only when no players and not in special modes
+        boolean showEmptyState = !hasPlayers && !showPastedPlayers && !showArchivedPlayers;
+        emptyStateContainer.setVisibility(showEmptyState ? View.VISIBLE : View.GONE);
+        rootView.findViewById(R.id.player_titles).setVisibility(showEmptyState ? View.GONE : View.VISIBLE);
+        rootView.findViewById(R.id.header_divider).setVisibility(showEmptyState ? View.GONE : View.VISIBLE);
 
         setHeadlines(true);
         playersAdapter = new PlayerAdapter(getContext(), players, this::onPlayerComingChanged);
