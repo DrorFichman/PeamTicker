@@ -64,7 +64,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private boolean showArchivedPlayers = false;
     private boolean showPastedPlayers = false;
     private Set<String> mPastedPlayers;
-    private Set<String> mAutoCreatedPlayers = new HashSet<>(); // Track auto-created players for undo
+    private final Set<String> mAutoCreatedPlayers = new HashSet<>(); // Track auto-created players for undo
 
     private View rootView;
     private ListView playersList;
