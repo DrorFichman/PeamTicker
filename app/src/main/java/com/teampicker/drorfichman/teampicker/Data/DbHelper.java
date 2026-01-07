@@ -159,7 +159,8 @@ public class DbHelper extends SQLiteOpenHelper {
     @SuppressWarnings("resource") // DbHelper is intentionally kept open for the app's lifetime
     public static SQLiteDatabase getSqLiteDatabase(Context context) {
         // Gets the data repository in write mode
-        if (writableDatabase == null) {
+        // Check both null and isOpen() to handle cases where database was closed
+        if (writableDatabase == null || !writableDatabase.isOpen()) {
             DbHelper mDbHelper = new DbHelper(context.getApplicationContext());
             writableDatabase = mDbHelper.getWritableDatabase();
         }
