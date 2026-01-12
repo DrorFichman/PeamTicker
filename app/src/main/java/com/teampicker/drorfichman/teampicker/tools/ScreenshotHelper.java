@@ -37,7 +37,7 @@ public class ScreenshotHelper {
         try {
             Bitmap bitmap = getWholeListViewItemsToBitmap(list, titles, adapter);
 
-            Uri imageUri = saveImageUri(activity, bitmap, 100);
+            Uri imageUri = saveImageUri(activity, bitmap);
 
             openScreenshot(activity, imageUri);
         } catch (Throwable e) {
@@ -46,19 +46,20 @@ public class ScreenshotHelper {
         }
     }
 
-    private static Uri saveImageUri(Context context, Bitmap bitmap, int quality) throws IOException {
+    private static Uri saveImageUri(Context context, Bitmap bitmap) throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String fileName = "IMG_" + timeStamp + ".jpg";
+        String fileName = "IMG_" + timeStamp + ".webp";
 
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/webp");
         values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
 
         Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         if (uri != null) {
             try (OutputStream out = context.getContentResolver().openOutputStream(uri)) {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out);
+                // WebP at 90% quality provides excellent quality with small file sizes
+                bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 90, out);
             }
             return uri;
         } else {
@@ -72,7 +73,7 @@ public class ScreenshotHelper {
             Bitmap bitmap = getBitmapFromView(view);
 
             // Save the bitmap to a file
-            Uri imageUri = saveImageUri(activity, bitmap, 50);
+            Uri imageUri = saveImageUri(activity, bitmap);
 
             // Open the screenshot for preview
             openScreenshot(activity, imageUri);
@@ -84,16 +85,16 @@ public class ScreenshotHelper {
         }
     }
 
-    private static File getImageFromBitmap(Bitmap bitmap, int quality) throws IOException {
+    private static File getImageFromBitmap(Bitmap bitmap) throws IOException {
         String name = DateHelper.getNow() + "-" + System.currentTimeMillis();
-        if (quality < 0) quality = 50;
 
         File imagePath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/TeamPicker/");
         imagePath.mkdirs();
-        File imageFile = new File(imagePath, name + ".png");
+        File imageFile = new File(imagePath, name + ".webp");
 
         FileOutputStream outputStream = new FileOutputStream(imageFile);
-        bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream);
+        // WebP at 90% quality provides excellent quality with small file sizes
+        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 90, outputStream);
         outputStream.flush();
         outputStream.close();
 
