@@ -49,6 +49,8 @@ public class PlayerWinRateChartFragment extends Fragment {
     private TextView emptyMessage;
     private CardView unbeatenRunCard;
     private TextView unbeatenRunValue;
+    private CardView overallWinRateCard;
+    private TextView overallWinRateValue;
     private LinearLayout infoPanel;
     private TextView selectedDate;
     private TextView selectedValue;
@@ -92,12 +94,15 @@ public class PlayerWinRateChartFragment extends Fragment {
         emptyMessage = root.findViewById(R.id.insights_empty_message);
         unbeatenRunCard = root.findViewById(R.id.unbeaten_run_card);
         unbeatenRunValue = root.findViewById(R.id.unbeaten_run_value);
+        overallWinRateCard = root.findViewById(R.id.overall_win_rate_card);
+        overallWinRateValue = root.findViewById(R.id.overall_win_rate_value);
         infoPanel = root.findViewById(R.id.insights_info_panel);
         selectedDate = root.findViewById(R.id.insights_selected_date);
         selectedValue = root.findViewById(R.id.insights_selected_value);
 
         loadDataAndSetupChart();
         updateLongestUnbeatenRun();
+        updateOverallWinRateCard();
 
         return root;
     }
@@ -374,6 +379,19 @@ public class PlayerWinRateChartFragment extends Fragment {
                 unbeatenRunCard.setOnClickListener(v -> toggleStreakHighlight());
             } else {
                 unbeatenRunCard.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void updateOverallWinRateCard() {
+        if (player != null && getContext() != null) {
+            Player playerWithStats = DbHelper.getPlayer(getContext(), player.mName, -1);
+            if (playerWithStats != null && playerWithStats.statistics != null && playerWithStats.statistics.gamesCount > 0) {
+                overallWinRateValue.setText(getString(R.string.win_rate_value,
+                        playerWithStats.statistics.getWinRate()));
+                overallWinRateCard.setVisibility(View.VISIBLE);
+            } else {
+                overallWinRateCard.setVisibility(View.GONE);
             }
         }
     }

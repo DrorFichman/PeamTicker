@@ -61,6 +61,8 @@ public class PlayerParticipationChartFragment extends Fragment {
     private TextView emptyMessage;
     private CardView consecutiveAttendanceCard;
     private TextView consecutiveAttendanceValue;
+    private CardView totalGamesCard;
+    private TextView totalGamesValue;
     private LinearLayout infoPanel;
     private TextView selectedPeriod;
     private TextView selectedStats;
@@ -108,12 +110,15 @@ public class PlayerParticipationChartFragment extends Fragment {
         TextView chartTitle = root.findViewById(R.id.participation_chart_title);
         consecutiveAttendanceCard = root.findViewById(R.id.consecutive_attendance_card);
         consecutiveAttendanceValue = root.findViewById(R.id.consecutive_attendance_value);
+        totalGamesCard = root.findViewById(R.id.total_games_card);
+        totalGamesValue = root.findViewById(R.id.total_games_value);
         infoPanel = root.findViewById(R.id.participation_info_panel);
         selectedPeriod = root.findViewById(R.id.participation_selected_period);
         selectedStats = root.findViewById(R.id.participation_selected_stats);
 
         loadDataAndSetupChart();
         updateConsecutiveAttendance();
+        updateTotalGamesCard();
 
         return root;
     }
@@ -473,6 +478,19 @@ public class PlayerParticipationChartFragment extends Fragment {
             }
         }
     }
+
+    private void updateTotalGamesCard() {
+        if (player != null && getContext() != null) {
+            Player playerWithStats = DbHelper.getPlayer(getContext(), player.mName, -1);
+            if (playerWithStats != null && playerWithStats.statistics != null && playerWithStats.statistics.gamesCount > 0) {
+                totalGamesValue.setText(getString(R.string.total_games_count,
+                        playerWithStats.statistics.gamesCount));
+                totalGamesCard.setVisibility(View.VISIBLE);
+            } else {
+                totalGamesCard.setVisibility(View.GONE);
+            }
+        }
+    }
     
     private void toggleStreakHighlight() {
         if (quarterDataList == null || quarterDataList.isEmpty() || currentStreak == null || currentStreak.length == 0) {
@@ -526,7 +544,7 @@ public class PlayerParticipationChartFragment extends Fragment {
         xAxis.addLimitLine(endLine);
         
         // Update card appearance to show it's active
-        consecutiveAttendanceCard.setCardBackgroundColor(Color.rgb(187, 222, 251)); // Darker blue
+        consecutiveAttendanceCard.setCardBackgroundColor(Color.rgb(200, 230, 201)); // Darker green
         
         chart.invalidate();
     }
@@ -540,7 +558,7 @@ public class PlayerParticipationChartFragment extends Fragment {
         updateChart();
         
         // Reset card appearance
-        consecutiveAttendanceCard.setCardBackgroundColor(Color.parseColor("#E3F2FD")); // Original light blue
+        consecutiveAttendanceCard.setCardBackgroundColor(Color.parseColor("#E8F5E9")); // Original light green
         
         chart.invalidate();
     }

@@ -215,6 +215,11 @@
 
     <!--    Player Participation Chart-->
     <string name="insights_participation_title">Participation Over Time</string>
+    <string name="total_games_played">Total Games Played</string>
+    <string name="total_games_count">%1$d games</string>
+    <string name="player_games_header">%1$s (%2$d games)</string>
+    <string name="overall_win_rate">Overall Win Rate</string>
+    <string name="win_rate_value">%1$d%%</string>
     <string name="insights_participation_no_data">Not enough game data. Play at least %1$d games to see activity.</string>
     <string name="insights_wins_label">Wins</string>
     <string name="insights_ties_label">Ties</string>
