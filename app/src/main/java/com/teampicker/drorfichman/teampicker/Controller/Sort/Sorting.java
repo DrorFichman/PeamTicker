@@ -145,7 +145,13 @@ public class Sorting {
 
             if (headlineView instanceof TextView) {
                 ((TextView) headlineView).setText(headlineTitle);
-                ((TextView) headlineView).setTypeface(null, Typeface.BOLD);
+            }
+
+            // Apply the correct initial text appearance based on current sorting
+            if (type == sortBy) {
+                setSelected(headlineView, originalOrder ? HeadlineSortType.Sorted : HeadlineSortType.Reversed);
+            } else {
+                setSelected(headlineView, HeadlineSortType.None);
             }
 
             if (handler != null) {
