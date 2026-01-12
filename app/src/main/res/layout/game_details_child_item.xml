@@ -37,7 +37,8 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="12dp"
-        android:paddingVertical="8dp">
+        android:paddingVertical="8dp"
+        android:theme="@style/Theme.MaterialComponents.Light">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/game_copy_game"
