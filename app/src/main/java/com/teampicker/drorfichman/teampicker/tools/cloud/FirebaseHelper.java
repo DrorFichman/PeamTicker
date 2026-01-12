@@ -119,31 +119,39 @@ public class FirebaseHelper implements CloudSync {
             case RequireAuthentication: // can't because checked previously, no break
                 Log.e("User", "Unauthenticated user at syncToCloud " + AuthHelper.getUser());
             case Unknown:
+                progress.showSyncProgress(null, 0);
                 Toast.makeText(ctx, ctx.getString(R.string.main_connectivity), Toast.LENGTH_SHORT).show();
                 break;
             case NotAllowed:
             case Disabled:
+                progress.showSyncProgress(null, 0);
                 Toast.makeText(ctx, ctx.getString(R.string.main_cloud_not_allowed), Toast.LENGTH_SHORT).show();
                 break;
         }
     }
 
     private void checkSync(Context ctx, SyncProgress progress) {
+        // Hide progress while showing dialog
+        progress.showSyncProgress(null, 0);
         DialogHelper.showApprovalDialog(ctx,
                 "Sync players and games to the cloud?", "",
                 (dialog, positive) -> {
-                    progress.showSyncStatus("Syncing...");
+                    progress.showSyncProgress("Syncing players...", 25);
                     syncData(ctx, progress);
                 });
     }
 
     private void syncData(Context ctx, SyncProgress progress) {
-        syncPlayersToCloud(ctx, () ->
-                syncGamesToCloud(ctx, () ->
-                        syncPlayersGamesToCloud(ctx, () -> {
-                            progress.showSyncStatus(null);
-                            Toast.makeText(ctx, "Sync completed", Toast.LENGTH_LONG).show();
-                        })));
+        syncPlayersToCloud(ctx, () -> {
+            progress.showSyncProgress("Syncing games...", 50);
+            syncGamesToCloud(ctx, () -> {
+                progress.showSyncProgress("Syncing player stats...", 75);
+                syncPlayersGamesToCloud(ctx, () -> {
+                    progress.showSyncProgress(null, 100);
+                    Toast.makeText(ctx, "Sync completed", Toast.LENGTH_LONG).show();
+                });
+            });
+        });
     }
 
     private static void syncPlayersToCloud(Context ctx, DataCallback handler) {
@@ -238,6 +246,7 @@ public class FirebaseHelper implements CloudSync {
                             Log.d("Date", "Date " + game.dateString);
                             checkPull(ctx, game.getDisplayDate(ctx), handler);
                         } else {
+                            handler.showSyncProgress(null, 0);
                             Toast.makeText(ctx, "No Games found - sync to cloud first", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -247,10 +256,12 @@ public class FirebaseHelper implements CloudSync {
             case RequireAuthentication: // can't because checked previously, no break
                 Log.e("User", "Unauthenticated user at pull from cloud " + AuthHelper.getUser());
             case Unknown:
+                handler.showSyncProgress(null, 0);
                 Toast.makeText(ctx, ctx.getString(R.string.main_connectivity), Toast.LENGTH_SHORT).show();
                 break;
             case NotAllowed:
             case Disabled:
+                handler.showSyncProgress(null, 0);
                 Toast.makeText(ctx, ctx.getString(R.string.main_cloud_not_allowed), Toast.LENGTH_SHORT).show();
                 break;
         }
@@ -258,6 +269,9 @@ public class FirebaseHelper implements CloudSync {
 
     private void showUsersDialog(Context ctx, ArrayList<AccountData> users, SyncProgress handler) {
         Log.d("showUsersDialog", users.size() + " users ");
+        // Hide progress while showing dialog
+        handler.showSyncProgress(null, 0);
+        
         ArrayList<String> l = new ArrayList<>();
         for (AccountData a : users) {
             if (a != null && a.displayName != null) {
@@ -273,37 +287,47 @@ public class FirebaseHelper implements CloudSync {
 
             // Fetch data from the selected user
             AuthHelper.fetchFor(users.get(which));
-            fetchData(ctx, status -> {
+            fetchData(ctx, (status, progress) -> {
                 if (status == null) {
                     // Clear selection once done
                     AuthHelper.fetchFor(null);
                     Toast.makeText(ctx, "Pull completed from " + users.get(which).displayName, Toast.LENGTH_LONG).show();
                 }
-                handler.showSyncStatus(status);
+                handler.showSyncProgress(status, progress);
             });
         });
         builder.show();
     }
 
     private void checkPull(Context ctx, String date, SyncProgress handler) {
-
+        // Hide progress while showing dialog
+        handler.showSyncProgress(null, 0);
+        
         DialogHelper.showApprovalDialog(ctx,
                 "Pull data from cloud? \n" + "Last game - " + date, "",
                 (dialog, positive) -> {
-                    fetchData(ctx, handler);
+                    fetchData(ctx, (status, progress) -> handler.showSyncProgress(status, progress));
                 });
     }
 
-    private void fetchData(Context ctx, SyncProgress handler) {
+    private interface FetchDataProgress {
+        void onProgress(String status, int progress);
+    }
+
+    private void fetchData(Context ctx, FetchDataProgress handler) {
         DbHelper.deleteTableContents(ctx);
         Log.i("pullFromCloud", "Delete local DB");
 
-        handler.showSyncStatus("Pulling...");
-        pullPlayersFromCloud(ctx, () ->
-                pullGamesFromCloud(ctx, () ->
-                        pullPlayersGamesFromCloud(ctx, () -> {
-                            handler.showSyncStatus(null);
-                        })));
+        handler.onProgress("Pulling players...", 25);
+        pullPlayersFromCloud(ctx, () -> {
+            handler.onProgress("Pulling games...", 50);
+            pullGamesFromCloud(ctx, () -> {
+                handler.onProgress("Pulling player stats...", 75);
+                pullPlayersGamesFromCloud(ctx, () -> {
+                    handler.onProgress(null, 100);
+                });
+            });
+        });
     }
 
     private static void pullPlayersFromCloud(Context ctx, DataCallback handler) {

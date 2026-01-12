@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity
     private static final int ACTIVITY_RESULT_SIGN_IN = 3;
 
     View syncInProgress;
+    ProgressBar syncSpinner;
+    ProgressBar syncProgressBar;
     TextView syncProgressStatus;
     ViewPager viewPager;
 
@@ -63,6 +66,8 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         syncInProgress = findViewById(R.id.sync_progress);
+        syncSpinner = findViewById(R.id.sync_spinner);
+        syncProgressBar = findViewById(R.id.sync_progress_bar);
         syncProgressStatus = findViewById(R.id.sync_progress_status);
 
         setSupportActionBar(toolbar);
@@ -247,7 +252,9 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
             authenticate();
         } else {
-            FirebaseHelper.getInstance().pullFromCloud(this, this::showSyncStatus);
+            // Show immediate loading indicator
+            showSyncProgress("Connecting...", 0);
+            FirebaseHelper.getInstance().pullFromCloud(this, this);
             Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.pull_from_cloud);
         }
     }
@@ -257,19 +264,34 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, getString(R.string.main_auth_required), Toast.LENGTH_SHORT).show();
             authenticate();
         } else { // user is authenticated, and cloud is not disabled
-            FirebaseHelper.getInstance().syncToCloud(this, this::showSyncStatus);
+            // Show immediate loading indicator
+            showSyncProgress("Connecting...", 0);
+            FirebaseHelper.getInstance().syncToCloud(this, this);
             Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.sync_to_cloud);
         }
     }
 
     @Override
-    public void showSyncStatus(String status) {
+    public void showSyncProgress(String status, int progressPercent) {
         if (status != null) {
             syncInProgress.setVisibility(View.VISIBLE);
             syncProgressStatus.setText(status);
+            
+            if (progressPercent > 0) {
+                // Show determinate progress bar when we have progress
+                syncSpinner.setVisibility(View.GONE);
+                syncProgressBar.setVisibility(View.VISIBLE);
+                syncProgressBar.setProgress(progressPercent);
+            } else {
+                // Show indeterminate spinner for initial connecting phase
+                syncSpinner.setVisibility(View.VISIBLE);
+                syncProgressBar.setVisibility(View.GONE);
+            }
         } else {
+            // Hide everything when complete
             syncInProgress.setVisibility(View.GONE);
             syncProgressStatus.setText("");
+            syncProgressBar.setProgress(0);
             DbHelper.onUnderlyingDataChange();
 
             // refresh after sync

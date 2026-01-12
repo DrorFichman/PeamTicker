@@ -1,5 +1,5 @@
 package com.teampicker.drorfichman.teampicker.tools.cloud;
 
 public interface SyncProgress {
-    void showSyncStatus(String status);
+    void showSyncProgress(String status, int progressPercent);
 }
