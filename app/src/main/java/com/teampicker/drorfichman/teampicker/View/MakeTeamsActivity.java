@@ -56,7 +56,17 @@ import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.analytics.ParameterType;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 
+import nl.dionsegijn.konfetti.core.Party;
+import nl.dionsegijn.konfetti.core.PartyFactory;
+import nl.dionsegijn.konfetti.core.emitter.Emitter;
+import nl.dionsegijn.konfetti.core.emitter.EmitterConfig;
+import nl.dionsegijn.konfetti.core.models.Shape;
+import nl.dionsegijn.konfetti.core.models.Size;
+import nl.dionsegijn.konfetti.xml.KonfettiView;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -114,6 +124,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private View weatherDisplay;
     private TextView weatherEmoji, weatherTemperature, weatherTimeRange;
     private TextView weatherDate;
+
+    private KonfettiView konfettiView;
 
     protected View analysisHeaders1, analysisHeaders2;
 
@@ -203,6 +215,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
         weatherTimeRange = findViewById(R.id.weather_time_range);
         weatherDate = findViewById(R.id.weather_date);
         setWeatherData(true);
+
+        konfettiView = findViewById(R.id.konfetti_view);
 
         area1.setOnDragListener(playerMoveDragListener);
         area2.setOnDragListener(playerMoveDragListener);
@@ -488,8 +502,33 @@ public class MakeTeamsActivity extends AppCompatActivity {
             Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.save_results);
             LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
 
-            finish();
+            // Show celebratory confetti animation
+            showConfetti();
+
+            // Delay finish to let users enjoy the celebration
+            new Handler().postDelayed(this::finish, 1500);
         }
+    }
+
+    private void showConfetti() {
+        // Team colors: blue (#1565C0) and orange (#E65100)
+        int teamBlue = 0xFF1565C0;
+        int teamOrange = 0xFFE65100;
+        int gold = 0xFFFFD700;
+        int white = 0xFFFFFFFF;
+
+        // Create confetti burst - using fewer particles to avoid memory issues
+        EmitterConfig emitterConfig = new Emitter(50, TimeUnit.MILLISECONDS).max(30);
+
+        Party party = new PartyFactory(emitterConfig)
+                .spread(120)
+                .shapes(Arrays.asList(Shape.Square.INSTANCE, Shape.Circle.INSTANCE))
+                .colors(Arrays.asList(teamBlue, teamOrange, gold, white))
+                .sizes(new ArrayList<>(Arrays.asList(new Size(6, 30f, 5f))))
+                .position(0.3, 0.5)
+                .build();
+
+        konfettiView.start(party);
     }
 
     private void setupScoreControls() {

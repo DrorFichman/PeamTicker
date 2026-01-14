@@ -60,6 +60,9 @@ dependencies {
     // TapTargetView for modern spotlight tutorials
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
 
+    // Konfetti for celebratory confetti animations
+    implementation 'nl.dionsegijn:konfetti-xml:2.0.4'
+
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0-alpha05'
     androidTestImplementation 'androidx.test:rules:1.4.0-alpha05'
 
