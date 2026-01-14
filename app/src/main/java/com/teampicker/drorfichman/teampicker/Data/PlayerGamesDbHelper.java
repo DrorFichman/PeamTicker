@@ -73,8 +73,11 @@ public class PlayerGamesDbHelper {
                 values);
     }
 
+    /**
+     * Get players from a completed/historical game.
+     */
     @NonNull
-    public static ArrayList<Player> getCurrTeam(SQLiteDatabase db, int currGame, TeamEnum team) {
+    public static ArrayList<Player> getGameTeam(SQLiteDatabase db, int gameId, TeamEnum team) {
 
         String[] projection = {
                 PlayerContract.PlayerGameEntry.ID,
@@ -96,7 +99,7 @@ public class PlayerGamesDbHelper {
                 PlayerContract.PlayerGameEntry.GAME + " = ? ";
         String[] whereArgs = new String[]{
                 String.valueOf(team.ordinal()),
-                String.valueOf(currGame)};
+                String.valueOf(gameId)};
 
         Cursor c = db.query(
                 PlayerContract.PlayerGameEntry.TABLE_NAME,  // The table to query
@@ -143,21 +146,6 @@ public class PlayerGamesDbHelper {
         return players;
     }
 
-    public static void clearOldGameTeams(SQLiteDatabase db) {
-        Log.d("teams", "Clear old Game teams ");
-
-        // Delete empty result (-10), missed result (-9), and null result rows
-        // This ensures missed player records don't create orphaned entries
-        int n = db.delete(PlayerContract.PlayerGameEntry.TABLE_NAME,
-                PlayerContract.PlayerGameEntry.PLAYER_RESULT + " IS NULL OR " +
-                        PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ? OR " +
-                        PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ? ",
-                new String[]{String.valueOf(PlayerGamesDbHelper.EMPTY_RESULT), 
-                        String.valueOf(PlayerGamesDbHelper.MISSED_GAME)});
-
-        Log.d("teams", "deleted games players " + n);
-    }
-
     @NonNull
     public static ArrayList<PlayerGame> getPlayersGames(SQLiteDatabase db) {
 
@@ -171,7 +159,8 @@ public class PlayerGamesDbHelper {
                 PlayerContract.PlayerGameEntry.PLAYER_AGE,
                 PlayerContract.PlayerGameEntry.TEAM,
                 PlayerContract.PlayerGameEntry.PLAYER_RESULT,
-                PlayerContract.PlayerGameEntry.DID_WIN
+                PlayerContract.PlayerGameEntry.DID_WIN,
+                PlayerContract.PlayerGameEntry.ATTRIBUTES
         };
 
         String sortOrder = "date(" + PlayerContract.PlayerGameEntry.DATE + ") DESC, " 
@@ -208,6 +197,7 @@ public class PlayerGamesDbHelper {
                     g.result = ResultEnum.getResultFromOrdinal(res);
                     int team = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.TEAM));
                     g.team = TeamEnum.getResultFromOrdinal(team);
+                    g.attributes = c.getString(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.ATTRIBUTES));
 
                     playersGames.add(g);
                 } while (c.moveToNext());
@@ -467,14 +457,14 @@ public class PlayerGamesDbHelper {
                         team2 = cache.team2s.get(currGame);
 
                         if (team1 == null || team2 == null) {
-                            team1 = getCurrTeam(db, currGame, TeamEnum.Team1);
-                            team2 = getCurrTeam(db, currGame, TeamEnum.Team2);
+                            team1 = getGameTeam(db, currGame, TeamEnum.Team1);
+                            team2 = getGameTeam(db, currGame, TeamEnum.Team2);
                             cache.team1s.put(currGame, team1);
                             cache.team2s.put(currGame, team2);
                         }
                     } else {
-                        team1 = getCurrTeam(db, currGame, TeamEnum.Team1);
-                        team2 = getCurrTeam(db, currGame, TeamEnum.Team2);
+                        team1 = getGameTeam(db, currGame, TeamEnum.Team1);
+                        team2 = getGameTeam(db, currGame, TeamEnum.Team2);
                     }
 
                     if (TeamEnum.Team1.ordinal() == collaboratorTeam) {
@@ -524,22 +514,6 @@ public class PlayerGamesDbHelper {
         if (ResultEnum.Lose.equals(collaboratorRes)) {
             playerStatistics.successRate--;
         }
-    }
-
-    public static int getActiveGame(SQLiteDatabase db) {
-
-        try (Cursor c = db.rawQuery("select game " +
-                        " from player_game " +
-                        " where " +
-                        " result = " + PlayerGamesDbHelper.EMPTY_RESULT +
-                        " order by game DESC ",
-                null, null)) {
-            if (c.moveToFirst()) {
-                return c.getInt(c.getColumnIndexOrThrow("game"));
-            }
-        }
-
-        return -1;
     }
 
     public static int getMaxGame(SQLiteDatabase db) {

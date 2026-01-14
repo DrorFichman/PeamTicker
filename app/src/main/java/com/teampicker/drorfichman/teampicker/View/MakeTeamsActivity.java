@@ -294,19 +294,18 @@ public class MakeTeamsActivity extends AppCompatActivity {
     //region initial teams
     private void initialTeams() {
 
-        int currGame = DbHelper.getActiveGame(this);
         mSetResult = getIntent().getBooleanExtra(SET_RESULT, false);
-        if (currGame < 0) {
+        if (!DbHelper.hasActiveGame(this)) {
             divideComingPlayers(selectedDivision);
         } else {
-            players1 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team1, RECENT_GAMES);
-            players2 = DbHelper.getCurrTeam(this, currGame, TeamEnum.Team2, RECENT_GAMES);
+            players1 = DbHelper.getActiveGameTeam(this, TeamEnum.Team1, RECENT_GAMES);
+            players2 = DbHelper.getActiveGameTeam(this, TeamEnum.Team2, RECENT_GAMES);
 
             if (mSetResult) {
                 refreshPlayers();
                 initSetResults();
             } else {
-                benchedPlayers = DbHelper.getCurrTeam(this, currGame, TeamEnum.Bench, RECENT_GAMES);
+                benchedPlayers = DbHelper.getActiveGameTeam(this, TeamEnum.Bench, RECENT_GAMES);
 
                 boolean changed = handleComingChanges(getPlayers());
                 if (!benchedPlayers.isEmpty()) {
@@ -474,16 +473,17 @@ public class MakeTeamsActivity extends AppCompatActivity {
         if (!mSetResult) {
             initSetResults();
         } else {
-            // Remove bench players before persisting the game
+            // Save team assignments (without bench players for final game)
             saveCurrentTeams(false);
-            // clear missed state to avoid writing them for the next game
+
+            int nextGameId = DbHelper.getNextGameId(this);
+            Game game = new Game(nextGameId, getGameDateString(), team1ScoreValue, team2ScoreValue);
+
+            // Finalize the game - writes player_game records with results
+            DbHelper.insertGame(this, game, missedPlayers);
+            
+            // Clear missed state for next game
             missedPlayers.clear();
-
-            int currGame = DbHelper.getActiveGame(this);
-            Game game = new Game(currGame, getGameDateString(), team1ScoreValue, team2ScoreValue);
-
-            // TODO Improve above - can set the results when inserting the teams
-            DbHelper.insertGame(this, game);
 
             Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.save_results);
             LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);

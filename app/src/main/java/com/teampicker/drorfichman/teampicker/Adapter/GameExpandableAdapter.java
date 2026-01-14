@@ -127,8 +127,8 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     private void setPlayerCount(Game g, TextView playerCountView) {
-        ArrayList<Player> team1 = DbHelper.getCurrTeam(context, g.gameId, TeamEnum.Team1, 0);
-        ArrayList<Player> team2 = DbHelper.getCurrTeam(context, g.gameId, TeamEnum.Team2, 0);
+        ArrayList<Player> team1 = DbHelper.getGameTeam(context, g.gameId, TeamEnum.Team1, 0);
+        ArrayList<Player> team2 = DbHelper.getGameTeam(context, g.gameId, TeamEnum.Team2, 0);
         playerCountView.setText(context.getString(R.string.games_player_count, team1.size() + team2.size()));
     }
 
@@ -216,8 +216,8 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
     private void setChildTeams(int mCurrGameId, ListView team1List, ListView team2List) {
         if (mCurrGameId < 0) return;
 
-        ArrayList<Player> mTeam1 = DbHelper.getCurrTeam(context, mCurrGameId, TeamEnum.Team1, 0);
-        ArrayList<Player> mTeam2 = DbHelper.getCurrTeam(context, mCurrGameId, TeamEnum.Team2, 0);
+        ArrayList<Player> mTeam1 = DbHelper.getGameTeam(context, mCurrGameId, TeamEnum.Team1, 0);
+        ArrayList<Player> mTeam2 = DbHelper.getGameTeam(context, mCurrGameId, TeamEnum.Team2, 0);
 
         mTeam1.sort(Comparator.comparing(Player::name));
         mTeam2.sort(Comparator.comparing(Player::name));
@@ -295,8 +295,8 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
 
     private void copyGamePlayers(Game g) {
         DbHelper.clearComingPlayers(context);
-        ArrayList<Player> mTeam1 = DbHelper.getCurrTeam(context, g.gameId, TeamEnum.Team1, 0);
-        ArrayList<Player> mTeam2 = DbHelper.getCurrTeam(context, g.gameId, TeamEnum.Team2, 0);
+        ArrayList<Player> mTeam1 = DbHelper.getGameTeam(context, g.gameId, TeamEnum.Team1, 0);
+        ArrayList<Player> mTeam2 = DbHelper.getGameTeam(context, g.gameId, TeamEnum.Team2, 0);
 
         DbHelper.setPlayerComing(context, mTeam1);
         DbHelper.setPlayerComing(context, mTeam2);

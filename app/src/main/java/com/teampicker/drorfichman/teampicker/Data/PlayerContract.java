@@ -32,6 +32,8 @@ public final class PlayerContract {
         public static final String ATTRIBUTES = "attributes";
         public static final String ARCHIVED = "archived";
         public static final String MSG_IDENTIFIER = "message_identifier";
+        /** Team assignment for current game: NULL=not assigned, 0=Team1, 1=Team2, 2=Bench */
+        public static final String TEAM = "current_team";
     }
 
     public static abstract class PlayerGameEntry {

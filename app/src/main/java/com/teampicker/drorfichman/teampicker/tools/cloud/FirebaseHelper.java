@@ -182,8 +182,8 @@ public class FirebaseHelper implements CloudSync {
                 ArrayList<Game> games = DbHelper.getGames(ctx);
 
                 for (Game g : games) {
-                    ArrayList<Player> team1 = DbHelper.getCurrTeam(ctx, g.gameId, TeamEnum.Team1, 0);
-                    ArrayList<Player> team2 = DbHelper.getCurrTeam(ctx, g.gameId, TeamEnum.Team2, 0);
+                    ArrayList<Player> team1 = DbHelper.getGameTeam(ctx, g.gameId, TeamEnum.Team1, 0);
+                    ArrayList<Player> team2 = DbHelper.getGameTeam(ctx, g.gameId, TeamEnum.Team2, 0);
                     g.setTeams(team1, team2);
                     storeGame(g);
                 }

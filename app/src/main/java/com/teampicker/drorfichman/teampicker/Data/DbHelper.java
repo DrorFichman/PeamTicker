@@ -9,6 +9,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
+import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.ArrayList;
@@ -23,51 +26,53 @@ import java.util.List;
 public class DbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 7;
+    public static final int DATABASE_VERSION = 8;
     public static final String DATABASE_NAME = "Players.db";
 
     private static SQLiteDatabase writableDatabase;
     static HashMap<String, ArrayList<PlayerGameStat>> playersHistory = new HashMap<>();
+    
+    private final Context appContext;
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.appContext = context.getApplicationContext();
     }
 
     public static void onUnderlyingDataChange() {
         playersHistory.clear();
     }
 
+    /**
+     * Save teams by updating the team column in the player table.
+     * This stores the current game setup without committing to player_game history until results are saved.
+     * The missedPlayers parameter is ignored here - missed players are only 
+     * recorded when game results are finalized.
+     */
     public static void saveTeams(Context ctx, ArrayList<Player> firstTeam,
                                  ArrayList<Player> secondTeam,
                                  ArrayList<Player> benchedPlayers,
                                  Collection<Player> missedPlayers,
                                  Collection<Player> mvpPlayers) {
-        DbHelper.clearOldGameTeams(ctx);
+        // Clear any existing team assignments
+        clearActiveGame(ctx);
 
-        int currGame = DbHelper.getMaxGame(ctx) + 1;
-
+        SQLiteDatabase db = getSqLiteDatabase(ctx);
+        
         for (Player a : firstTeam) {
-            String attributes = getAttributesWithMVP(a, mvpPlayers);
-            PlayerGame pg = new PlayerGame(currGame, a.mName, a.mGrade, TeamEnum.Team1, a.getAge(), attributes);
-            DbHelper.insertPlayerGame(ctx, pg);
+            PlayerDbHelper.updatePlayerTeam(db, a.mName, TeamEnum.Team1);
         }
         for (Player b : secondTeam) {
-            String attributes = getAttributesWithMVP(b, mvpPlayers);
-            PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Team2, b.getAge(), attributes);
-            DbHelper.insertPlayerGame(ctx, pg);
+            PlayerDbHelper.updatePlayerTeam(db, b.mName, TeamEnum.Team2);
         }
         if (benchedPlayers != null) {
             for (Player b : benchedPlayers) {
-                String attributes = getAttributesWithMVP(b, mvpPlayers);
-                PlayerGame pg = new PlayerGame(currGame, b.mName, b.mGrade, TeamEnum.Bench, b.getAge(), attributes);
-                DbHelper.insertPlayerGame(ctx, pg);
+                PlayerDbHelper.updatePlayerTeam(db, b.mName, TeamEnum.Bench);
             }
         }
-        if (missedPlayers != null) {
-            for (Player m : missedPlayers) {
-                DbHelper.setPlayerResultMissed(ctx, currGame, m.mName);
-            }
-        }
+        // Note: missedPlayers are not stored here - they are only recorded
+        // when the game is finalized with results in insertGame()
+        // MVP attributes are stored in player_game when results are saved
     }
 
     private static String getAttributesWithMVP(Player player, Collection<Player> mvpPlayers) {
@@ -103,6 +108,8 @@ public class DbHelper extends SQLiteOpenHelper {
 
         addColumns(db);
 
+        migrateEmptyResultRecords(db);
+
         // TODO sanitize player names for firebase, not mandatory - sanitized when synced to cloud
     }
 
@@ -119,6 +126,35 @@ public class DbHelper extends SQLiteOpenHelper {
         modifyGameDates(db);
         addColumn(db, PlayerContract.PlayerEntry.TABLE_NAME, PlayerContract.PlayerEntry.MSG_IDENTIFIER, "TEXT", "''");
         addColumn(db, PlayerContract.PlayerEntry.TABLE_NAME, PlayerContract.PlayerEntry.BIRTH_DAY, "INTEGER", null);
+        // Team column for current game assignment (NULL=not assigned, 0=Team1, 1=Team2, 2=Bench)
+        addColumn(db, PlayerContract.PlayerEntry.TABLE_NAME, PlayerContract.PlayerEntry.TEAM, "INTEGER", null);
+    }
+
+    /**
+     * Migrate any pending game data (EMPTY_RESULT records) from player_game to player.team column.
+     */
+    private void migrateEmptyResultRecords(SQLiteDatabase db) {
+        try {
+            // Migrate EMPTY_RESULT records: update player.team from player_game
+            db.execSQL("UPDATE " + PlayerContract.PlayerEntry.TABLE_NAME + 
+                    " SET " + PlayerContract.PlayerEntry.TEAM + " = (" +
+                    "SELECT " + PlayerContract.PlayerGameEntry.TEAM + " FROM " + PlayerContract.PlayerGameEntry.TABLE_NAME +
+                    " WHERE " + PlayerContract.PlayerGameEntry.TABLE_NAME + "." + PlayerContract.PlayerGameEntry.NAME + 
+                    " = " + PlayerContract.PlayerEntry.TABLE_NAME + "." + PlayerContract.PlayerEntry.NAME +
+                    " AND " + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = " + PlayerGamesDbHelper.EMPTY_RESULT + ")");
+            
+            // Delete the migrated EMPTY_RESULT records from player_game
+            int deleted = db.delete(PlayerContract.PlayerGameEntry.TABLE_NAME,
+                    PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ?",
+                    new String[]{String.valueOf(PlayerGamesDbHelper.EMPTY_RESULT)});
+            
+            if (deleted > 0) {
+                Log.i("Migrate", "Migrated " + deleted + " pending records from player_game to player.team");
+                Event.logEvent(FirebaseAnalytics.getInstance(appContext), EventType.db_migrate_empty_result);
+            }
+        } catch (Exception e) {
+            Log.e("Migrate", "Error migrating EMPTY_RESULT records: " + e.getMessage(), e);
+        }
     }
 
     private void addColumn(SQLiteDatabase db, String table, String column, String type, String def) {
@@ -294,8 +330,12 @@ public class DbHelper extends SQLiteOpenHelper {
         PlayerDbHelper.clearPlayerMsgIdentifier(getSqLiteDatabase(context), name);
     }
 
-    public static void clearOldGameTeams(Context context) {
-        PlayerGamesDbHelper.clearOldGameTeams(getSqLiteDatabase(context));
+    /**
+     * Clear the active game setup. This clears all team assignments in the player table,
+     * leaving historical player_game records untouched.
+     */
+    public static void clearActiveGame(Context context) {
+        PlayerDbHelper.clearAllTeams(getSqLiteDatabase(context));
     }
 
     public static void insertPlayerGame(Context context, PlayerGame pg) {
@@ -313,13 +353,37 @@ public class DbHelper extends SQLiteOpenHelper {
         return PlayerGamesDbHelper.getPlayerLastGames(getSqLiteDatabase(context), player, countLastGames);
     }
 
+    /**
+     * Get players assigned to a team for the active game setup.
+     * Reads from the player.team column.
+     * 
+     * @param context Context
+     * @param team Which team to get (Team1, Team2, or Bench)
+     * @param countLastGames Number of last games to include in player stats
+     * @return List of players on the requested team
+     */
     @NonNull
-    public static ArrayList<Player> getCurrTeam(Context context, int currGame, TeamEnum team, int countLastGames) {
-        ArrayList<Player> currTeam = PlayerGamesDbHelper.getCurrTeam(getSqLiteDatabase(context), currGame, team);
+    public static ArrayList<Player> getActiveGameTeam(Context context, TeamEnum team, int countLastGames) {
+        ArrayList<Player> players = PlayerDbHelper.getPlayersByTeam(getSqLiteDatabase(context), team);
+        addLastGameStats(context, countLastGames, players, countLastGames > 0);
+        return players;
+    }
 
-        addLastGameStats(context, countLastGames, currTeam, countLastGames > 0);
-
-        return currTeam;
+    /**
+     * Get players from a completed/historical game.
+     * Reads from the player_game table.
+     * 
+     * @param context Context
+     * @param gameId The game ID to retrieve
+     * @param team Which team to get (Team1, Team2, or Bench)
+     * @param countLastGames Number of last games to include in player stats
+     * @return List of players on the requested team
+     */
+    @NonNull
+    public static ArrayList<Player> getGameTeam(Context context, int gameId, TeamEnum team, int countLastGames) {
+        ArrayList<Player> players = PlayerGamesDbHelper.getGameTeam(getSqLiteDatabase(context), gameId, team);
+        addLastGameStats(context, countLastGames, players, countLastGames > 0);
+        return players;
     }
 
     private static void addLastGameStats(Context context, int countLastGames, List<Player> currTeam, boolean statistics) {
@@ -357,11 +421,87 @@ public class DbHelper extends SQLiteOpenHelper {
         return GameDbHelper.getGames(getSqLiteDatabase(context), name, another);
     }
 
+    /**
+     * Finalize the active game with results. This reads players from player.team column,
+     * writes them to player_game with results, and clears team assignments.
+     */
     public static void insertGame(Context context, Game game) {
-        GameDbHelper.insertGameResults(getSqLiteDatabase(context), game);
-        PlayerGamesDbHelper.setPlayerGameResult(getSqLiteDatabase(context),
-                game.gameId, game.dateString, game.winningTeam);
+        insertGame(context, game, null);
+    }
+
+    /**
+     * Finalize the active game with results and record missed players.
+     * Reads players from player.team column, writes to player_game, then clears assignments.
+     */
+    public static void insertGame(Context context, Game game, Collection<Player> missedPlayers) {
+        SQLiteDatabase db = getSqLiteDatabase(context);
+        
+        // Insert the game record
+        GameDbHelper.insertGameResults(db, game);
+        
+        // Get players from each team and write to player_game with results
+        finalizeActiveGame(db, game.gameId, game.dateString, game.winningTeam);
+        
+        // Record missed players
+        if (missedPlayers != null) {
+            for (Player m : missedPlayers) {
+                PlayerGamesDbHelper.updatePlayerResultMissed(db, game.gameId, m.mName);
+            }
+        }
+        
         onUnderlyingDataChange();
+    }
+
+    /**
+     * Transfer players from player.team column to player_game table with final results.
+     */
+    private static void finalizeActiveGame(SQLiteDatabase db, int gameId, String dateString, TeamEnum winningTeam) {
+        // Process Team1
+        ArrayList<Player> team1 = PlayerDbHelper.getPlayersByTeam(db, TeamEnum.Team1);
+        ResultEnum team1Result = getResultForTeam(TeamEnum.Team1, winningTeam);
+        for (Player p : team1) {
+            PlayerGame pg = new PlayerGame(gameId, p.mName, p.mGrade, TeamEnum.Team1, p.getAge(), p.getAttributes());
+            pg.date = dateString;
+            pg.result = team1Result;
+            PlayerGamesDbHelper.addPlayerGame(db, pg);
+        }
+        
+        // Process Team2
+        ArrayList<Player> team2 = PlayerDbHelper.getPlayersByTeam(db, TeamEnum.Team2);
+        ResultEnum team2Result = getResultForTeam(TeamEnum.Team2, winningTeam);
+        for (Player p : team2) {
+            PlayerGame pg = new PlayerGame(gameId, p.mName, p.mGrade, TeamEnum.Team2, p.getAge(), p.getAttributes());
+            pg.date = dateString;
+            pg.result = team2Result;
+            PlayerGamesDbHelper.addPlayerGame(db, pg);
+        }
+        
+        // Process Bench (result is NA)
+        ArrayList<Player> bench = PlayerDbHelper.getPlayersByTeam(db, TeamEnum.Bench);
+        for (Player p : bench) {
+            PlayerGame pg = new PlayerGame(gameId, p.mName, p.mGrade, TeamEnum.Bench, p.getAge(), p.getAttributes());
+            pg.date = dateString;
+            pg.result = ResultEnum.NA;
+            PlayerGamesDbHelper.addPlayerGame(db, pg);
+        }
+        
+        // Clear all team assignments
+        PlayerDbHelper.clearAllTeams(db);
+        Log.d("DbHelper", "Finalized game " + gameId + " with " + 
+                (team1.size() + team2.size() + bench.size()) + " players");
+    }
+
+    /**
+     * Determine the result for a team based on the winning team.
+     */
+    private static ResultEnum getResultForTeam(TeamEnum team, TeamEnum winningTeam) {
+        if (winningTeam == null || winningTeam == TeamEnum.Bench) {
+            return ResultEnum.Tie;
+        } else if (team == winningTeam) {
+            return ResultEnum.Win;
+        } else {
+            return ResultEnum.Lose;
+        }
     }
 
     public static void updateGameDate(Context context, Game game, String gameDate) {
@@ -395,8 +535,19 @@ public class DbHelper extends SQLiteOpenHelper {
         return PlayerGamesDbHelper.getMaxGame(getSqLiteDatabase(context));
     }
 
-    public static int getActiveGame(Context context) {
-        return PlayerGamesDbHelper.getActiveGame(getSqLiteDatabase(context));
+    /**
+     * Get the next game ID to use when creating a new game.
+     * This is always max + 1, regardless of whether there's an active game setup.
+     */
+    public static int getNextGameId(Context context) {
+        return getMaxGame(context) + 1;
+    }
+
+    /**
+     * Check if there's an active game setup in progress (any player has a team assignment).
+     */
+    public static boolean hasActiveGame(Context context) {
+        return PlayerDbHelper.hasActiveGame(getSqLiteDatabase(context));
     }
 
     @NonNull
@@ -409,3 +560,4 @@ public class DbHelper extends SQLiteOpenHelper {
         return PlayerGamesDbHelper.getConsecutiveAttendance(getSqLiteDatabase(context), playerName);
     }
 }
+

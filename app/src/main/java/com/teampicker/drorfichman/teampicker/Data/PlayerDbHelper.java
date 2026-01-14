@@ -431,4 +431,80 @@ public class PlayerDbHelper {
 
         DbHelper.updateRecord(db, values, null, null, PlayerContract.PlayerEntry.TABLE_NAME);
     }
+
+    //region Team assignment for current game
+
+    /**
+     * Update a player's team assignment for the current game.
+     * @param team The team to assign, or null to clear the assignment
+     */
+    public static void updatePlayerTeam(SQLiteDatabase db, String name, TeamEnum team) {
+        ContentValues values = new ContentValues();
+        if (team != null) {
+            values.put(PlayerContract.PlayerEntry.TEAM, team.ordinal());
+        } else {
+            values.putNull(PlayerContract.PlayerEntry.TEAM);
+        }
+        updatePlayer(db, name, values);
+    }
+
+    /**
+     * Get all players assigned to a specific team for the current game.
+     */
+    @NonNull
+    public static ArrayList<Player> getPlayersByTeam(SQLiteDatabase db, TeamEnum team) {
+        String[] projection = {
+                PlayerContract.PlayerEntry.ID,
+                PlayerContract.PlayerEntry.NAME,
+                PlayerContract.PlayerEntry.GRADE,
+                PlayerContract.PlayerEntry.BIRTH_YEAR,
+                PlayerContract.PlayerEntry.BIRTH_MONTH,
+                PlayerContract.PlayerEntry.BIRTH_DAY,
+                PlayerContract.PlayerEntry.IS_COMING,
+                PlayerContract.PlayerEntry.ARCHIVED,
+                PlayerContract.PlayerEntry.ATTRIBUTES
+        };
+
+        String sortOrder = PlayerContract.PlayerEntry.GRADE + " DESC";
+        String where = PlayerContract.PlayerEntry.TEAM + " = ?";
+        String[] whereArgs = new String[]{String.valueOf(team.ordinal())};
+
+        Cursor c = db.query(
+                PlayerContract.PlayerEntry.TABLE_NAME,
+                projection,
+                where,
+                whereArgs,
+                null,
+                null,
+                sortOrder
+        );
+
+        return getPlayers(c);
+    }
+
+    /**
+     * Check if any player has a team assignment (i.e., there's an active game setup).
+     */
+    public static boolean hasActiveGame(SQLiteDatabase db) {
+        String query = "SELECT COUNT(*) FROM " + PlayerContract.PlayerEntry.TABLE_NAME +
+                " WHERE " + PlayerContract.PlayerEntry.TEAM + " IS NOT NULL";
+        try (Cursor c = db.rawQuery(query, null)) {
+            if (c.moveToFirst()) {
+                return c.getInt(0) > 0;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Clear all team assignments (called after game results are saved).
+     */
+    public static void clearAllTeams(SQLiteDatabase db) {
+        ContentValues values = new ContentValues();
+        values.putNull(PlayerContract.PlayerEntry.TEAM);
+
+        DbHelper.updateRecord(db, values, null, null, PlayerContract.PlayerEntry.TABLE_NAME);
+        Log.d("PlayerDbHelper", "Cleared all team assignments");
+    }
+    //endregion
 }

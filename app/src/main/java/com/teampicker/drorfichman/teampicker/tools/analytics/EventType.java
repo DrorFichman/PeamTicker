@@ -11,6 +11,7 @@ public enum EventType {
     paste_players, clear_attendance, players_archive, // Done
     sign_in, sign_out, // Done
     tutorial_dismissed, // Done
+    db_migrate_empty_result, // Done
 
     // TODO
     search_players, search_insights,
