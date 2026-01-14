@@ -109,7 +109,7 @@
     <string name="setting_team_color_scheme_orange_yellow">Orange — Yellow</string>
 
     <string name="setting_title_divide_attempts">Divide Attempts</string>
-    <string name="setting_summary_divide_attempts">Number of teams division to consider (1–200)</string>
+    <string name="setting_summary_divide_attempts">Number of teams division to consider (1–1000)</string>
     <string name="setting_title_grade_weight">Grade Weight</string>
     <string name="setting_summary_grade_weight">Grade weight percentage (0%–100%)</string>
     <string name="setting_title_color_scheme">Teams Colors</string>
