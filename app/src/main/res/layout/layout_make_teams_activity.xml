@@ -156,29 +156,60 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Calculating Progress Overlay -->
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/calculating_teams_progress"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#CC000000"
+                android:background="#E6000000"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="32dp"
                 android:visibility="gone">
 
-                <ProgressBar
-                    style="?android:attr/progressBarStyleLarge"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:layout_weight="1" />
+                <!-- Progress Title -->
+                <TextView
+                    android:id="@+id/calculating_teams_progress_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:text="@string/optimizing_teams"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
+                <!-- Material Progress Indicator -->
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progress_indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:max="100"
+                    android:progress="0"
+                    app:indicatorColor="#E65100"
+                    app:trackColor="#455A64"
+                    app:trackCornerRadius="4dp"
+                    app:trackThickness="8dp" />
+
+                <!-- Progress Percentage -->
                 <TextView
                     android:id="@+id/calculating_teams_progress_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:textColor="@android:color/white"
-                    android:textSize="40sp" />
-            </RelativeLayout>
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <!-- Best Score So Far -->
+                <TextView
+                    android:id="@+id/calculating_teams_progress_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="#B0BEC5"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Weather Display - Moved Below Teams -->

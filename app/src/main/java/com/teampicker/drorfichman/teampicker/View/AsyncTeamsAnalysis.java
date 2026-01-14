@@ -1,52 +1,50 @@
 package com.teampicker.drorfichman.teampicker.View;
 
-import android.os.AsyncTask;
-
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper;
+import com.teampicker.drorfichman.teampicker.tools.AsyncExecutor;
 
-import java.lang.ref.WeakReference;
+/**
+ * Async task for analyzing team collaboration data.
+ * Uses modern ExecutorService + Handler pattern instead of deprecated AsyncTask.
+ */
+class AsyncTeamsAnalysis {
 
-class AsyncTeamsAnalysis extends AsyncTask<Void, Void, String> {
+    private final AsyncExecutor<MakeTeamsActivity> executor;
+    private final OnTaskComplete doneHandler;
 
-    private final onTaskComplete doneHandler;
-
-    public interface onTaskComplete {
+    public interface OnTaskComplete {
         void execute();
     }
 
-    private WeakReference<MakeTeamsActivity> ref;
-
-    AsyncTeamsAnalysis(MakeTeamsActivity activity, onTaskComplete done) {
-        ref = new WeakReference<>(activity);
-        doneHandler = done;
+    AsyncTeamsAnalysis(MakeTeamsActivity activity, OnTaskComplete done) {
+        this.executor = new AsyncExecutor<>(activity);
+        this.doneHandler = done;
     }
 
-    @Override
-    protected String doInBackground(Void... params) {
-        MakeTeamsActivity activity = ref.get();
-        if (activity == null || activity.isFinishing()) return null;
-
-        activity.analysisResult = CollaborationHelper.getCollaborationData(activity, activity.players1, activity.players2);
-        return null;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        MakeTeamsActivity activity = ref.get();
-        if (activity == null || activity.isFinishing()) return;
-
-        activity.enterAnalysisAsync();
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        MakeTeamsActivity activity = ref.get();
-        if (activity == null || activity.isFinishing()) return;
-
-        doneHandler.execute();
-
-        activity.exitAnalysisAsync();
+    public void execute() {
+        executor
+                .onPreExecute(() -> {
+                    MakeTeamsActivity activity = executor.getActivity();
+                    if (activity != null) {
+                        activity.enterAnalysisAsync();
+                    }
+                })
+                .doInBackground(() -> {
+                    MakeTeamsActivity activity = executor.getActivity();
+                    if (activity != null && executor.isActivityValid()) {
+                        activity.analysisResult = CollaborationHelper.getCollaborationData(
+                                activity, activity.players1, activity.players2);
+                    }
+                })
+                .onPostExecute(() -> {
+                    MakeTeamsActivity activity = executor.getActivity();
+                    if (activity != null) {
+                        if (doneHandler != null) {
+                            doneHandler.execute();
+                        }
+                        activity.exitAnalysisAsync();
+                    }
+                })
+                .execute();
     }
 }

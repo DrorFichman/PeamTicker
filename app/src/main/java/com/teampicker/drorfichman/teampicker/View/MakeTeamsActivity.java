@@ -29,6 +29,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.util.Pair;
 
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerTeamAnalysisAdapter;
@@ -105,7 +106,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private View benchListLayout;
     private View teamsScreenArea;
     private View progressBarTeamDivision;
-    TextView progressBarTeamDivisionStatus;
+    private TextView progressBarTeamDivisionStatus;
+    private TextView progressBarTeamDivisionScore;
+    private LinearProgressIndicator progressIndicator;
     private View teamStatsLayout;
     private View buttonsLayout;
     private View shuffleLayout, moveLayout;
@@ -179,6 +182,8 @@ public class MakeTeamsActivity extends AppCompatActivity {
         moveLayout = findViewById(R.id.move_views);
         progressBarTeamDivision = findViewById(R.id.calculating_teams_progress);
         progressBarTeamDivisionStatus = findViewById(R.id.calculating_teams_progress_status);
+        progressBarTeamDivisionScore = findViewById(R.id.calculating_teams_progress_score);
+        progressIndicator = findViewById(R.id.progress_indicator);
 
         area1 = findViewById(R.id.panel1);
         area2 = findViewById(R.id.panel2);
@@ -1170,7 +1175,12 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     //region async division
     public void preDivideAsyncHideLists() {
+        // Reset and show progress UI
+        progressIndicator.setProgress(0, false);
+        progressBarTeamDivisionStatus.setText(getString(R.string.progress_percentage, 0));
+        progressBarTeamDivisionScore.setText(getString(R.string.progress_best_score, "--"));
         progressBarTeamDivision.setVisibility(View.VISIBLE);
+        
         teamStatsLayout.setVisibility(View.INVISIBLE);
         buttonsLayout.setVisibility(View.INVISIBLE);
         benchListLayout.setVisibility(View.INVISIBLE);
@@ -1181,8 +1191,12 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     public void postDivideAsyncShowTeams() {
+        // Hide progress UI
         progressBarTeamDivisionStatus.setText("");
+        progressBarTeamDivisionScore.setText("");
+        progressIndicator.setProgress(0, false);
         progressBarTeamDivision.setVisibility(View.GONE);
+        
         teamStatsLayout.setVisibility(View.VISIBLE);
         buttonsLayout.setVisibility(View.VISIBLE);
         setWeatherData(true);
@@ -1201,8 +1215,17 @@ public class MakeTeamsActivity extends AppCompatActivity {
     }
 
     private void updateAnalysisProgress(int progress, String score) {
-        runOnUiThread(() -> progressBarTeamDivisionStatus.setText(
-                getString(R.string.analysis_progress_update, progress, score)));
+        runOnUiThread(() -> {
+            // Update the progress indicator
+            progressIndicator.setProgress(progress, true);
+            
+            // Update the percentage text
+            progressBarTeamDivisionStatus.setText(getString(R.string.progress_percentage, progress));
+            
+            // Update the best score text
+            progressBarTeamDivisionScore.setText(getString(R.string.progress_best_score, 
+                    score != null ? score : "--"));
+        });
     }
     //endregion
     

@@ -142,6 +142,9 @@
     <string name="player_analysis_selected_games">"%1$02d</string>
     <string name="operation_move">"Long press players row to start drag and drop"</string>
     <string name="operation_divide_by_collaboration">* AI in progress :)</string>
+    <string name="optimizing_teams">Optimizing Teams…</string>
+    <string name="progress_percentage">%1$d%%</string>
+    <string name="progress_best_score">Best balance score: %1$s</string>
     <string name="analysis_progress_update">"%1$d%% (%2$s)"</string>
     <string name="operation_analysis">* Click the players for deeper analysis \n* Click icon to exit analysis mode</string>
     <string name="copy_players_success">Teams division applied</string>
