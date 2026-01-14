@@ -252,7 +252,10 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_analysis) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (item.getItemId() == R.id.action_analysis) {
             analysisClicked();
         } else if (item.getItemId() == R.id.action_enter_results) {
             initSetResults();
