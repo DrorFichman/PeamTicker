@@ -38,6 +38,10 @@
     <string name="playmaker">Playmaker</string>
     <string name="unbreakable">Unbreakable</string>
     <string name="extra">Extra</string>
+    <string name="injured">Injured</string>
+    <string name="injured_help_title">Injured Player</string>
+    <string name="injured_help_message">Mark a player as injured when they are not playing at their normal level.\n\nWhen picking teams with AI optimization, injured players\' chemistry with others will be ignored, but their grade and win rate will still be considered.\n\nThis helps balance teams fairly when a player is recovering.</string>
+    <string name="show_injured_players">Injured Players</string>
 
     <!--    Empty State-->
     <string name="empty_players_icon">No players</string>
@@ -45,6 +49,9 @@
     <string name="empty_players_message">Copy messages from your WhatsApp group and paste them here to quickly add players based on contact names.</string>
     <string name="empty_players_paste_button">Paste from WhatsApp</string>
     <string name="empty_players_or_add">Or tap + above to add players manually</string>
+    <string name="empty_injured_icon">No injured players</string>
+    <string name="empty_injured_title">No Injured Players</string>
+    <string name="empty_injured_message">Great news! None of your players are currently marked as injured.\n\nYou can mark a player as injured from their player details screen.</string>
 
     <!--    Buttons-->
     <string name="save">Save</string>

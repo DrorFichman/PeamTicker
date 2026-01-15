@@ -12,16 +12,14 @@ public class PlayerGameStat implements Serializable {
     public int grade;
     public String gameDateString;
     public boolean isMVP;
+    public boolean isInjured;
 
-    public PlayerGameStat(ResultEnum res, int currGrade, String date) {
-        this(res, currGrade, date, false);
-    }
-
-    public PlayerGameStat(ResultEnum res, int currGrade, String date, boolean mvp) {
+    public PlayerGameStat(ResultEnum res, int currGrade, String date, boolean mvp, boolean injured) {
         result = res;
         grade = currGrade;
         gameDateString = date;
         isMVP = mvp;
+        isInjured = injured;
     }
 
     @Exclude

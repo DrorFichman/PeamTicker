@@ -62,6 +62,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     boolean playerComingChanged = false;
 
     private boolean showArchivedPlayers = false;
+    private boolean showInjuredPlayers = false;
     private boolean showPastedPlayers = false;
     private Set<String> mPastedPlayers;
     private final Set<String> mAutoCreatedPlayers = new HashSet<>(); // Track auto-created players for undo
@@ -80,6 +81,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private View exitPastedModeButton;
     private View cancelPastedModeButton;
     private View emptyStateContainer;
+    private View emptyInjuredStateContainer;
 
     public PlayersFragment() {
         super(R.layout.layout_players_fragment);
@@ -102,6 +104,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         exitPastedModeButton = root.findViewById(R.id.exit_pasted_mode);
         cancelPastedModeButton = root.findViewById(R.id.cancel_pasted_mode);
         emptyStateContainer = root.findViewById(R.id.empty_state_container);
+        emptyInjuredStateContainer = root.findViewById(R.id.empty_injured_state_container);
         
         // Set up empty state paste button
         root.findViewById(R.id.empty_state_paste_button).setOnClickListener(v -> pasteComingPlayers());
@@ -215,6 +218,13 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 return;
             }
 
+            if (showInjuredPlayers) {
+                showInjuredPlayers = false;
+                refreshPlayers();
+                backPress.setEnabled(handleBackPress());
+                return;
+            }
+
             if (showPastedPlayers) {
                 // If there are auto-created players, cancel (undo) instead of just exiting
                 if (!mAutoCreatedPlayers.isEmpty()) {
@@ -243,7 +253,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private boolean handleBackPress() {
-        return (showArchivedPlayers || showPastedPlayers ||
+        return (showArchivedPlayers || showInjuredPlayers || showPastedPlayers ||
                 (filterView != null && filterView.isExpanded()));
     }
 
@@ -310,6 +320,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             pasteComingPlayers();
         } else if (item.getItemId() == R.id.add_player) {
             startActivity(PlayerDetailsActivity.getNewPlayerIntent(getContext()));
+        } else if (item.getItemId() == R.id.show_injured_players) {
+            switchInjuredPlayersView();
         } else if (item.getItemId() == R.id.show_archived_players) {
             switchArchivedPlayersView();
         } else if (item.getItemId() == R.id.clear_all) {
@@ -411,10 +423,13 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         playersList.setVisibility(hasPlayers ? View.VISIBLE : View.GONE);
         
         // Show empty state only when no players and not in special modes
-        boolean showEmptyState = !hasPlayers && !showPastedPlayers && !showArchivedPlayers;
+        boolean showEmptyState = !hasPlayers && !showPastedPlayers && !showArchivedPlayers && !showInjuredPlayers;
+        boolean showEmptyInjuredState = !hasPlayers && showInjuredPlayers;
         emptyStateContainer.setVisibility(showEmptyState ? View.VISIBLE : View.GONE);
-        rootView.findViewById(R.id.player_titles).setVisibility(showEmptyState ? View.GONE : View.VISIBLE);
-        rootView.findViewById(R.id.header_divider).setVisibility(showEmptyState ? View.GONE : View.VISIBLE);
+        emptyInjuredStateContainer.setVisibility(showEmptyInjuredState ? View.VISIBLE : View.GONE);
+        boolean hideHeaders = showEmptyState || showEmptyInjuredState;
+        rootView.findViewById(R.id.player_titles).setVisibility(hideHeaders ? View.GONE : View.VISIBLE);
+        rootView.findViewById(R.id.header_divider).setVisibility(hideHeaders ? View.GONE : View.VISIBLE);
 
         setHeadlines(true);
         playersAdapter = new PlayerAdapter(getContext(), players, this::onPlayerComingChanged);
@@ -447,7 +462,12 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             return;
         }
 
-        ArrayList<Player> players = DbHelper.getPlayers(getContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
+        ArrayList<Player> players;
+        if (showInjuredPlayers) {
+            players = DbHelper.getInjuredPlayers(getContext(), RECENT_GAMES_COUNT);
+        } else {
+            players = DbHelper.getPlayers(getContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
+        }
 
         setPlayersList(players, null);
 
@@ -463,6 +483,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         showArchivedPlayers = !showArchivedPlayers;
         if (showArchivedPlayers) {
             showPastedPlayers = false;
+            showInjuredPlayers = false;
             ArrayList<Player> players = DbHelper.getPlayers(getContext(), 0, showArchivedPlayers);
             if (players.isEmpty()) {
                 Toast.makeText(getContext(), "No archived players found", Toast.LENGTH_SHORT).show();
@@ -474,6 +495,17 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         refreshPlayers();
 
         Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.players_archive);
+    }
+
+    private void switchInjuredPlayersView() {
+        showInjuredPlayers = !showInjuredPlayers;
+        if (showInjuredPlayers) {
+            showPastedPlayers = false;
+            showArchivedPlayers = false;
+        }
+
+        backPress.setEnabled(showInjuredPlayers);
+        refreshPlayers();
     }
 
     private void setHeadlines(boolean show) {

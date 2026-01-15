@@ -144,11 +144,12 @@ public class GameDbHelper {
                     if (c.getColumnIndex(PlayerContract.PlayerGameEntry.PLAYER_GRADE) > 0)
                         g.playerGrade = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
                     
-                    // Check if player was MVP in this game
+                    // Check if player was MVP or injured in this game
                     int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);
                     if (attrIndex >= 0) {
                         String attributes = c.getString(attrIndex);
                         g.playerIsMVP = attributes != null && attributes.contains(PlayerAttribute.isMVP.displayName);
+                        g.playerIsInjured = attributes != null && attributes.contains(PlayerAttribute.isInjured.displayName);
                     }
 
                     games.add(g);

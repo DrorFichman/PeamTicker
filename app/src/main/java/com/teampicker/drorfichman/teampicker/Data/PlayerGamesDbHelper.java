@@ -129,11 +129,12 @@ public class PlayerGamesDbHelper {
                     p.setAge(c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_AGE)));
                     p.gameResult = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_RESULT));
                     
-                    // Check if player was MVP in this game
+                    // Check if player was MVP or injured in this game
                     int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);
                     if (attrIndex >= 0) {
                         String gameAttrs = c.getString(attrIndex);
                         p.gameIsMVP = gameAttrs != null && gameAttrs.contains(PlayerAttribute.isMVP.displayName);
+                        p.gameIsInjured = gameAttrs != null && gameAttrs.contains(PlayerAttribute.isInjured.displayName);
                     }
 
                     players.add(p);
@@ -241,16 +242,18 @@ public class PlayerGamesDbHelper {
                     int grade = c.getInt(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.PLAYER_GRADE));
                     String date = c.getString(c.getColumnIndexOrThrow(PlayerContract.PlayerGameEntry.DATE));
 
-                    // Check if player was MVP in this game
+                    // Check if player was MVP or injured in this game
                     boolean isMVP = false;
+                    boolean isInjured = false;
                     int attrIndex = c.getColumnIndex(PlayerContract.PlayerGameEntry.ATTRIBUTES);
                     if (attrIndex >= 0) {
                         String attributes = c.getString(attrIndex);
                         isMVP = attributes != null && attributes.contains(PlayerAttribute.isMVP.displayName);
+                        isInjured = attributes != null && attributes.contains(PlayerAttribute.isInjured.displayName);
                     }
 
                     ResultEnum resultEnum = ResultEnum.getResultFromOrdinal(res);
-                    PlayerGameStat stat = new PlayerGameStat(resultEnum, grade, date, isMVP);
+                    PlayerGameStat stat = new PlayerGameStat(resultEnum, grade, date, isMVP, isInjured);
 
                     results.add(stat);
                     i++;

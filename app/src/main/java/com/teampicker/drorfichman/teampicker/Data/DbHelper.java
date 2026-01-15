@@ -287,6 +287,13 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     @NonNull
+    public static ArrayList<Player> getInjuredPlayers(Context context, int gamesCount) {
+        ArrayList<Player> players = PlayerDbHelper.getInjuredPlayers(getSqLiteDatabase(context));
+        DbHelper.addLastGameStats(context, gamesCount, players, false);
+        return players;
+    }
+
+    @NonNull
     public static String[] getPlayersNames(Context ctx) {
         ArrayList<Player> players = DbHelper.getPlayers(ctx, 0, false);
         String[] allPlayerNames = new String[players.size()];

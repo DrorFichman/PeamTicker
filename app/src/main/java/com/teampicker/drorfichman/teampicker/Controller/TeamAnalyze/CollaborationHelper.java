@@ -53,7 +53,17 @@ public class CollaborationHelper {
 
     private static void processAgainstPlayers(List<Player> other, Player currPlayer, HashMap<String,
             PlayerChemistry> collaborationMap, PlayerCollaboration playerCollaboration) {
+        // Skip chemistry calculation if current player is injured
+        if (currPlayer.isInjured) {
+            return;
+        }
+        
         for (Player against : other) {
+            // Skip chemistry calculation if opponent is injured
+            if (against.isInjured) {
+                continue;
+            }
+            
             PlayerChemistry collaborationWith = collaborationMap.get(against.mName);
             if (collaborationWith != null) {
                 EffectMargin collaboratorEffect = new EffectMargin(currPlayer, collaborationWith);
@@ -64,7 +74,17 @@ public class CollaborationHelper {
 
     private static void processWithPlayers(List<Player> team, Player currPlayer, HashMap<String,
             PlayerChemistry> collaborationMap, PlayerCollaboration playerCollaboration) {
+        // Skip chemistry calculation if current player is injured
+        if (currPlayer.isInjured) {
+            return;
+        }
+        
         for (Player with : team) {
+            // Skip chemistry calculation if teammate is injured
+            if (with.isInjured) {
+                continue;
+            }
+            
             PlayerChemistry collaborationWith = collaborationMap.get(with.mName);
             if (collaborationWith != null) {
                 EffectMargin collaboratorEffect = new EffectMargin(currPlayer, collaborationWith);

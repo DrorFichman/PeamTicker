@@ -43,6 +43,9 @@ public class PlayerTeamGameHistoryAdapter extends ArrayAdapter<Player> {
         ImageView mvpTrophy = rowView.findViewById(R.id.player_mvp_trophy);
         setMvpTrophy(player, mvpTrophy);
 
+        ImageView injuredIcon = rowView.findViewById(R.id.player_injured_icon);
+        setInjuredIcon(player, injuredIcon);
+
         return rowView;
     }
 
@@ -51,6 +54,14 @@ public class PlayerTeamGameHistoryAdapter extends ArrayAdapter<Player> {
             mvpTrophy.setVisibility(View.VISIBLE);
         } else {
             mvpTrophy.setVisibility(View.GONE);
+        }
+    }
+
+    private void setInjuredIcon(Player player, ImageView injuredIcon) {
+        if (player.gameIsInjured) {
+            injuredIcon.setVisibility(View.VISIBLE);
+        } else {
+            injuredIcon.setVisibility(View.GONE);
         }
     }
 

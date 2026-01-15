@@ -155,7 +155,7 @@ public class PlayerDbHelper {
                 p.isPlaymaker = attr.contains(PlayerAttribute.isPlaymaker.displayName);
                 p.isUnbreakable = attr.contains(PlayerAttribute.isUnbreakable.displayName);
                 p.isExtra = attr.contains(PlayerAttribute.isExtra.displayName);
-                // p.isInjured = attr.contains(PlayerAttribute.isInjured.displayName);
+                p.isInjured = attr.contains(PlayerAttribute.isInjured.displayName);
             }
         }
         return p;
@@ -250,6 +250,40 @@ public class PlayerDbHelper {
                 null,                            // don't group the rows
                 null,                             // don't filter by row groups
                 sortOrder                                 // The sort order
+        );
+
+        return getPlayers(c);
+    }
+
+    @NonNull
+    public static ArrayList<Player> getInjuredPlayers(SQLiteDatabase db) {
+
+        String[] projection = {
+                PlayerContract.PlayerEntry.ID,
+                PlayerContract.PlayerEntry.NAME,
+                PlayerContract.PlayerEntry.GRADE,
+                PlayerContract.PlayerEntry.BIRTH_YEAR,
+                PlayerContract.PlayerEntry.BIRTH_MONTH,
+                PlayerContract.PlayerEntry.BIRTH_DAY,
+                PlayerContract.PlayerEntry.IS_COMING,
+                PlayerContract.PlayerEntry.ARCHIVED,
+                PlayerContract.PlayerEntry.ATTRIBUTES
+        };
+
+        // Only show non-archived injured players
+        String sortOrder = PlayerContract.PlayerEntry.GRADE + " DESC";
+        String where = PlayerContract.PlayerEntry.ARCHIVED + " = 0 AND " +
+                PlayerContract.PlayerEntry.ATTRIBUTES + " LIKE ?";
+        String[] selectionArgs = {"%" + PlayerAttribute.isInjured.displayName + "%"};
+
+        Cursor c = db.query(
+                PlayerContract.PlayerEntry.TABLE_NAME,
+                projection,
+                where,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
         );
 
         return getPlayers(c);

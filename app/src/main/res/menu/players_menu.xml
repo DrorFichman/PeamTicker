@@ -24,6 +24,10 @@
         android:title="@string/make_teams"
         app:showAsAction="never" />
     <item
+        android:id="@+id/show_injured_players"
+        android:title="@string/show_injured_players"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/show_archived_players"
         android:title="@string/show_archived"
         app:showAsAction="never" />

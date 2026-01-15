@@ -60,14 +60,31 @@
         android:textAppearance="@style/regularText"
         android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/game_player_mvp"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_gravity="start|center_vertical"
-        android:layout_marginStart="2dp"
-        android:src="@drawable/trophy_better"
-        android:visibility="invisible" />
+    <!-- Fixed-width container for icons to maintain alignment -->
+    <LinearLayout
+        android:id="@+id/game_icons_container"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/game_player_mvp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="2dp"
+            android:src="@drawable/trophy_better"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/game_player_injured"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="2dp"
+            android:src="@drawable/ic_injured"
+            android:visibility="gone" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/game_player_count"

@@ -20,6 +20,15 @@
         android:textSize="13sp" />
 
     <ImageView
+        android:id="@+id/player_injured_icon"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="4dp"
+        android:src="@drawable/ic_injured"
+        android:visibility="gone" />
+
+    <ImageView
         android:id="@+id/player_mvp_trophy"
         android:layout_width="16dp"
         android:layout_height="16dp"

@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.chip.Chip;
@@ -47,6 +48,8 @@ public class PlayerDetailsFragment extends Fragment {
     private Chip isPlaymaker;
     private Chip isUnbreakable;
     private Chip isExtra;
+    private Chip isInjured;
+    private View injuredHelpIcon;
 
     public PlayerDetailsFragment() {
         super(R.layout.player_crad_fragment);
@@ -86,6 +89,9 @@ public class PlayerDetailsFragment extends Fragment {
         isPlaymaker = root.findViewById(R.id.player_is_playmaker);
         isUnbreakable = root.findViewById(R.id.player_is_unbreaking);
         isExtra = root.findViewById(R.id.player_is_extra);
+        isInjured = root.findViewById(R.id.player_is_injured);
+        injuredHelpIcon = root.findViewById(R.id.injured_help_icon);
+        injuredHelpIcon.setOnClickListener(v -> showInjuredHelpDialog());
 
         if (player != null) {
             vName.setText(player.mName);
@@ -204,6 +210,7 @@ public class PlayerDetailsFragment extends Fragment {
         player.isPlaymaker = isPlaymaker.isChecked();
         player.isUnbreakable = isUnbreakable.isChecked();
         player.isExtra = isExtra.isChecked();
+        player.isInjured = isInjured.isChecked();
         DbHelper.updatePlayerAttributes(getContext(), player);
     }
 
@@ -214,6 +221,16 @@ public class PlayerDetailsFragment extends Fragment {
         isPlaymaker.setChecked(player.isPlaymaker);
         isUnbreakable.setChecked(player.isUnbreakable);
         isExtra.setChecked(player.isExtra);
+        isInjured.setChecked(player.isInjured);
+    }
+
+    private void showInjuredHelpDialog() {
+        if (getContext() == null) return;
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.injured_help_title)
+                .setMessage(R.string.injured_help_message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
     }
 
     public void showBirthdayPicker(View view) {

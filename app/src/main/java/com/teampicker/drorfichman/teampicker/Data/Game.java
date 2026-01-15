@@ -38,6 +38,9 @@ public class Game implements Serializable {
     @Exclude
     public boolean playerIsMVP;
 
+    @Exclude
+    public boolean playerIsInjured;
+
     public Game(int gameId, String date, int score1, int score2) {
         this.gameId = gameId;
         this.dateString = date;

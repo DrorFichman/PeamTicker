@@ -162,6 +162,37 @@
 
                 </com.google.android.material.chip.ChipGroup>
 
+                <!-- Injured Status with Help Icon -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/player_is_injured"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/injured"
+                        android:textColor="#D32F2F"
+                        app:chipBackgroundColor="#FFEBEE"
+                        app:chipStrokeColor="#D32F2F"
+                        app:chipStrokeWidth="1dp"
+                        app:checkedIconTint="#D32F2F" />
+
+                    <ImageView
+                        android:id="@+id/injured_help_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/ic_help_outline"
+                        android:contentDescription="@string/injured_help_title"
+                        android:background="?attr/selectableItemBackgroundBorderless" />
+
+                </LinearLayout>
+
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

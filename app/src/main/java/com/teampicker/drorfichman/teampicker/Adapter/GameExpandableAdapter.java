@@ -111,6 +111,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         ImageView res = view.findViewById(R.id.res_1);
         TextView playerGrade = view.findViewById(R.id.game_player_grade);
         ImageView playerMVP = view.findViewById(R.id.game_player_mvp);
+        ImageView playerInjured = view.findViewById(R.id.game_player_injured);
 
         dateView.setText(DateHelper.getDisplayDate(context, g.dateString));
         setResults(g, resultSet1, resultSet2, resultDivider);
@@ -118,6 +119,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         setPlayerResult(res, g);
         setPlayerGrade(playerGrade, g);
         setPlayerMVP(playerMVP, g);
+        setPlayerInjured(playerInjured, g);
 
         view.setTag(R.id.game, g);
         view.setTag(R.id.game_index_id, position);
@@ -198,6 +200,14 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
             playerMVP.setVisibility(View.VISIBLE);
         } else {
             playerMVP.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setPlayerInjured(ImageView playerInjured, Game g) {
+        if (mPlayerCollaborator == null && g.playerIsInjured) { // player view and was injured
+            playerInjured.setVisibility(View.VISIBLE);
+        } else {
+            playerInjured.setVisibility(View.GONE);
         }
     }
 

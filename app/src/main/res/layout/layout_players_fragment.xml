@@ -102,6 +102,47 @@
 
     </LinearLayout>
 
+    <!-- Empty State View for Injured Players -->
+    <LinearLayout
+        android:id="@+id/empty_injured_state_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header_divider"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_injured"
+            android:alpha="0.4"
+            android:contentDescription="@string/empty_injured_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/empty_injured_title"
+            android:textColor="#333333"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/empty_injured_message"
+            android:textColor="#666666"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp" />
+
+    </LinearLayout>
+
     <!-- Make Teams FAB -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/main_make_teams"

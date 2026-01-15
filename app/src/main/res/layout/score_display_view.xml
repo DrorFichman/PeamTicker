@@ -1,139 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true"
-    android:scrollbars="none">
+    android:orientation="horizontal"
+    android:background="#FFFFFF"
+    android:gravity="center"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="4dp">
 
+    <!-- Team 1 Score -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#FFFFFF"
-        android:padding="16dp">
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <LinearLayout
+        <Button
+            android:id="@+id/team1_minus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:minWidth="36dp"
+            android:minHeight="36dp"
+            android:text="−"
+            android:textSize="18dp"
+            android:padding="0dp"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <TextView
+            android:id="@+id/team1_score_display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="32dp"
             android:gravity="center"
-            android:layout_gravity="center"
-            android:orientation="horizontal">
+            android:text="0"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
 
-            <!-- Team 1 Score -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/team1_minus"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:minWidth="48dp"
-                        android:minHeight="48dp"
-                        android:text="−"
-                        android:textSize="20dp"
-                        android:background="?android:attr/selectableItemBackground" />
-
-                    <TextView
-                        android:id="@+id/team1_score_display"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"
-                        android:minWidth="48dp"
-                        android:gravity="center"
-                        android:text="0"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000" />
-
-                    <Button
-                        android:id="@+id/team1_plus"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:minWidth="48dp"
-                        android:minHeight="48dp"
-                        android:text="+"
-                        android:textSize="20dp"
-                        android:background="?android:attr/selectableItemBackground" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Date Button -->
-            <Button
-                android:id="@+id/set_game_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="8dp"
-                android:background="@color/fui_transparent"
-                android:drawableTop="@drawable/button_date"
-                android:onClick="showDatePicker"
-                android:padding="8dp" />
-
-            <!-- Team 2 Score -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/team2_minus"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:minWidth="48dp"
-                        android:minHeight="48dp"
-                        android:text="−"
-                        android:textSize="20dp"
-                        android:background="?android:attr/selectableItemBackground" />
-
-                    <TextView
-                        android:id="@+id/team2_score_display"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"
-                        android:minWidth="48dp"
-                        android:gravity="center"
-                        android:text="0"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000" />
-
-                    <Button
-                        android:id="@+id/team2_plus"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:minWidth="48dp"
-                        android:minHeight="48dp"
-                        android:text="+"
-                        android:textSize="20dp"
-                        android:background="?android:attr/selectableItemBackground" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        <Button
+            android:id="@+id/team1_plus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:minWidth="36dp"
+            android:minHeight="36dp"
+            android:text="+"
+            android:textSize="18dp"
+            android:padding="0dp"
+            android:background="?android:attr/selectableItemBackground" />
 
     </LinearLayout>
 
-</HorizontalScrollView>
+    <!-- Date Button -->
+    <Button
+        android:id="@+id/set_game_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/fui_transparent"
+        android:drawableTop="@drawable/button_date"
+        android:onClick="showDatePicker"
+        android:padding="4dp" />
 
+    <!-- Team 2 Score -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/team2_minus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:minWidth="36dp"
+            android:minHeight="36dp"
+            android:text="−"
+            android:textSize="18dp"
+            android:padding="0dp"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <TextView
+            android:id="@+id/team2_score_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="32dp"
+            android:gravity="center"
+            android:text="0"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/team2_plus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:minWidth="36dp"
+            android:minHeight="36dp"
+            android:text="+"
+            android:textSize="18dp"
+            android:padding="0dp"
+            android:background="?android:attr/selectableItemBackground" />
+
+    </LinearLayout>
+
+</LinearLayout>

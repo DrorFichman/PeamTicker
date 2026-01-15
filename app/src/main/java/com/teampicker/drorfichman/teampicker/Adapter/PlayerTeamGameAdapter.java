@@ -57,7 +57,7 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
         TextView name = rowView.findViewById(R.id.player_team_name);
         setName(rowView, player, name);
 
-        setAttributes(rowView, player);
+        setInjuredIndicator(rowView, player);
 
         setGamesHistory(rowView, player);
 
@@ -92,13 +92,8 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
         }
     }
 
-    private void setAttributes(View rowView, Player player) {
-        rowView.findViewById(R.id.player_gk).setVisibility(isAttributesVisible && player.isGK ? View.VISIBLE : View.GONE);
-        rowView.findViewById(R.id.player_d).setVisibility(isAttributesVisible && player.isDefender ? View.VISIBLE : View.GONE);
-        rowView.findViewById(R.id.player_pm).setVisibility(isAttributesVisible && player.isPlaymaker ? View.VISIBLE : View.GONE);
-        rowView.findViewById(R.id.player_breaking).setVisibility(isAttributesVisible && player.isUnbreakable ? View.VISIBLE : View.GONE);
-        rowView.findViewById(R.id.player_extra).setVisibility(isAttributesVisible && player.isExtra ? View.VISIBLE : View.GONE);
-        // rowView.findViewById(R.id.player_is_injured).setVisibility(isAttributesVisible && player.isInjured ? View.VISIBLE : View.GONE);
+    private void setInjuredIndicator(View rowView, Player player) {
+        rowView.findViewById(R.id.player_injured).setVisibility(isAttributesVisible && player.isInjured ? View.VISIBLE : View.GONE);
     }
 
     private void setGrade(Player player, TextView grade) {
