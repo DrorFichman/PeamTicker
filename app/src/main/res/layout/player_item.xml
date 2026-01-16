@@ -71,7 +71,7 @@
     <!-- Age - Hidden, shown in team summary instead -->
     <TextView
         android:id="@+id/player_age"
-        android:layout_width="28dp"
+        android:layout_width="32dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:gravity="center_vertical"

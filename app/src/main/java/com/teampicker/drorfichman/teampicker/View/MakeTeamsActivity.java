@@ -105,6 +105,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private View benchListLayout;
     private View teamsScreenArea;
+    private View screenshotArea;
     private View progressBarTeamDivision;
     private TextView progressBarTeamDivisionStatus;
     private TextView progressBarTeamDivisionScore;
@@ -177,6 +178,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         setupScoreControls();
 
         teamsScreenArea = findViewById(R.id.teams_list_area);
+        screenshotArea = findViewById(R.id.screenshot_area);
         buttonsLayout = findViewById(R.id.buttons_layout);
         shuffleLayout = findViewById(R.id.shuffle_views);
         moveLayout = findViewById(R.id.move_views);
@@ -688,7 +690,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         enterSendMode();
 
         final Runnable r = () -> {
-            ScreenshotHelper.takeScreenshot(MakeTeamsActivity.this, teamsScreenArea);
+            ScreenshotHelper.takeScreenshot(MakeTeamsActivity.this, screenshotArea);
             Log.d("teams", "Exit send mode - Shot taken");
             exitSendMode();
         };
