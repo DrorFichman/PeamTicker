@@ -6,7 +6,7 @@
     <string name="pick_teams_title_results">"Results"</string>
     <string name="pick_teams_title_analysis">"Analysis"</string>
     <string name="games_with_count">"Games (%1$d)"</string>
-    <string name="stats_with_count">"%1$d players · %2$d games"</string>
+    <string name="stats_with_count">"%1$d players\n%2$d games"</string>
     <string name="games_player_count">"%1$d players"</string>
     <string name="search_title">Search</string>
 
