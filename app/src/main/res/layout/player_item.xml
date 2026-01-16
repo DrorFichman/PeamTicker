@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="44dp"
+    android:layout_height="wrap_content"
+    android:minHeight="44dp"
     android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:layoutDirection="ltr"
@@ -42,7 +43,7 @@
     <TextView
         android:id="@+id/player_grade"
         android:layout_width="44dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:focusable="false"
         android:gravity="center_vertical"
@@ -60,28 +61,29 @@
     <TextView
         android:id="@+id/player_attributes"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="6dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:textColor="#546E7A"
         android:textSize="12sp" />
 
-    <!-- Age -->
+    <!-- Age - Hidden, shown in team summary instead -->
     <TextView
         android:id="@+id/player_age"
         android:layout_width="28dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
         android:textColor="#78909C"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:visibility="gone" />
 
     <!-- Player Name -->
     <TextView
         android:id="@+id/player_name"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ellipsize="end"
         android:gravity="right|center_vertical"
