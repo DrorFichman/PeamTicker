@@ -42,6 +42,11 @@
     <string name="injured_help_title">Injured Player</string>
     <string name="injured_help_message">Mark a player as injured when they are not playing at their normal level.\n\nWhen picking teams with AI optimization, injured players\' chemistry with others will be ignored, but their grade and win rate will still be considered.\n\nThis helps balance teams fairly when a player is recovering.</string>
     <string name="show_injured_players">Injured Players</string>
+    <string name="injured_grade_change_title">Update Grade?</string>
+    <string name="injured_marked_message">You marked this player as injured. Would you like to adjust their grade to reflect their current performance level?</string>
+    <string name="injury_cleared_message">Player is no longer marked as injured. Would you like to restore their grade?</string>
+    <string name="update_grade">Update</string>
+    <string name="skip">Skip</string>
 
     <!--    Empty State-->
     <string name="empty_players_icon">No players</string>

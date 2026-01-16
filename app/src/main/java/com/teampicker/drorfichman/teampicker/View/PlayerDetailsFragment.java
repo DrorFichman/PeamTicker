@@ -12,6 +12,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import android.widget.EditText;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -221,7 +223,10 @@ public class PlayerDetailsFragment extends Fragment {
         isPlaymaker.setChecked(player.isPlaymaker);
         isUnbreakable.setChecked(player.isUnbreakable);
         isExtra.setChecked(player.isExtra);
+        // Temporarily remove listener to avoid triggering dialog during init
+        isInjured.setOnCheckedChangeListener(null);
         isInjured.setChecked(player.isInjured);
+        isInjured.setOnCheckedChangeListener((buttonView, isChecked) -> showGradeChangeDialog(isChecked));
     }
 
     private void showInjuredHelpDialog() {
@@ -230,6 +235,40 @@ public class PlayerDetailsFragment extends Fragment {
                 .setTitle(R.string.injured_help_title)
                 .setMessage(R.string.injured_help_message)
                 .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
+    private void showGradeChangeDialog(boolean markedAsInjured) {
+        if (getContext() == null) return;
+
+        EditText gradeInput = new EditText(getContext());
+        gradeInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        gradeInput.setText(vGrade.getText());
+        gradeInput.setSelection(gradeInput.getText().length());
+        gradeInput.setPadding(50, 30, 50, 30);
+
+        int messageRes = markedAsInjured ? R.string.injured_marked_message : R.string.injury_cleared_message;
+
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.injured_grade_change_title)
+                .setMessage(messageRes)
+                .setView(gradeInput)
+                .setPositiveButton(R.string.update_grade, (dialog, which) -> {
+                    String newGradeStr = gradeInput.getText().toString();
+                    if (!TextUtils.isEmpty(newGradeStr)) {
+                        try {
+                            int newGrade = Integer.parseInt(newGradeStr);
+                            if (newGrade >= 0 && newGrade <= 99) {
+                                vGrade.setText(String.valueOf(newGrade));
+                            } else {
+                                Toast.makeText(getContext(), "Grade must be between 0-99", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(getContext(), "Invalid grade", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.skip, null)
                 .show();
     }
 
