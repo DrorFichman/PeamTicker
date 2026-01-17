@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +42,7 @@ import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.analytics.UserProperty;
 import com.teampicker.drorfichman.teampicker.tools.analytics.UserPropertyType;
+import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.SyncProgress;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
@@ -159,6 +161,9 @@ public class MainActivity extends AppCompatActivity
         FirebaseHelper.getInstance().storeAccountData();
 
         FirebaseHelper.fetchConfigurations(this);
+
+        // Update sync badge based on login state
+        updateSyncBadge();
     }
 
     private void authenticate() {
@@ -213,8 +218,14 @@ public class MainActivity extends AppCompatActivity
     private void setNavigationDrawer(Toolbar toolbar) {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                updateSyncBadge();
+            }
+        };
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -222,6 +233,54 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setItemIconTintList(ColorStateList.valueOf(Color.BLUE));
         navigationView.setItemTextColor(null);
+
+        // Set up sync badge action view
+        setupSyncBadge(navigationView);
+    }
+
+    private void setupSyncBadge(NavigationView navigationView) {
+        MenuItem syncItem = navigationView.getMenu().findItem(R.id.nav_data_sync);
+        if (syncItem != null) {
+            syncItem.setActionView(R.layout.menu_sync_badge);
+            updateSyncBadge();
+        }
+    }
+
+    private void updateSyncBadge() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        if (navigationView == null) return;
+
+        MenuItem syncItem = navigationView.getMenu().findItem(R.id.nav_data_sync);
+        if (syncItem == null || syncItem.getActionView() == null) return;
+
+        View actionView = syncItem.getActionView();
+        TextView badgeCount = actionView.findViewById(R.id.sync_badge_count);
+        ImageView syncedIcon = actionView.findViewById(R.id.sync_badge_synced);
+
+        // Only show sync status for logged in users
+        if (AuthHelper.getUser() == null) {
+            badgeCount.setVisibility(View.GONE);
+            syncedIcon.setVisibility(View.GONE);
+            return;
+        }
+
+        int lastSyncedGameId = PreferenceHelper.getLastSyncedGameId(this);
+        int unsyncedCount = DbHelper.countUnsyncedGames(this, lastSyncedGameId);
+
+        if (unsyncedCount > 0) {
+            // Show unsynced count badge
+            badgeCount.setText(String.valueOf(unsyncedCount));
+            badgeCount.setVisibility(View.VISIBLE);
+            syncedIcon.setVisibility(View.GONE);
+        } else if (lastSyncedGameId > 0) {
+            // Show synced indicator (only if user has synced at least once)
+            badgeCount.setVisibility(View.GONE);
+            syncedIcon.setVisibility(View.VISIBLE);
+        } else {
+            // User hasn't synced yet, don't show anything
+            badgeCount.setVisibility(View.GONE);
+            syncedIcon.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -296,6 +355,9 @@ public class MainActivity extends AppCompatActivity
 
             // refresh after sync
             LocalNotifications.sendNotification(this, LocalNotifications.PULL_DATA_ACTION);
+
+            // Update sync badge after sync operation
+            updateSyncBadge();
         }
     }
     //endregion

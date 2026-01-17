@@ -38,6 +38,25 @@ public class PreferenceHelper {
     public static String pref_tutorial_clicked_analysis = "pref_tutorial_clicked_analysis";
     public static String pref_tutorial_clicked_shuffle_stats = "pref_tutorial_clicked_shuffle_stats";
 
+    public static String pref_last_synced_game_id = "pref_last_synced_game_id";
+
+    /**
+     * Get the last synced game ID
+     * @return the last synced game ID, or 0 if never synced
+     */
+    public static int getLastSyncedGameId(Context context) {
+        SharedPreferences settings = context.getSharedPreferences(PREF_FILE, 0);
+        return settings.getInt(pref_last_synced_game_id, 0);
+    }
+
+    /**
+     * Set the last synced game ID
+     * @param gameId the game ID that was last synced
+     */
+    public static void setLastSyncedGameId(Context context, int gameId) {
+        setSharedPreferenceInt(context, pref_last_synced_game_id, gameId);
+    }
+
     /**
      * Set a string shared preference
      * @param key - Key to set shared preference

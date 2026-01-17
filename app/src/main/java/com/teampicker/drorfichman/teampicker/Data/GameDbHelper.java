@@ -168,4 +168,24 @@ public class GameDbHelper {
                 new String[]{String.valueOf(gameId)});
         Log.d("TEAMS", delete + " game was deleted");
     }
+
+    /**
+     * Count games with ID greater than the given ID
+     * @param db the database
+     * @param sinceGameId the game ID to start counting from (exclusive)
+     * @return count of games with ID > sinceGameId
+     */
+    public static int countGamesSince(SQLiteDatabase db, int sinceGameId) {
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + PlayerContract.GameEntry.TABLE_NAME +
+                        " WHERE " + PlayerContract.GameEntry.GAME + " > ?",
+                new String[]{String.valueOf(sinceGameId)});
+        try {
+            if (c.moveToFirst()) {
+                return c.getInt(0);
+            }
+        } finally {
+            c.close();
+        }
+        return 0;
+    }
 }

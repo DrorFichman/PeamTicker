@@ -26,6 +26,7 @@ import com.teampicker.drorfichman.teampicker.Data.TeamEnum;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
+import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetConfiguration;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetLastGame;
@@ -142,11 +143,18 @@ public class FirebaseHelper implements CloudSync {
     }
 
     private void syncData(Context ctx, SyncProgress progress) {
+        // Get current max game ID before syncing
+        int maxGameId = DbHelper.getMaxGame(ctx);
+        
         syncPlayersToCloud(ctx, () -> {
             progress.showSyncProgress("Syncing games...", 50);
             syncGamesToCloud(ctx, () -> {
                 progress.showSyncProgress("Syncing player stats...", 75);
                 syncPlayersGamesToCloud(ctx, () -> {
+                    // Save the last synced game ID
+                    PreferenceHelper.setLastSyncedGameId(ctx, maxGameId);
+                    Log.i("syncData", "Saved last synced game ID: " + maxGameId);
+                    
                     progress.showSyncProgress(null, 100);
                     Toast.makeText(ctx, "Sync completed", Toast.LENGTH_LONG).show();
                 });
@@ -324,6 +332,12 @@ public class FirebaseHelper implements CloudSync {
             pullGamesFromCloud(ctx, () -> {
                 handler.onProgress("Pulling player stats...", 75);
                 pullPlayersGamesFromCloud(ctx, () -> {
+                    // After pulling from cloud, update last synced game ID to current max
+                    // since all data is now in sync with the cloud
+                    int maxGameId = DbHelper.getMaxGame(ctx);
+                    PreferenceHelper.setLastSyncedGameId(ctx, maxGameId);
+                    Log.i("fetchData", "Updated last synced game ID after pull: " + maxGameId);
+                    
                     handler.onProgress(null, 100);
                 });
             });

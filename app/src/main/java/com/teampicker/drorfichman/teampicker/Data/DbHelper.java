@@ -566,5 +566,15 @@ public class DbHelper extends SQLiteOpenHelper {
     public static StreakInfo getConsecutiveAttendance(Context context, String playerName) {
         return PlayerGamesDbHelper.getConsecutiveAttendance(getSqLiteDatabase(context), playerName);
     }
+
+    /**
+     * Count games that have not been synced to cloud yet.
+     * @param context Context
+     * @param lastSyncedGameId the last game ID that was synced
+     * @return count of games with ID > lastSyncedGameId
+     */
+    public static int countUnsyncedGames(Context context, int lastSyncedGameId) {
+        return GameDbHelper.countGamesSince(getSqLiteDatabase(context), lastSyncedGameId);
+    }
 }
 

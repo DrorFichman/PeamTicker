@@ -95,6 +95,8 @@
     <string name="nav_import_from_file">Import from file</string>
     <string name="nav_sync_to_cloud">Sync to cloud</string>
     <string name="nav_pull_from_cloud">Pull from cloud</string>
+    <string name="sync_status_synced">Synced</string>
+    <string name="sync_status_unsynced">%d unsynced</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_getting_started">Getting Started</string>
     <string name="nav_about">About</string>
