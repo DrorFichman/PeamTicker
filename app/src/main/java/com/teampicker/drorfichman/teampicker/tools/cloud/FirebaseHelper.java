@@ -33,6 +33,8 @@ import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetLastGame;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetUsers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FirebaseHelper implements CloudSync {
 
@@ -59,6 +61,10 @@ public class FirebaseHelper implements CloudSync {
         playersGames,
         account,
         app,
+        // Staging nodes for transactional sync
+        players_staging,
+        games_staging,
+        playersGames_staging,
     }
 
     public interface PostConfigurationAction {
@@ -87,6 +93,31 @@ public class FirebaseHelper implements CloudSync {
 
     public static DatabaseReference players() {
         return getNode(Node.players);
+    }
+
+    // Staging nodes for transactional sync
+    public static DatabaseReference stagingPlayers() {
+        return getNode(Node.players_staging);
+    }
+
+    public static DatabaseReference stagingGames() {
+        return getNode(Node.games_staging);
+    }
+
+    public static DatabaseReference stagingPlayersGames() {
+        return getNode(Node.playersGames_staging);
+    }
+
+    /**
+     * Get the user's root reference for atomic multi-path updates.
+     */
+    private static DatabaseReference getUserRoot() {
+        if (AuthHelper.getUser() == null || AuthHelper.getUserUID().isEmpty()) {
+            Log.e("AccountFB", "User is not connected" + AuthHelper.getUser());
+            return null;
+        }
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        return database.getReference(AuthHelper.getUserUID());
     }
 
     private static DatabaseReference getNode(Node node) {
@@ -142,97 +173,213 @@ public class FirebaseHelper implements CloudSync {
                 });
     }
 
+    /**
+     * Holds data being prepared for staging upload.
+     */
+    private static class StagingData {
+        Map<String, Object> playersMap = new HashMap<>();
+        Map<String, Object> gamesMap = new HashMap<>();
+        Map<String, Object> playersGamesMap = new HashMap<>();
+        int maxGameId = 0;
+        String error = null;
+    }
+
+    /**
+     * Sync data to cloud using a staging approach for atomicity.
+     * 1. First clear any leftover staging data
+     * 2. Write all data to staging nodes
+     * 3. Perform atomic swap from staging to production using updateChildren()
+     * 
+     * If the app crashes during staging writes, production data remains intact.
+     */
     private void syncData(Context ctx, SyncProgress progress) {
-        // Get current max game ID before syncing
-        int maxGameId = DbHelper.getMaxGame(ctx);
+        progress.showSyncProgress("Preparing data...", 10);
         
-        syncPlayersToCloud(ctx, () -> {
-            progress.showSyncProgress("Syncing games...", 50);
-            syncGamesToCloud(ctx, () -> {
-                progress.showSyncProgress("Syncing player stats...", 75);
-                syncPlayersGamesToCloud(ctx, () -> {
-                    // Save the last synced game ID
-                    PreferenceHelper.setLastSyncedGameId(ctx, maxGameId);
-                    Log.i("syncData", "Saved last synced game ID: " + maxGameId);
+        // Prepare all data for upload
+        StagingData stagingData = new StagingData();
+        
+        // Get current max game ID before syncing
+        stagingData.maxGameId = DbHelper.getMaxGame(ctx);
+        
+        // Prepare players data
+        ArrayList<Player> players = DbHelper.getPlayers(ctx);
+        for (Player p : players) {
+            stagingData.playersMap.put(sanitizeKey(p.name()), p);
+        }
+        Log.i("syncData", "Prepared " + players.size() + " players for sync");
+        
+        // Prepare games data
+        ArrayList<Game> games = DbHelper.getGames(ctx);
+        for (Game g : games) {
+            ArrayList<Player> team1 = DbHelper.getGameTeam(ctx, g.gameId, TeamEnum.Team1, 0);
+            ArrayList<Player> team2 = DbHelper.getGameTeam(ctx, g.gameId, TeamEnum.Team2, 0);
+            g.setTeams(team1, team2);
+            stagingData.gamesMap.put(String.valueOf(g.gameId), g);
+        }
+        Log.i("syncData", "Prepared " + games.size() + " games for sync");
+        
+        // Prepare player games data
+        ArrayList<PlayerGame> playerGames = DbHelper.getPlayersGames(ctx);
+        for (PlayerGame pg : playerGames) {
+            String playerKey = sanitizeKey(pg.playerName);
+            // Build nested structure: playersGames/{playerName}/{gameId}
+            @SuppressWarnings("unchecked")
+            Map<String, Object> playerGamesForPlayer = (Map<String, Object>) stagingData.playersGamesMap.get(playerKey);
+            if (playerGamesForPlayer == null) {
+                playerGamesForPlayer = new HashMap<>();
+                stagingData.playersGamesMap.put(playerKey, playerGamesForPlayer);
+            }
+            playerGamesForPlayer.put(String.valueOf(pg.gameId), pg);
+        }
+        Log.i("syncData", "Prepared " + playerGames.size() + " player games for sync");
+        
+        // Step 1: Clear any leftover staging data first
+        progress.showSyncProgress("Clearing staging...", 20);
+        clearStagingData(() -> {
+            // Step 2: Write to staging nodes
+            progress.showSyncProgress("Writing players to staging...", 30);
+            writeStagingPlayers(stagingData, ctx, () -> {
+                if (stagingData.error != null) {
+                    progress.showSyncProgress(null, 0);
+                    Toast.makeText(ctx, "Failed to stage players: " + stagingData.error, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                
+                progress.showSyncProgress("Writing games to staging...", 45);
+                writeStagingGames(stagingData, ctx, () -> {
+                    if (stagingData.error != null) {
+                        progress.showSyncProgress(null, 0);
+                        Toast.makeText(ctx, "Failed to stage games: " + stagingData.error, Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     
-                    progress.showSyncProgress(null, 100);
-                    Toast.makeText(ctx, "Sync completed", Toast.LENGTH_LONG).show();
+                    progress.showSyncProgress("Writing player stats to staging...", 60);
+                    writeStagingPlayersGames(stagingData, ctx, () -> {
+                        if (stagingData.error != null) {
+                            progress.showSyncProgress(null, 0);
+                            Toast.makeText(ctx, "Failed to stage player stats: " + stagingData.error, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        
+                        // Step 3: Atomic swap from staging to production
+                        progress.showSyncProgress("Finalizing sync...", 80);
+                        swapStagingToProduction(stagingData, ctx, progress);
+                    });
                 });
             });
         });
     }
 
-    private static void syncPlayersToCloud(Context ctx, DataCallback handler) {
-        players().removeValue((error, ref) -> {
-            Log.i("syncPlayersToCloud", "Deleted error - " + error);
-            if (error == null) {
-
-                ArrayList<Player> players = DbHelper.getPlayers(ctx);
-                for (Player p : players) {
-                    storePlayer(p);
-                }
-
-                Log.i("syncPlayersToCloud", "Sync players completed");
-                handler.DataChanged();
-
-            } else {
-                Log.i("syncPlayersToCloud", "Sync failed " + error);
-                Toast.makeText(ctx, "Failed to sync players data " + error, Toast.LENGTH_LONG).show();
-            }
+    /**
+     * Clear any leftover staging data from a previous incomplete sync.
+     */
+    private static void clearStagingData(DataCallback handler) {
+        stagingPlayers().removeValue((error1, ref1) -> {
+            stagingGames().removeValue((error2, ref2) -> {
+                stagingPlayersGames().removeValue((error3, ref3) -> {
+                    Log.i("clearStagingData", "Staging data cleared");
+                    handler.DataChanged();
+                });
+            });
         });
     }
 
-    private static void syncGamesToCloud(Context ctx, DataCallback handler) {
-        games().removeValue((error, ref) -> {
-            Log.i("syncGamesToCloud", "Deleted error - " + error);
-            if (error == null) {
-
-                ArrayList<Game> games = DbHelper.getGames(ctx);
-
-                for (Game g : games) {
-                    ArrayList<Player> team1 = DbHelper.getGameTeam(ctx, g.gameId, TeamEnum.Team1, 0);
-                    ArrayList<Player> team2 = DbHelper.getGameTeam(ctx, g.gameId, TeamEnum.Team2, 0);
-                    g.setTeams(team1, team2);
-                    storeGame(g);
-                }
-
-                Log.i("syncGamesToCloud", "Sync games completed");
-                handler.DataChanged();
-
+    /**
+     * Write players data to staging node.
+     */
+    private static void writeStagingPlayers(StagingData stagingData, Context ctx, DataCallback handler) {
+        if (stagingData.playersMap.isEmpty()) {
+            Log.i("writeStagingPlayers", "No players to stage");
+            handler.DataChanged();
+            return;
+        }
+        
+        stagingPlayers().setValue(stagingData.playersMap, (error, ref) -> {
+            if (error != null) {
+                Log.e("writeStagingPlayers", "Failed: " + error.getMessage());
+                stagingData.error = error.getMessage();
             } else {
-                Log.i("syncGamesToCloud", "Sync failed " + error);
-                Toast.makeText(ctx, "Failed to sync games data " + error, Toast.LENGTH_LONG).show();
+                Log.i("writeStagingPlayers", "Staged " + stagingData.playersMap.size() + " players");
             }
+            handler.DataChanged();
         });
     }
 
-    private static void syncPlayersGamesToCloud(Context ctx, DataCallback handler) {
-        playersGames().removeValue((error, ref) -> {
-            Log.i("syncPlayersGamesToCloud", "Deleted, error - " + error);
-            if (error == null) {
-                ArrayList<PlayerGame> pgs = DbHelper.getPlayersGames(ctx);
-                for (PlayerGame pg : pgs) {
-                    storePlayerGame(pg);
-                }
-                Log.i("syncPlayersGamesToCloud", "Sync players games completed");
-                handler.DataChanged();
+    /**
+     * Write games data to staging node.
+     */
+    private static void writeStagingGames(StagingData stagingData, Context ctx, DataCallback handler) {
+        if (stagingData.gamesMap.isEmpty()) {
+            Log.i("writeStagingGames", "No games to stage");
+            handler.DataChanged();
+            return;
+        }
+        
+        stagingGames().setValue(stagingData.gamesMap, (error, ref) -> {
+            if (error != null) {
+                Log.e("writeStagingGames", "Failed: " + error.getMessage());
+                stagingData.error = error.getMessage();
             } else {
-                Log.i("syncPlayersGamesToCloud", "Sync failed " + error);
-                Toast.makeText(ctx, "Failed to sync players games data " + error, Toast.LENGTH_LONG).show();
+                Log.i("writeStagingGames", "Staged " + stagingData.gamesMap.size() + " games");
             }
+            handler.DataChanged();
         });
     }
 
-    private static void storePlayer(Player p) {
-        players().child(sanitizeKey(p.name())).setValue(p);
+    /**
+     * Write player games data to staging node.
+     */
+    private static void writeStagingPlayersGames(StagingData stagingData, Context ctx, DataCallback handler) {
+        if (stagingData.playersGamesMap.isEmpty()) {
+            Log.i("writeStagingPlayersGames", "No player games to stage");
+            handler.DataChanged();
+            return;
+        }
+        
+        stagingPlayersGames().setValue(stagingData.playersGamesMap, (error, ref) -> {
+            if (error != null) {
+                Log.e("writeStagingPlayersGames", "Failed: " + error.getMessage());
+                stagingData.error = error.getMessage();
+            } else {
+                Log.i("writeStagingPlayersGames", "Staged player games for " + stagingData.playersGamesMap.size() + " players");
+            }
+            handler.DataChanged();
+        });
     }
 
-    private static void storeGame(Game g) {
-        games().child(String.valueOf(g.gameId)).setValue(g);
-    }
-
-    private static void storePlayerGame(PlayerGame pg) {
-        playersGames().child(sanitizeKey(pg.playerName)).child(String.valueOf(pg.gameId)).setValue(pg);
+    /**
+     * Atomically swap staging data to production using updateChildren().
+     * This operation is atomic - either all paths are updated or none are.
+     */
+    private static void swapStagingToProduction(StagingData stagingData, Context ctx, SyncProgress progress) {
+        Map<String, Object> updates = new HashMap<>();
+        
+        // Set production paths to staging data (or null if empty to clear existing)
+        updates.put("/" + Node.players.name(), stagingData.playersMap.isEmpty() ? null : stagingData.playersMap);
+        updates.put("/" + Node.games.name(), stagingData.gamesMap.isEmpty() ? null : stagingData.gamesMap);
+        updates.put("/" + Node.playersGames.name(), stagingData.playersGamesMap.isEmpty() ? null : stagingData.playersGamesMap);
+        
+        // Clear staging paths
+        updates.put("/" + Node.players_staging.name(), null);
+        updates.put("/" + Node.games_staging.name(), null);
+        updates.put("/" + Node.playersGames_staging.name(), null);
+        
+        Log.i("swapStagingToProduction", "Performing atomic swap with " + updates.size() + " path updates");
+        
+        getUserRoot().updateChildren(updates, (error, ref) -> {
+            if (error != null) {
+                Log.e("swapStagingToProduction", "Atomic swap failed: " + error.getMessage());
+                progress.showSyncProgress(null, 0);
+                Toast.makeText(ctx, "Failed to finalize sync: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            } else {
+                // Save the last synced game ID after successful sync
+                PreferenceHelper.setLastSyncedGameId(ctx, stagingData.maxGameId);
+                Log.i("swapStagingToProduction", "Atomic swap completed, saved last synced game ID: " + stagingData.maxGameId);
+                
+                progress.showSyncProgress(null, 100);
+                Toast.makeText(ctx, "Sync completed", Toast.LENGTH_LONG).show();
+            }
+        });
     }
     //endregion
 
@@ -322,113 +469,166 @@ public class FirebaseHelper implements CloudSync {
         void onProgress(String status, int progress);
     }
 
-    private void fetchData(Context ctx, FetchDataProgress handler) {
-        DbHelper.deleteTableContents(ctx);
-        Log.i("pullFromCloud", "Delete local DB");
+    /**
+     * Holds all data fetched from the cloud before committing to local database.
+     * This allows us to fetch all data first, then insert atomically.
+     */
+    private static class CloudData {
+        ArrayList<Player> players = new ArrayList<>();
+        ArrayList<Game> games = new ArrayList<>();
+        ArrayList<PlayerGame> playerGames = new ArrayList<>();
+        String error = null;
+    }
 
-        handler.onProgress("Pulling players...", 25);
-        pullPlayersFromCloud(ctx, () -> {
-            handler.onProgress("Pulling games...", 50);
-            pullGamesFromCloud(ctx, () -> {
-                handler.onProgress("Pulling player stats...", 75);
-                pullPlayersGamesFromCloud(ctx, () -> {
-                    // After pulling from cloud, update last synced game ID to current max
-                    // since all data is now in sync with the cloud
-                    int maxGameId = DbHelper.getMaxGame(ctx);
-                    PreferenceHelper.setLastSyncedGameId(ctx, maxGameId);
-                    Log.i("fetchData", "Updated last synced game ID after pull: " + maxGameId);
+    /**
+     * Fetch all data from cloud first, then insert into local DB in a single transaction.
+     * This ensures atomicity - if anything fails or the app crashes during fetch,
+     * the local database remains untouched.
+     */
+    private void fetchData(Context ctx, FetchDataProgress handler) {
+        handler.onProgress("Pulling players...", 20);
+        
+        CloudData cloudData = new CloudData();
+        
+        // Fetch players from cloud
+        fetchPlayersFromCloud(cloudData, () -> {
+            if (cloudData.error != null) {
+                handler.onProgress(null, 0);
+                Toast.makeText(ctx, "Failed to pull players: " + cloudData.error, Toast.LENGTH_LONG).show();
+                return;
+            }
+            
+            handler.onProgress("Pulling games...", 40);
+            
+            // Fetch games from cloud
+            fetchGamesFromCloud(cloudData, () -> {
+                if (cloudData.error != null) {
+                    handler.onProgress(null, 0);
+                    Toast.makeText(ctx, "Failed to pull games: " + cloudData.error, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                
+                handler.onProgress("Pulling player stats...", 60);
+                
+                // Fetch all player games from cloud
+                fetchAllPlayerGamesFromCloud(cloudData, () -> {
+                    if (cloudData.error != null) {
+                        handler.onProgress(null, 0);
+                        Toast.makeText(ctx, "Failed to pull player stats: " + cloudData.error, Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     
-                    handler.onProgress(null, 100);
+                    handler.onProgress("Saving data...", 80);
+                    
+                    // All data fetched successfully - now insert atomically
+                    try {
+                        DbHelper.replaceDataInTransaction(ctx, 
+                                cloudData.players, 
+                                cloudData.games, 
+                                cloudData.playerGames);
+                        
+                        // After successful transaction, update last synced game ID
+                        int maxGameId = DbHelper.getMaxGame(ctx);
+                        PreferenceHelper.setLastSyncedGameId(ctx, maxGameId);
+                        Log.i("pullFromCloud", "Transaction completed, updated last synced game ID: " + maxGameId);
+                        
+                        handler.onProgress(null, 100);
+                    } catch (Exception e) {
+                        Log.e("pullFromCloud", "Transaction failed", e);
+                        handler.onProgress(null, 0);
+                        Toast.makeText(ctx, "Failed to save data: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 });
             });
         });
     }
 
-    private static void pullPlayersFromCloud(Context ctx, DataCallback handler) {
+    /**
+     * Fetch players from cloud into memory (does not write to local DB).
+     */
+    private static void fetchPlayersFromCloud(CloudData cloudData, DataCallback handler) {
         ValueEventListener playerListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 for (DataSnapshot snapshotNode : dataSnapshot.getChildren()) {
                     Player p = snapshotNode.getValue(Player.class);
-                    boolean created = DbHelper.insertPlayer(ctx, p);
-                    if (!created) Log.e("pullPlayersFromCloud", "Failed to insert " + p.mName);
+                    if (p != null) {
+                        cloudData.players.add(p);
+                    }
                 }
-
-                Log.i("pullPlayersFromCloud", "Local players DB updated from cloud");
+                Log.i("fetchPlayersFromCloud", "Fetched " + cloudData.players.size() + " players from cloud");
                 handler.DataChanged();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("pullPlayersFromCloud", "onCancelled", databaseError.toException());
+                Log.e("fetchPlayersFromCloud", "onCancelled", databaseError.toException());
+                cloudData.error = databaseError.getMessage();
+                handler.DataChanged();
             }
         };
 
         players().addListenerForSingleValueEvent(playerListener);
     }
 
-    private static void pullGamesFromCloud(Context ctx, DataCallback handler) {
+    /**
+     * Fetch games from cloud into memory (does not write to local DB).
+     */
+    private static void fetchGamesFromCloud(CloudData cloudData, DataCallback handler) {
         ValueEventListener gamesListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                int gameCount = 0;
                 for (DataSnapshot snapshotNode : dataSnapshot.getChildren()) {
                     Game g = snapshotNode.getValue(Game.class);
-                    DbHelper.insertGame(ctx, g);
-                    gameCount++;
+                    if (g != null) {
+                        cloudData.games.add(g);
+                    }
                 }
-
-                Log.i("pullGamesFromCloud", "Local games DB updated from cloud - " + gameCount);
+                Log.i("fetchGamesFromCloud", "Fetched " + cloudData.games.size() + " games from cloud");
                 handler.DataChanged();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("pullGamesFromCloud", "onCancelled", databaseError.toException());
+                Log.e("fetchGamesFromCloud", "onCancelled", databaseError.toException());
+                cloudData.error = databaseError.getMessage();
+                handler.DataChanged();
             }
         };
 
         games().addListenerForSingleValueEvent(gamesListener);
     }
 
-    private static void pullPlayersGamesFromCloud(Context ctx, DataCallback handler) {
-        ArrayList<Player> players = DbHelper.getPlayers(ctx);
-        if (players.size() == 0) {
-            handler.DataChanged();
-            return;
-        }
-
-        ArrayList<Player> clone = (ArrayList<Player>) players.clone();
-        for (Player p : players) {
-            ValueEventListener playersGamesListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    int gameCount = 0;
-                    for (DataSnapshot snapshotNode : dataSnapshot.getChildren()) {
-                        PlayerGame pg = snapshotNode.getValue(PlayerGame.class);
-                        DbHelper.insertPlayerGame(ctx, pg);
-                        gameCount++;
-                    }
-
-                    clone.remove(p);
-                    Log.i("pullPlayersGamesFromCloud", "Local players games DB updated from cloud - " + p.mName + " - " + gameCount + " clone " + clone.size());
-
-                    if (clone.size() == 0) {
-                        handler.DataChanged();
+    /**
+     * Fetch all player games from cloud into memory (does not write to local DB).
+     * Fetches the entire playersGames node at once instead of per-player.
+     */
+    private static void fetchAllPlayerGamesFromCloud(CloudData cloudData, DataCallback handler) {
+        ValueEventListener playersGamesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // playersGames is structured as: playersGames/{playerName}/{gameId}
+                for (DataSnapshot playerNode : dataSnapshot.getChildren()) {
+                    for (DataSnapshot gameNode : playerNode.getChildren()) {
+                        PlayerGame pg = gameNode.getValue(PlayerGame.class);
+                        if (pg != null) {
+                            cloudData.playerGames.add(pg);
+                        }
                     }
                 }
+                Log.i("fetchAllPlayerGamesFromCloud", "Fetched " + cloudData.playerGames.size() + " player games from cloud");
+                handler.DataChanged();
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e("pullPlayersGamesFromCloud", "onCancelled", databaseError.toException());
-                }
-            };
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("fetchAllPlayerGamesFromCloud", "onCancelled", databaseError.toException());
+                cloudData.error = databaseError.getMessage();
+                handler.DataChanged();
+            }
+        };
 
-            playersGames().child(p.mName).addListenerForSingleValueEvent(playersGamesListener);
-        }
+        playersGames().addListenerForSingleValueEvent(playersGamesListener);
     }
     //endregion
 
