@@ -433,7 +433,7 @@ public class MainActivity extends AppCompatActivity
             } else if (position == 1) {
                 return GamesContainerFragment.newInstance();
             } else {
-                return StatisticsFragment.newInstance();
+                return StatisticsContainerFragment.newInstance();
             }
         }
     }

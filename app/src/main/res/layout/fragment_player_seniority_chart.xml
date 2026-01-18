@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/charts_goal_diff_trend_title"
+        android:text="@string/stats_seniority_chart_title"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />
@@ -26,44 +26,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/charts_goal_diff_trend_description"
+        android:text="@string/stats_seniority_chart_description"
         android:textSize="13sp"
         android:textColor="@android:color/darker_gray"
         android:layout_marginBottom="8dp" />
 
-    <!-- Selected data point info panel -->
-    <LinearLayout
-        android:id="@+id/info_panel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingVertical="4dp"
-        android:paddingHorizontal="16dp"
-        android:background="#F5F5F5"
-        android:visibility="invisible">
-
-        <TextView
-            android:id="@+id/selected_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#333333" />
-
-        <TextView
-            android:id="@+id/selected_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:textSize="14sp"
-            android:textColor="#555555" />
-
-    </LinearLayout>
-
     <!-- Summary Card -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/trend_summary_card"
+        android:id="@+id/summary_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
@@ -79,11 +49,11 @@
             android:gravity="center_vertical"
             android:padding="12dp">
 
-            <!-- Trend icon -->
+            <!-- Icon -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📈"
+                android:text="👥"
                 android:textSize="24sp"
                 android:layout_marginEnd="12dp" />
 
@@ -96,12 +66,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/charts_avg_goal_diff"
+                    android:text="@string/stats_seniority_current_avg"
                     android:textSize="14sp"
                     android:textColor="@android:color/darker_gray" />
 
                 <TextView
-                    android:id="@+id/avg_goal_diff_value"
+                    android:id="@+id/current_avg_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="18sp"
@@ -112,9 +82,35 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- Info Panel for selected point -->
+    <LinearLayout
+        android:id="@+id/info_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="8dp"
+        android:visibility="invisible"
+        android:background="#F5F5F5">
+
+        <TextView
+            android:id="@+id/selected_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="16dp" />
+
+        <TextView
+            android:id="@+id/selected_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp" />
+    </LinearLayout>
+
     <!-- Chart Container -->
     <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/goal_diff_trend_chart"
+        android:id="@+id/seniority_chart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />

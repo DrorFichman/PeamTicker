@@ -257,4 +257,27 @@
     <string name="charts_avg_last_n_games">Avg (last %1$d)</string>
     <string name="charts_median_last_n_games">Median (last %1$d)</string>
     <string name="charts_no_data">Not enough game data. Play at least %1$d games to see charts.</string>
+
+    <!--    Statistics Tab Charts-->
+    <string name="stats_tab_stats">Stats</string>
+    <string name="stats_tab_charts">Charts</string>
+    <string name="stats_charts_tab_seniority">Seniority</string>
+    <string name="stats_charts_tab_success">Success</string>
+
+    <!--    Player Seniority Chart-->
+    <string name="stats_seniority_chart_title">Player Seniority Trend</string>
+    <string name="stats_seniority_chart_description">moving average of new players (less than 10 games)</string>
+    <string name="stats_seniority_no_data">Not enough game data. Play at least %1$d games to see the seniority trend.</string>
+    <string name="stats_seniority_current_avg">Current Average</string>
+    <string name="stats_seniority_current_value">%.1f new players per game</string>
+    <string name="stats_seniority_new_players_avg">New Players (25-game avg)</string>
+    <string name="stats_seniority_avg_new_players">New players: %.1f</string>
+    <string name="stats_game_number">Game %1$d</string>
+
+    <!--    Player Success Chart-->
+    <string name="stats_success_heatmap_title">Player Success Over Time</string>
+    <string name="stats_success_heatmap_description">Cumulative success (wins - losses) for top players</string>
+    <string name="stats_success_no_data">Not enough game data. Play at least %1$d games to see the success chart.</string>
+    <string name="stats_success_show_players">Show players:</string>
+    <string name="stats_success_all_players">All</string>
 </resources>

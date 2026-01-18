@@ -17,7 +17,6 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -29,44 +28,52 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
+import com.teampicker.drorfichman.teampicker.Data.PlayerGame;
 import com.teampicker.drorfichman.teampicker.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Fragment displaying a line chart of moving average goal difference over time.
- * Lower values indicate more competitive/balanced games.
+ * Fragment displaying a line chart showing the trend of new players (less than 10 games)
+ * over time using a X-game moving average.
  */
-public class GoalDiffMedianChartFragment extends Fragment {
+public class PlayerSeniorityChartFragment extends Fragment {
 
-    private static final int MIN_GAMES_FOR_DISPLAY = 10;
-    private static final int WINDOW_SIZE_SMALL = 10;
-    private static final int WINDOW_SIZE_LARGE = 50;
+    private static final int MIN_GAMES_FOR_DISPLAY = 60;  // Need at least 60 games (skip first)
+    private static final int WINDOW_SIZE = 25;
+    private static final int NEW_PLAYER_THRESHOLD = 10;  // Players with < 10 games are "new"
 
     private LineChart chart;
     private TextView emptyMessage;
     private CardView summaryCard;
-    private TextView avgGoalDiffValue;
+    private TextView currentAvgValue;
     private LinearLayout infoPanel;
     private TextView selectedDate;
     private TextView selectedValue;
 
     private ArrayList<Game> games;
+    private ArrayList<PlayerGame> allPlayerGames;
+    private List<GameNewPlayerData> gameNewPlayerCounts;
     private SimpleDateFormat dateFormat;
     private GameUpdateBroadcast notificationHandler;
 
-    public GoalDiffMedianChartFragment() {
-        super(R.layout.fragment_goal_diff_median_chart);
+    public PlayerSeniorityChartFragment() {
+        super(R.layout.fragment_player_seniority_chart);
     }
 
-    public static GoalDiffMedianChartFragment newInstance() {
-        return new GoalDiffMedianChartFragment();
+    public static PlayerSeniorityChartFragment newInstance() {
+        return new PlayerSeniorityChartFragment();
     }
 
     @Override
@@ -75,6 +82,7 @@ public class GoalDiffMedianChartFragment extends Fragment {
         notificationHandler = new GameUpdateBroadcast();
         LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION, notificationHandler);
         LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION, notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION, notificationHandler);
     }
 
     @Override
@@ -89,10 +97,10 @@ public class GoalDiffMedianChartFragment extends Fragment {
         View root = super.onCreateView(inflater, container, savedInstanceState);
 
         assert root != null;
-        chart = root.findViewById(R.id.goal_diff_trend_chart);
+        chart = root.findViewById(R.id.seniority_chart);
         emptyMessage = root.findViewById(R.id.empty_message);
-        summaryCard = root.findViewById(R.id.trend_summary_card);
-        avgGoalDiffValue = root.findViewById(R.id.avg_goal_diff_value);
+        summaryCard = root.findViewById(R.id.summary_card);
+        currentAvgValue = root.findViewById(R.id.current_avg_value);
         infoPanel = root.findViewById(R.id.info_panel);
         selectedDate = root.findViewById(R.id.selected_date);
         selectedValue = root.findViewById(R.id.selected_value);
@@ -109,6 +117,7 @@ public class GoalDiffMedianChartFragment extends Fragment {
         }
 
         games = DbHelper.getGames(getContext());
+        allPlayerGames = DbHelper.getPlayersGames(getContext());
 
         if (games == null || games.size() < MIN_GAMES_FOR_DISPLAY) {
             showEmptyState();
@@ -117,6 +126,14 @@ public class GoalDiffMedianChartFragment extends Fragment {
 
         // Games are sorted DESC (newest first), we need oldest first for chronological chart
         Collections.reverse(games);
+
+        // Calculate new player count for each game
+        calculateNewPlayerCounts();
+
+        if (gameNewPlayerCounts == null || gameNewPlayerCounts.size() < WINDOW_SIZE + 10) {
+            showEmptyState();
+            return;
+        }
 
         // Create date formatter for info panel
         dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
@@ -130,7 +147,55 @@ public class GoalDiffMedianChartFragment extends Fragment {
         chart.setVisibility(View.GONE);
         summaryCard.setVisibility(View.GONE);
         emptyMessage.setVisibility(View.VISIBLE);
-        emptyMessage.setText(getString(R.string.charts_no_data, MIN_GAMES_FOR_DISPLAY));
+        emptyMessage.setText(getString(R.string.stats_seniority_no_data, MIN_GAMES_FOR_DISPLAY));
+    }
+
+    /**
+     * Calculate the number of "new players" (players with < 10 games) for each game.
+     */
+    private void calculateNewPlayerCounts() {
+        gameNewPlayerCounts = new ArrayList<>();
+
+        // Group player games by game ID
+        Map<Integer, List<PlayerGame>> gameIdToPlayers = new HashMap<>();
+        for (PlayerGame pg : allPlayerGames) {
+            gameIdToPlayers.computeIfAbsent(pg.gameId, k -> new ArrayList<>()).add(pg);
+        }
+
+        // Track cumulative game count for each player
+        Map<String, Integer> playerGameCounts = new HashMap<>();
+
+        // Process games in chronological order
+        for (Game game : games) {
+            List<PlayerGame> playersInGame = gameIdToPlayers.get(game.gameId);
+            if (playersInGame == null || playersInGame.isEmpty()) {
+                continue;
+            }
+
+            int newPlayerCount = 0;
+            int totalPlayers = playersInGame.size();
+
+            // Count how many players in this game are "new" (less than threshold games)
+            for (PlayerGame pg : playersInGame) {
+                int playerGames = playerGameCounts.getOrDefault(pg.playerName, 0);
+                if (playerGames < NEW_PLAYER_THRESHOLD) {
+                    newPlayerCount++;
+                }
+            }
+
+            // Store the data for this game
+            gameNewPlayerCounts.add(new GameNewPlayerData(
+                    game.gameId,
+                    game.getDate(),
+                    newPlayerCount,
+                    totalPlayers
+            ));
+
+            // Increment game count for all participating players
+            for (PlayerGame pg : playersInGame) {
+                playerGameCounts.merge(pg.playerName, 1, Integer::sum);
+            }
+        }
     }
 
     private void setupChart() {
@@ -148,7 +213,7 @@ public class GoalDiffMedianChartFragment extends Fragment {
         chart.setClipValuesToContent(false);
         chart.setClipToPadding(false);
 
-        // Enable highlight by drag
+        // Enable highlight
         chart.setHighlightPerDragEnabled(true);
         chart.setHighlightPerTapEnabled(true);
 
@@ -167,8 +232,8 @@ public class GoalDiffMedianChartFragment extends Fragment {
             @Override
             public String getFormattedValue(float value) {
                 int index = (int) value;
-                if (index >= 0 && index < games.size()) {
-                    Date gameDate = games.get(index).getDate();
+                if (index >= 0 && index < gameNewPlayerCounts.size()) {
+                    Date gameDate = gameNewPlayerCounts.get(index).date;
                     if (gameDate != null) {
                         if (shouldShowMonths()) {
                             return monthYearFormat.format(gameDate);
@@ -180,9 +245,9 @@ public class GoalDiffMedianChartFragment extends Fragment {
             }
 
             private boolean shouldShowMonths() {
-                if (games.size() < 2) return false;
-                Date first = games.get(0).getDate();
-                Date last = games.get(games.size() - 1).getDate();
+                if (gameNewPlayerCounts.size() < 2) return false;
+                Date first = gameNewPlayerCounts.get(0).date;
+                Date last = gameNewPlayerCounts.get(gameNewPlayerCounts.size() - 1).date;
                 if (first == null || last == null) return false;
 
                 Calendar cal1 = Calendar.getInstance();
@@ -201,19 +266,13 @@ public class GoalDiffMedianChartFragment extends Fragment {
         leftAxis.setDrawGridLines(true);
         leftAxis.setGridColor(Color.LTGRAY);
         leftAxis.setGranularity(1f);
-        leftAxis.setGranularityEnabled(true);
         leftAxis.setTextSize(10f);
-
-        // Add reference line at 3.0 (competitive threshold)
-        leftAxis.removeAllLimitLines();
-        LimitLine competitiveLine = new LimitLine(3.0f, "Competitive (< 3 goals)");
-        competitiveLine.setLineColor(Color.rgb(156, 39, 176));  // Purple
-        competitiveLine.setLineWidth(2f);
-        competitiveLine.enableDashedLine(10f, 5f, 0f);
-        competitiveLine.setTextSize(10f);
-        competitiveLine.setTextColor(Color.rgb(156, 39, 176));  // Purple
-        competitiveLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
-        leftAxis.addLimitLine(competitiveLine);
+        leftAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format(Locale.getDefault(), "%.1f", value);
+            }
+        });
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
@@ -225,13 +284,13 @@ public class GoalDiffMedianChartFragment extends Fragment {
         chart.getLegend().setOrientation(com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL);
         chart.getLegend().setDrawInside(false);
 
-        // Set up selection listener to update info panel
+        // Set up selection listener
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 int index = (int) e.getX();
-                float medianDiff = e.getY();
-                updateInfoPanel(index, medianDiff);
+                float value = e.getY();
+                updateInfoPanel(index, value);
             }
 
             @Override
@@ -241,21 +300,21 @@ public class GoalDiffMedianChartFragment extends Fragment {
         });
     }
 
-    private void updateInfoPanel(int gameIndex, float medianDiff) {
+    private void updateInfoPanel(int gameIndex, float avgNewPlayers) {
         infoPanel.setVisibility(View.VISIBLE);
 
-        if (gameIndex >= 0 && gameIndex < games.size()) {
-            Date gameDate = games.get(gameIndex).getDate();
+        if (gameIndex >= 0 && gameIndex < gameNewPlayerCounts.size()) {
+            Date gameDate = gameNewPlayerCounts.get(gameIndex).date;
             if (gameDate != null) {
                 selectedDate.setText(dateFormat.format(gameDate));
             } else {
-                selectedDate.setText("Game " + (gameIndex + 1));
+                selectedDate.setText(getString(R.string.stats_game_number, gameIndex + 1));
             }
         } else {
-            selectedDate.setText("Game " + (gameIndex + 1));
+            selectedDate.setText(getString(R.string.stats_game_number, gameIndex + 1));
         }
 
-        selectedValue.setText(String.format(Locale.getDefault(), "Median Diff: %.1f", medianDiff));
+        selectedValue.setText(getString(R.string.stats_seniority_avg_new_players, avgNewPlayers));
     }
 
     private void hideInfoPanel() {
@@ -263,82 +322,53 @@ public class GoalDiffMedianChartFragment extends Fragment {
     }
 
     private void updateChart() {
-        if (games == null || games.isEmpty()) {
+        if (gameNewPlayerCounts == null || gameNewPlayerCounts.isEmpty()) {
             return;
         }
 
-        List<LineDataSet> dataSets = new ArrayList<>();
-
-        // Last 10 games average
-        LineDataSet avg10Set = createMovingDataSet(WINDOW_SIZE_SMALL);
-        if (avg10Set != null) {
-            avg10Set.setColor(Color.rgb(33, 150, 243)); // Blue
-            avg10Set.setLabel(getString(R.string.charts_avg_last_n_games, WINDOW_SIZE_SMALL));
-            dataSets.add(avg10Set);
-        }
-
-        // Only show 50-game line if we have enough games
-        if (games.size() >= WINDOW_SIZE_LARGE) {
-            // Last 50 games average
-            LineDataSet avg50Set = createMovingDataSet(WINDOW_SIZE_LARGE);
-            if (avg50Set != null) {
-                avg50Set.setColor(Color.rgb(76, 175, 80)); // Green
-                avg50Set.setLabel(getString(R.string.charts_avg_last_n_games, WINDOW_SIZE_LARGE));
-                dataSets.add(avg50Set);
-            }
-        }
-
-        if (dataSets.isEmpty()) {
-            return;
-        }
-
-        LineData lineData = new LineData(dataSets.toArray(new LineDataSet[0]));
-        chart.setData(lineData);
-        chart.invalidate();
-    }
-
-    /**
-     * Create a moving average or median dataset
-     *
-     * @param windowSize The window size for calculation
-     */
-    private LineDataSet createMovingDataSet(int windowSize) {
         ArrayList<Entry> entries = new ArrayList<>();
 
-        // Start from windowSize to have enough data
-        for (int i = windowSize - 1; i < games.size(); i++) {
-            float value = calculateAverageDiff(i - windowSize + 1, i + 1);
-            entries.add(new Entry(i, value));
+        // Calculate X-game moving average, starting from game X+1
+        for (int i = WINDOW_SIZE; i < gameNewPlayerCounts.size(); i++) {
+            float movingAvg = calculateMovingAverage(i - WINDOW_SIZE, i);
+            entries.add(new Entry(i, movingAvg));
         }
 
         if (entries.isEmpty()) {
-            return null;
+            return;
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "");
+        LineDataSet dataSet = new LineDataSet(entries, getString(R.string.stats_seniority_new_players_avg));
+        dataSet.setColor(Color.rgb(33, 150, 243)); // Blue
         dataSet.setLineWidth(2.5f);
         dataSet.setDrawCircles(false);
         dataSet.setDrawValues(false);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setCubicIntensity(0.2f);
-        dataSet.setHighLightColor(Color.rgb(255, 193, 7));
+        dataSet.setHighLightColor(Color.rgb(255, 193, 7)); // Amber
         dataSet.setHighlightLineWidth(2f);
         dataSet.setDrawVerticalHighlightIndicator(true);
         dataSet.setDrawHorizontalHighlightIndicator(false);
 
-        return dataSet;
+        // Add fill
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(Color.rgb(33, 150, 243));
+        dataSet.setFillAlpha(50);
+
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
+        chart.invalidate();
     }
 
     /**
-     * Calculate average goal difference for games in range [startIndex, endIndex)
+     * Calculate moving average of new player count for games in range [startIndex, endIndex)
      */
-    private float calculateAverageDiff(int startIndex, int endIndex) {
-        int totalDiff = 0;
+    private float calculateMovingAverage(int startIndex, int endIndex) {
+        float total = 0;
         int count = 0;
 
-        for (int i = startIndex; i < endIndex && i < games.size(); i++) {
-            Game game = games.get(i);
-            totalDiff += Math.abs(game.team1Score - game.team2Score);
+        for (int i = startIndex; i < endIndex && i < gameNewPlayerCounts.size(); i++) {
+            total += gameNewPlayerCounts.get(i).newPlayerCount;
             count++;
         }
 
@@ -346,27 +376,39 @@ public class GoalDiffMedianChartFragment extends Fragment {
             return 0f;
         }
 
-        return (float) totalDiff / count;
+        return total / count;
     }
 
     private void updateSummaryCard() {
-        if (games == null || games.isEmpty()) {
+        if (gameNewPlayerCounts == null || gameNewPlayerCounts.size() < WINDOW_SIZE) {
             summaryCard.setVisibility(View.GONE);
             return;
         }
 
-        // Calculate overall average goal difference
-        int totalDiff = 0;
-        for (Game game : games) {
-            totalDiff += Math.abs(game.team1Score - game.team2Score);
-        }
+        // Calculate current average (last X games)
+        int lastIndex = gameNewPlayerCounts.size();
+        float currentAvg = calculateMovingAverage(lastIndex - WINDOW_SIZE, lastIndex);
 
-        float avgDiff = (float) totalDiff / games.size();
-        avgGoalDiffValue.setText(String.format(Locale.getDefault(), "%.1f goals", avgDiff));
+        currentAvgValue.setText(getString(R.string.stats_seniority_current_value, currentAvg));
         summaryCard.setVisibility(View.VISIBLE);
     }
 
-    // Broadcast receiver for game updates
+    // Data class for storing game new player counts
+    private static class GameNewPlayerData {
+        int gameId;
+        Date date;
+        int newPlayerCount;
+        int totalPlayers;
+
+        GameNewPlayerData(int gameId, Date date, int newPlayerCount, int totalPlayers) {
+            this.gameId = gameId;
+            this.date = date;
+            this.newPlayerCount = newPlayerCount;
+            this.totalPlayers = totalPlayers;
+        }
+    }
+
+    // Broadcast receiver for updates
     private class GameUpdateBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
