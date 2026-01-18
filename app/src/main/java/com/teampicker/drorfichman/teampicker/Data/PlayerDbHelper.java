@@ -170,6 +170,12 @@ public class PlayerDbHelper {
         return (key != null && c.getColumnIndex(key) > 0) ? c.getInt(c.getColumnIndex(key)) : def;
     }
 
+    /**
+     * Delete a player from the players table only.
+     * IMPORTANT: This does NOT delete records from the player_game table.
+     * Historical game data is preserved so deleted players still appear in past games.
+     * This is intentional - modifying past game attendance is not allowed.
+     */
     public static void deletePlayer(SQLiteDatabase db, String name) {
         Log.d("DB", "delete player " + name);
 

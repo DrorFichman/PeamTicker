@@ -251,6 +251,8 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     //region edit games
+    // Note: Game editing is intentionally limited to date changes only.
+    // Past game attendance (players) cannot be modified to preserve historical integrity.
     public void editGame(Game game) {
         if (game == null) {
             Toast.makeText(context, "Select game to edit", Toast.LENGTH_SHORT).show();

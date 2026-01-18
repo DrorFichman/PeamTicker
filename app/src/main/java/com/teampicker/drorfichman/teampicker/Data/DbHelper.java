@@ -369,10 +369,21 @@ public class DbHelper extends SQLiteOpenHelper {
         return comingPlayers;
     }
 
+    /**
+     * Delete a player from the players table.
+     * IMPORTANT: This intentionally does NOT delete player_game records.
+     * Historical game attendance must be preserved - deleted players should
+     * still appear in their past games.
+     */
     public static void deletePlayer(Context context, String playerName) {
         PlayerDbHelper.deletePlayer(getSqLiteDatabase(context), playerName);
     }
 
+    /**
+     * Archive or unarchive a player. Archived players are hidden from the main
+     * player list but remain in the database.
+     * Historical game attendance is never affected by archive status.
+     */
     public static void archivePlayer(Context context, String name, boolean archiveValue) {
         PlayerDbHelper.setPlayerArchive(getSqLiteDatabase(context), name, archiveValue);
     }
