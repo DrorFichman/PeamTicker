@@ -226,14 +226,8 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
         }
 
         int suggestedGrade = player.getSuggestedGrade();
-        Date lastPlayerGame = player.lastPlayedGame();
 
-        if (lastPlayerGame == null ||
-                lastPlayerGame.before(Date.from(Instant.now().minus(LAST_GAME_DAYS, ChronoUnit.DAYS)))) {
-            if (!player.archived) {
-                recentPerformance.setImageResource(R.drawable.archive);
-            }
-        } else if (suggestedGrade > player.mGrade) {
+        if (suggestedGrade > player.mGrade) {
             recentPerformance.setImageResource(R.drawable.increase);
             recentPerformance.setVisibility(View.VISIBLE);
         } else if (suggestedGrade < player.mGrade) {
