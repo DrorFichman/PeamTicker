@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity
             if (position == 0) {
                 return PlayersFragment.newInstance();
             } else if (position == 1) {
-                return GamesFragment.newInstance(null, null, true, null);
+                return GamesContainerFragment.newInstance();
             } else {
                 return StatisticsFragment.newInstance();
             }

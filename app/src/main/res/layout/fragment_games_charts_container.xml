@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Chart selector tabs -->
+    <RadioGroup
+        android:id="@+id/charts_tab_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="8dp"
+        android:background="#F5F5F5">
+
+        <RadioButton
+            android:id="@+id/tab_goal_diff_distribution"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/charts_tab_distribution"
+            android:textSize="13sp"
+            android:textColor="@color/insights_tab_text_color"
+            android:background="@drawable/insights_tab_selector"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/tab_goal_diff_trend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/charts_tab_trend"
+            android:textSize="13sp"
+            android:textColor="@color/insights_tab_text_color"
+            android:background="@drawable/insights_tab_selector"
+            android:layout_marginStart="4dp" />
+    </RadioGroup>
+
+    <!-- ViewPager2 for charts -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/charts_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>
+

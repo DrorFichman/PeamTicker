@@ -241,4 +241,20 @@
     <string name="insights_wins_label">Wins</string>
     <string name="insights_ties_label">Ties</string>
     <string name="insights_losses_label">Losses</string>
+
+    <!--    Games Charts-->
+    <string name="games_tab_history">History</string>
+    <string name="games_tab_charts">Charts</string>
+    <string name="charts_tab_distribution">Distribution</string>
+    <string name="charts_tab_trend">Trend</string>
+    <string name="charts_goal_diff_distribution_title">Goal Difference Distribution</string>
+    <string name="charts_goal_diff_distribution_description">Percentage of games ending with each score difference</string>
+    <string name="charts_goal_diff_trend_title">Goal Difference Trend</string>
+    <string name="charts_goal_diff_trend_description">Moving average goal difference over time</string>
+    <string name="charts_close_games_percentage">Competitive Games (diff &lt; 3)</string>
+    <string name="charts_avg_goal_diff">Average Goal Difference</string>
+    <string name="charts_last_n_games">Last %1$d games</string>
+    <string name="charts_avg_last_n_games">Avg (last %1$d)</string>
+    <string name="charts_median_last_n_games">Median (last %1$d)</string>
+    <string name="charts_no_data">Not enough game data. Play at least %1$d games to see charts.</string>
 </resources>
