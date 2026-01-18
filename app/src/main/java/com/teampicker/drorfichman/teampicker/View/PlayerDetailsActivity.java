@@ -183,7 +183,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             } else if (position == 2) {
                 return "Team";
             } else {
-                return "Insights";
+                return "Charts";
             }
         }
 

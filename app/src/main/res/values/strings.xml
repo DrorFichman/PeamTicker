@@ -245,8 +245,8 @@
     <!--    Games Charts-->
     <string name="games_tab_history">History</string>
     <string name="games_tab_charts">Charts</string>
-    <string name="charts_tab_distribution">Distribution</string>
-    <string name="charts_tab_trend">Trend</string>
+    <string name="charts_tab_distribution">Game Diff</string>
+    <string name="charts_tab_trend">Over Time</string>
     <string name="charts_goal_diff_distribution_title">Goal Difference Distribution</string>
     <string name="charts_goal_diff_distribution_description">Percentage of games ending with each score difference</string>
     <string name="charts_goal_diff_trend_title">Goal Difference Trend</string>
@@ -261,7 +261,7 @@
     <!--    Statistics Tab Charts-->
     <string name="stats_tab_stats">Stats</string>
     <string name="stats_tab_charts">Charts</string>
-    <string name="stats_charts_tab_seniority">Seniority</string>
+    <string name="stats_charts_tab_seniority">New Players</string>
     <string name="stats_charts_tab_success">Success</string>
 
     <!--    Player Seniority Chart-->
