@@ -26,7 +26,7 @@ import java.util.List;
 public class DbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 9;
     public static final String DATABASE_NAME = "Players.db";
 
     private static SQLiteDatabase writableDatabase;
@@ -207,6 +207,54 @@ public class DbHelper extends SQLiteOpenHelper {
         getSqLiteDatabase(context).execSQL(PlayerDbHelper.SQL_DROP_PLAYER_TABLE);
         getSqLiteDatabase(context).execSQL(GameDbHelper.SQL_DROP_GAMES_TABLE);
         getSqLiteDatabase(context).execSQL(PlayerGamesDbHelper.SQL_DROP_PLAYER_GAMES_TABLE);
+    }
+
+    /**
+     * Replace all data in a transaction. The entire operation (delete + insert) is atomic -
+     * if the app crashes before completion, the database will roll back to its previous state.
+     * 
+     * @param context Context for database access
+     * @param players List of players to insert
+     * @param games List of games to insert
+     * @param playerGames List of player games to insert
+     */
+    public static void replaceDataInTransaction(Context context,
+                                                ArrayList<Player> players,
+                                                ArrayList<Game> games,
+                                                ArrayList<PlayerGame> playerGames) {
+        SQLiteDatabase db = getSqLiteDatabase(context);
+        db.beginTransaction();
+        try {
+            // Delete existing data
+            db.execSQL(PlayerDbHelper.SQL_DROP_PLAYER_TABLE);
+            db.execSQL(GameDbHelper.SQL_DROP_GAMES_TABLE);
+            db.execSQL(PlayerGamesDbHelper.SQL_DROP_PLAYER_GAMES_TABLE);
+
+            // Insert players
+            for (Player p : players) {
+                p.mName = FirebaseHelper.sanitizeKey(p.mName);
+                PlayerDbHelper.insertPlayer(db, p);
+            }
+
+            // Insert games
+            for (Game g : games) {
+                GameDbHelper.insertGameResults(db, g);
+            }
+
+            // Insert player games
+            for (PlayerGame pg : playerGames) {
+                pg.playerName = FirebaseHelper.sanitizeKey(pg.playerName);
+                PlayerGamesDbHelper.addPlayerGame(db, pg);
+            }
+
+            // Mark successful - will commit on endTransaction()
+            db.setTransactionSuccessful();
+            Log.i("DbHelper", "Transaction completed: " + players.size() + " players, " + 
+                    games.size() + " games, " + playerGames.size() + " player games");
+            onUnderlyingDataChange();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     public static void setPlayerComing(Context context, ArrayList<Player> team) {
