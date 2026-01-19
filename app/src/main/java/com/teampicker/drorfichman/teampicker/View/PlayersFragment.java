@@ -26,6 +26,8 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -45,6 +47,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
@@ -83,6 +86,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private View emptyStateContainer;
     private View emptyInjuredStateContainer;
 
+    // Contact import
+    private ActivityResultLauncher<String> contactPermissionLauncher;
+    private boolean hadPlayersBeforeImport = false;
+
     public PlayersFragment() {
         super(R.layout.layout_players_fragment);
     }
@@ -106,8 +113,9 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         emptyStateContainer = root.findViewById(R.id.empty_state_container);
         emptyInjuredStateContainer = root.findViewById(R.id.empty_injured_state_container);
         
-        // Set up empty state paste button
+        // Set up empty state buttons
         root.findViewById(R.id.empty_state_paste_button).setOnClickListener(v -> pasteComingPlayers());
+        root.findViewById(R.id.empty_state_import_button).setOnClickListener(v -> launchContactPicker());
 
         refreshPlayers();
 
@@ -250,6 +258,17 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this, backPress);
         backPress.setEnabled(false);
+
+        // Register contact permission launcher
+        contactPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        showContactSelectionDialog();
+                    } else {
+                        Toast.makeText(getContext(), R.string.import_contacts_permission_denied, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private boolean handleBackPress() {
@@ -318,6 +337,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             launchMakeTeams();
         } else if (item.getItemId() == R.id.paste_coming_players) {
             pasteComingPlayers();
+        } else if (item.getItemId() == R.id.import_contacts) {
+            launchContactPicker();
         } else if (item.getItemId() == R.id.add_player) {
             startActivity(PlayerDetailsActivity.getNewPlayerIntent(getContext()));
         } else if (item.getItemId() == R.id.show_injured_players) {
@@ -766,6 +787,118 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
         dialog.show();
+    }
+    //endregion
+
+    //region import contacts
+    private void launchContactPicker() {
+        // Check if there are players before import (for dialog decision)
+        ArrayList<Player> existingPlayers = DbHelper.getPlayers(getContext(), 0, false);
+        hadPlayersBeforeImport = existingPlayers != null && !existingPlayers.isEmpty();
+
+        // Check if we have permission
+        if (requireContext().checkSelfPermission(android.Manifest.permission.READ_CONTACTS) 
+                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            showContactSelectionDialog();
+        } else {
+            contactPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS);
+        }
+    }
+
+    private void showContactSelectionDialog() {
+        new ContactPickerDialog(requireContext(), selectedContacts -> {
+            Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.import_contacts);
+            processImportedContacts(selectedContacts);
+        }).show();
+    }
+
+    private void processImportedContacts(ArrayList<String> contactNames) {
+        ArrayList<String> importedPlayers = new ArrayList<>();
+        ArrayList<String> skippedPlayers = new ArrayList<>();
+
+        for (String displayName : contactNames) {
+            if (TextUtils.isEmpty(displayName)) {
+                continue;
+            }
+
+            // Check if player already exists
+            Player existingPlayer = DbHelper.getPlayer(getContext(), displayName);
+            if (existingPlayer != null) {
+                skippedPlayers.add(displayName);
+                // Mark existing player as coming
+                if (!existingPlayer.isComing) {
+                    DbHelper.updatePlayerComing(getContext(), displayName, true);
+                }
+                continue;
+            }
+
+            // Create new player with default grade 80
+            Player newPlayer = new Player(displayName, 80);
+            newPlayer.msgDisplayName = displayName;
+            newPlayer.isComing = true;
+
+            if (DbHelper.insertPlayer(getContext(), newPlayer)) {
+                DbHelper.setPlayerIdentifier(getContext(), displayName, displayName);
+                DbHelper.updatePlayerComing(getContext(), displayName, true);
+                importedPlayers.add(displayName);
+                Log.i("ImportContacts", "Created player: " + displayName);
+            }
+        }
+
+        // Refresh the players list
+        refreshPlayers();
+
+        // Show appropriate feedback
+        if (!importedPlayers.isEmpty()) {
+            showImportResult(importedPlayers, skippedPlayers);
+        } else if (!skippedPlayers.isEmpty()) {
+            Toast.makeText(getContext(), 
+                    skippedPlayers.size() == 1 
+                        ? "Player already exists: " + skippedPlayers.get(0)
+                        : skippedPlayers.size() + " players already exist",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showImportResult(ArrayList<String> importedPlayers, ArrayList<String> skippedPlayers) {
+        // Check if this is the first time using contact import
+        boolean isFirstImport = !PreferenceHelper.getSharedPreference(getContext())
+                .contains(PreferenceHelper.pref_first_contact_import_shown);
+
+        if (isFirstImport) {
+            // Mark as shown
+            PreferenceHelper.setSharedPreferenceString(getContext(), 
+                    PreferenceHelper.pref_first_contact_import_shown, "1");
+            
+            // Show first-time snackbar
+            Snackbar.make(rootView, R.string.import_contacts_first_time_hint, Snackbar.LENGTH_LONG).show();
+        }
+
+        // If there were players before import, show dialog with imported names
+        if (hadPlayersBeforeImport && !importedPlayers.isEmpty()) {
+            StringBuilder message = new StringBuilder();
+            message.append(getString(R.string.import_contacts_added_players)).append("\n\n");
+            for (String name : importedPlayers) {
+                message.append("• ").append(name).append("\n");
+            }
+            if (!skippedPlayers.isEmpty()) {
+                message.append("\n").append(getString(R.string.import_contacts_skipped_existing)).append("\n");
+                for (String name : skippedPlayers) {
+                    message.append("• ").append(name).append("\n");
+                }
+            }
+
+            new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.import_contacts_result_title)
+                    .setMessage(message.toString().trim())
+                    .setPositiveButton(R.string.done, null)
+                    .show();
+        } else if (!hadPlayersBeforeImport) {
+            // First players - just show a toast
+            Toast.makeText(getContext(), 
+                    getString(R.string.import_contacts_success, importedPlayers.size()), 
+                    Toast.LENGTH_SHORT).show();
+        }
     }
     //endregion
 

@@ -73,23 +73,40 @@
             android:lineSpacingExtra="4dp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/empty_state_paste_button"
+            android:id="@+id/empty_state_import_button"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:paddingHorizontal="24dp"
             android:paddingVertical="12dp"
-            android:text="@string/empty_players_paste_button"
+            android:text="@string/empty_players_import_button"
             android:textAllCaps="false"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:theme="@style/Theme.MaterialComponents.Light"
             app:cornerRadius="24dp"
-            app:icon="@drawable/paste"
+            app:icon="@drawable/player"
             app:iconPadding="8dp"
             app:iconTint="@android:color/white" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/empty_state_paste_button"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            android:text="@string/empty_players_paste_button"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:theme="@style/Theme.MaterialComponents.Light"
+            app:cornerRadius="24dp"
+            app:icon="@drawable/paste"
+            app:iconPadding="8dp" />
 
         <TextView
             android:layout_width="wrap_content"

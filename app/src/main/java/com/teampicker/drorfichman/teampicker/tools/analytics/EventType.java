@@ -8,7 +8,7 @@ public enum EventType {
     make_teams, send_teams, save_results, shuffle_teams, move_player, analysis_mode, analysis_mode_player_clicked, // Done
     settings_view, settings_changed_color, settings_changed_grades, settings_changed_tutorial_reset, settings_changed_show_hints, settings_changed_division_percentage, settings_changed_division_attempts, // Done
     backup_to_file, import_from_file, sync_to_cloud, pull_from_cloud, // Done
-    paste_players, clear_attendance, players_archive, // Done
+    paste_players, clear_attendance, players_archive, import_contacts, // Done
     sign_in, sign_out, // Done
     tutorial_dismissed, // Done
     db_migrate_empty_result, // Done

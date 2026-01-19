@@ -39,6 +39,7 @@ public class PreferenceHelper {
     public static String pref_tutorial_clicked_shuffle_stats = "pref_tutorial_clicked_shuffle_stats";
 
     public static String pref_last_synced_game_id = "pref_last_synced_game_id";
+    public static String pref_first_contact_import_shown = "pref_first_contact_import_shown";
 
     /**
      * Get the last synced game ID

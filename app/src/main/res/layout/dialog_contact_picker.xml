@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Search field with icons -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_search_field">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_search"
+            android:contentDescription="@string/search_title" />
+
+        <EditText
+            android:id="@+id/contact_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/import_contacts_search_hint"
+            android:inputType="text"
+            android:background="@null"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:textSize="16sp"
+            android:textColorHint="#999999"
+            android:maxLines="1"
+            android:imeOptions="actionSearch" />
+
+        <ImageView
+            android:id="@+id/contact_search_clear"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_clear"
+            android:visibility="gone"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/clear_search" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/contact_selection_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textColor="#666666"
+        android:textSize="13sp" />
+
+    <ListView
+        android:id="@+id/contact_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:divider="#E0E0E0"
+        android:dividerHeight="1dp" />
+
+</LinearLayout>

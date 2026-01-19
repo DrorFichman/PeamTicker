@@ -12,8 +12,8 @@
         android:title="@string/add_player"
         app:showAsAction="always" />
     <item
-        android:id="@+id/clear_all"
-        android:title="@string/clear_all_coming"
+        android:id="@+id/import_contacts"
+        android:title="@string/import_contacts"
         app:showAsAction="never" />
     <item
         android:id="@+id/paste_coming_players"
@@ -30,5 +30,9 @@
     <item
         android:id="@+id/show_archived_players"
         android:title="@string/show_archived"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/clear_all"
+        android:title="@string/clear_all_coming"
         app:showAsAction="never" />
 </menu>

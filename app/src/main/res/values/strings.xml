@@ -41,7 +41,7 @@
     <string name="injured">Injured</string>
     <string name="injured_help_title">Injured Player</string>
     <string name="injured_help_message">Mark a player as injured when they are not playing at their normal level.\n\nWhen picking teams with AI optimization, injured players\' chemistry with others will be ignored, but their grade and win rate will still be considered.\n\nThis helps balance teams fairly when a player is recovering.</string>
-    <string name="show_injured_players">Injured Players</string>
+    <string name="show_injured_players">View Injured Players</string>
     <string name="injured_grade_change_title">Update Grade?</string>
     <string name="injured_marked_message">You marked this player as injured. Would you like to adjust their grade to reflect their current performance level?</string>
     <string name="injury_cleared_message">Player is no longer marked as injured. Would you like to restore their grade?</string>
@@ -51,7 +51,8 @@
     <!--    Empty State-->
     <string name="empty_players_icon">No players</string>
     <string name="empty_players_title">No Players Yet</string>
-    <string name="empty_players_message">Copy messages from your WhatsApp group and paste them here to quickly add players based on contact names.</string>
+    <string name="empty_players_message">Import players from your contacts or paste WhatsApp messages to quickly get started.</string>
+    <string name="empty_players_import_button">Import from Contacts</string>
     <string name="empty_players_paste_button">Paste from WhatsApp</string>
     <string name="empty_players_or_add">Or tap + above to add players manually</string>
     <string name="empty_injured_icon">No injured players</string>
@@ -104,7 +105,25 @@
     <!--    Menus-->
     <string name="add_player">Add Player</string>
     <string name="paste_players">Paste Players</string>
-    <string name="show_archived">Players Archive</string>
+    <string name="import_contacts">Import from Contacts</string>
+
+    <!--    Import Contacts-->
+    <string name="import_contacts_first_time_hint">Players imported! Tap any player to edit their details.</string>
+    <string name="import_contacts_result_title">Players Imported</string>
+    <string name="import_contacts_added_players">Added the following players:</string>
+    <string name="import_contacts_skipped_existing">Skipped (already exist):</string>
+    <string name="import_contacts_success">%1$d player(s) imported successfully</string>
+    <string name="import_contacts_select_title">Select Contacts to Import</string>
+    <string name="import_contacts_done">Import</string>
+    <string name="import_contacts_permission_denied">Contact permission is required to import players</string>
+    <string name="import_contacts_no_contacts">No contacts found</string>
+    <string name="import_contacts_search_hint">Search contacts…</string>
+    <string name="clear_search">Clear search</string>
+    <string name="import_contacts_selected_count">%1$d selected</string>
+    <string name="import_contacts_confirm_exit_title">Discard selection?</string>
+    <string name="import_contacts_confirm_exit_message">You have %1$d contact(s) selected. Are you sure you want to exit without importing them?</string>
+    <string name="import_contacts_discard">Discard</string>
+    <string name="show_archived">View Players Archive</string>
     <string name="make_teams">Pick Teams</string>
     <string name="new_game">New Game</string>
     <string name="enter_results">Enter Results</string>
