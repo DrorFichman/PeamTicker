@@ -43,6 +43,7 @@ import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.analytics.UserProperty;
 import com.teampicker.drorfichman.teampicker.tools.analytics.UserPropertyType;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
+import com.teampicker.drorfichman.teampicker.tools.SharedContactHandler;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.cloud.SyncProgress;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
@@ -81,6 +82,9 @@ public class MainActivity extends AppCompatActivity
         setUserProperties();
 
         setTabs();
+
+        // Handle shared contact from external app
+        SharedContactHandler.handleSharedContact(this, getIntent());
     }
 
     private void setUserProperties() {

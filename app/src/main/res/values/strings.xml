@@ -123,6 +123,12 @@
     <string name="import_contacts_confirm_exit_title">Discard selection?</string>
     <string name="import_contacts_confirm_exit_message">You have %1$d contact(s) selected. Are you sure you want to exit without importing them?</string>
     <string name="import_contacts_discard">Discard</string>
+
+    <!--    Shared Contact-->
+    <string name="shared_contact_exists">Player \"%1$s\" already exists</string>
+    <string name="shared_contact_exists_archived">Player \"%1$s\" exists in archive</string>
+    <string name="shared_contact_read_error">Could not read contact</string>
+    <string name="shared_contact_parse_error">Could not parse contact name</string>
     <string name="show_archived">View Players Archive</string>
     <string name="make_teams">Pick Teams</string>
     <string name="new_game">New Game</string>
