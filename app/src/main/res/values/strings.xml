@@ -270,7 +270,7 @@
     <!--    Games Charts-->
     <string name="games_tab_history">History</string>
     <string name="games_tab_charts">Charts</string>
-    <string name="charts_tab_distribution">Game Diff</string>
+    <string name="charts_tab_distribution">Scores</string>
     <string name="charts_tab_trend">Over Time</string>
     <string name="charts_goal_diff_distribution_title">Goal Difference Distribution</string>
     <string name="charts_goal_diff_distribution_description">Percentage of games ending with each score difference</string>
@@ -286,17 +286,20 @@
     <!--    Statistics Tab Charts-->
     <string name="stats_tab_stats">Stats</string>
     <string name="stats_tab_charts">Charts</string>
-    <string name="stats_charts_tab_seniority">New Players</string>
+    <string name="stats_charts_tab_seniority">Experience</string>
     <string name="stats_charts_tab_success">Success</string>
 
-    <!--    Player Seniority Chart-->
-    <string name="stats_seniority_chart_title">Player Seniority Trend</string>
-    <string name="stats_seniority_chart_description">moving average of new players (less than 10 games)</string>
-    <string name="stats_seniority_no_data">Not enough game data. Play at least %1$d games to see the seniority trend.</string>
-    <string name="stats_seniority_current_avg">Current Average</string>
-    <string name="stats_seniority_current_value">%.1f new players per game</string>
-    <string name="stats_seniority_new_players_avg">New Players (25-game avg)</string>
-    <string name="stats_seniority_avg_new_players">New players: %.1f</string>
+    <!--    Player Experience Distribution Chart-->
+    <string name="stats_seniority_chart_title">Player Experience Distribution</string>
+    <string name="stats_seniority_chart_description">Stacked counts by experience level</string>
+    <string name="stats_seniority_no_data">Not enough game data. Play at least %1$d games to see the experience distribution.</string>
+    <string name="stats_seniority_current_avg">Current Average (25 games)</string>
+    <string name="stats_seniority_current_value">New: %.0f | Returning: %.0f | Regulars: %.0f</string>
+    <string name="stats_seniority_new_players">New (&lt;10)</string>
+    <string name="stats_seniority_returning_players">Returning (10–50)</string>
+    <string name="stats_seniority_regulars">Regulars (&gt;50)</string>
+    <string name="stats_seniority_click_hint">Click the chart to view player details</string>
+    <string name="stats_seniority_player_games">%1$s (%2$d)</string>
     <string name="stats_game_number">Game %1$d</string>
 
     <!--    Player Success Chart-->
