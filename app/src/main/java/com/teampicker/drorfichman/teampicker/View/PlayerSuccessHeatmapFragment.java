@@ -83,6 +83,7 @@ public class PlayerSuccessHeatmapFragment extends Fragment {
     private static final int ALL_PLAYERS = -1;
     private int currentPlayerCount = 10;
     private int highlightedPlayerIndex = -1;  // -1 means no player is highlighted
+    private int infoPanelPlayerIndex = -1;    // Track which player is currently shown in info panel
     private List<Chip> legendItems = new ArrayList<>();
 
     // Distinct colors for up to 25 players
@@ -157,6 +158,13 @@ public class PlayerSuccessHeatmapFragment extends Fragment {
         setupPlayerCountSpinner();
         loadDataAndSetupChart();
 
+        // Set up info panel click to toggle highlight for the displayed player
+        infoPanel.setOnClickListener(v -> {
+            if (infoPanelPlayerIndex >= 0) {
+                onLegendItemClicked(infoPanelPlayerIndex);
+            }
+        });
+
         return root;
     }
 
@@ -189,8 +197,25 @@ public class PlayerSuccessHeatmapFragment extends Fragment {
                     newCount = ALL_PLAYERS;  // "All" option
                 }
                 if (newCount != currentPlayerCount) {
+                    // Check if highlighted player will still be visible
+                    if (highlightedPlayerIndex != -1) {
+                        int effectiveNewCount = (newCount == ALL_PLAYERS)
+                                ? (topPlayerNames != null ? topPlayerNames.size() : 0)
+                                : newCount;
+                        if (highlightedPlayerIndex >= effectiveNewCount) {
+                            highlightedPlayerIndex = -1;  // Player no longer visible
+                        }
+                    }
+                    // Check if info panel player will still be visible
+                    if (infoPanelPlayerIndex != -1) {
+                        int effectiveNewCount = (newCount == ALL_PLAYERS)
+                                ? (topPlayerNames != null ? topPlayerNames.size() : 0)
+                                : newCount;
+                        if (infoPanelPlayerIndex >= effectiveNewCount) {
+                            hideInfoPanel();
+                        }
+                    }
                     currentPlayerCount = newCount;
-                    highlightedPlayerIndex = -1;  // Reset highlight when changing player count
                     updateChart();
                 }
             }
@@ -453,10 +478,12 @@ public class PlayerSuccessHeatmapFragment extends Fragment {
 
         LineData lineData = new LineData(dataSets);
         chart.setData(lineData);
-        chart.invalidate();
 
         // Build custom legend
         buildCustomLegend(playerCount);
+
+        // Apply highlight styling if a player is highlighted
+        applyHighlightToChart();
     }
 
     /**
@@ -482,17 +509,20 @@ public class PlayerSuccessHeatmapFragment extends Fragment {
             int color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length];
 
             Chip chip = new Chip(requireContext());
-            chip.setText(truncateName(playerName));
+            chip.setText(playerName);
             chip.setTextSize(10);
             chip.setChipMinHeight(24 * getResources().getDisplayMetrics().density);
             chip.setChipCornerRadius(12 * getResources().getDisplayMetrics().density);
-            chip.setTextStartPadding(2 * getResources().getDisplayMetrics().density);
-            chip.setTextEndPadding(2 * getResources().getDisplayMetrics().density);
-            chip.setChipStartPadding(4 * getResources().getDisplayMetrics().density);
-            chip.setChipEndPadding(4 * getResources().getDisplayMetrics().density);
+            chip.setTextStartPadding(6 * getResources().getDisplayMetrics().density);
+            chip.setTextEndPadding(6 * getResources().getDisplayMetrics().density);
+            chip.setChipStartPadding(0);
+            chip.setChipEndPadding(0);
             chip.setChipIconVisible(false);
             chip.setCheckable(false);
             chip.setClickable(true);
+            chip.setSingleLine(true);
+            chip.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            chip.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
             // Style with player color
             chip.setChipStrokeWidth(2 * getResources().getDisplayMetrics().density);
@@ -609,6 +639,9 @@ public class PlayerSuccessHeatmapFragment extends Fragment {
     private void updateInfoPanel(int gameIndex, float value, int dataSetIndex) {
         infoPanel.setVisibility(View.VISIBLE);
 
+        // Track the currently displayed player for info panel click handling
+        infoPanelPlayerIndex = dataSetIndex;
+
         // Get date
         if (gameIndex >= 0 && gameIndex < games.size()) {
             Date gameDate = games.get(gameIndex).getDate();
@@ -640,6 +673,7 @@ public class PlayerSuccessHeatmapFragment extends Fragment {
 
     private void hideInfoPanel() {
         infoPanel.setVisibility(View.INVISIBLE);
+        infoPanelPlayerIndex = -1;
     }
 
     // Data class for storing player success points
