@@ -289,8 +289,11 @@ public class MakeTeamsActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         // Applies the changes made (shuffle/manual) when leaving activity
-        // It also copies the latest game teams after a game result is saved
-        saveCurrentTeams();
+        // Skip if results were just saved - teams were cleared by insertGame()
+        // (mSetResult stays true after saving, but is set to false when canceling)
+        if (!mSetResult) {
+            saveCurrentTeams();
+        }
         super.onPause();
     }
 

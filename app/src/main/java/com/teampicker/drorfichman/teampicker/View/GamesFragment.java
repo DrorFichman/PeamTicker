@@ -88,7 +88,7 @@ public class GamesFragment extends Fragment {
     }
 
     private void setNewGameButton() {
-        newGameButton.setVisibility(isAllGamesView() ? View.VISIBLE : View.GONE);
+        updateNewGameButtonVisibility();
 
         newGameButton.setOnClickListener(view -> {
             Intent makeTeamsIntent = MakeTeamsActivity.getIntent(getContext());
@@ -99,6 +99,12 @@ public class GamesFragment extends Fragment {
                 Toast.makeText(getContext(), "First - select attending players", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void updateNewGameButtonVisibility() {
+        // Only show "new game" button when viewing all games AND there's an active game with team divisions
+        boolean hasActiveGame = DbHelper.hasActiveGame(getContext());
+        newGameButton.setVisibility(isAllGamesView() && hasActiveGame ? View.VISIBLE : View.GONE);
     }
 
     private void setHeadlines(View root) {
@@ -139,6 +145,12 @@ public class GamesFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        updateNewGameButtonVisibility();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         LocalNotifications.unregisterBroadcastReceiver(getContext(), notificationHandler);
@@ -170,8 +182,8 @@ public class GamesFragment extends Fragment {
     class GameResultBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i("Broadcast games", "new data");
             refreshGames();
+            updateNewGameButtonVisibility();
         }
     }
     //endregion
