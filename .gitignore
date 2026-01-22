@@ -42,6 +42,9 @@ captures/
 .idea/libraries
 .idea/misc.xml
 .idea/shelf/
+.idea/caches/
+.idea/compiler.xml
+.idea/deploymentTargetSelector.xml
 
 # Keystore files
 *.jks
