@@ -29,6 +29,7 @@ android {
     lintOptions {
         abortOnError false
     }
+
     namespace 'com.teampicker.drorfichman.teampicker'
     buildToolsVersion '35.0.0'
 }

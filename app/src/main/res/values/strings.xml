@@ -164,11 +164,9 @@
 
     <!--    Messages-->
     <string name="parentheses">"(%1$d)"</string>
-    <string name="team_data_headline">" Count \n Grade \n Success \n  Win Rate \n \n  "</string>
-    <string name="team_data_headline_forecast">" Count \n Grade \n Success \n Win Rate \n 50% StdDev \n Chemistry "</string>
-    <string name="team_data">" %1$d \n %2$.1f (&#177;%3$.1f) \n %4$d \n %5$d%% \n %6$s \n %7$s "</string>
-    <string name="team_data_forecast">" %1$d%%"</string>
-    <string name="team_data_win_rate_stdev">"&#177;%1$d%%"</string>
+    <string name="team_data_headline">" Players \n Grade \n Success \n Win Rate \n Chemistry "</string>
+    <string name="team_data">" %1$d \n %2$.1f (&#177;%3$.1f) \n %4$d \n %5$d%% \n %6$s "</string>
+    <string name="team_data_chemistry">" %1$d%%"</string>
     <string name="team_public_stats">" Age: %1$d "</string>
     <string name="player_stat">"Games: %1$s \nWins: %2$s"</string>
     <string name="stats_player_games">"%1$d (%2$d%%)"</string>
@@ -308,4 +306,13 @@
     <string name="stats_success_no_data">Not enough game data. Play at least %1$d games to see the success chart.</string>
     <string name="stats_success_show_players">Show players:</string>
     <string name="stats_success_all_players">All</string>
+
+    <!--    Prediction-->
+    <string name="prediction_label">Prediction</string>
+    <string name="prediction_explanation_title">Win Prediction</string>
+    <string name="prediction_explanation_stats_mode">This prediction is based on a weighted combination of:\n\n• Chemistry - How well players perform together based on historical games\n• Win Rate - Individual player win rates\n• Grades - Player skill ratings\n\nTeams are currently divided using Stats mode, which optimizes for balanced, competitive matches.</string>
+    <string name="prediction_explanation_other_mode">This prediction is based on a weighted combination of:\n\n• Chemistry - How well players perform together based on historical games\n• Win Rate - Individual player win rates\n• Grades - Player skill ratings\n\nTip: Switch to \"Stats\" shuffle mode (via the 3 dots below Shuffle) for AI-optimized team balancing based on these factors.</string>
+    <string name="prediction_reveal_title">Pre-Game Prediction</string>
+    <string name="prediction_reveal_message">The prediction before the game was:\n\n%1$d%% — %2$d%%</string>
+    <string name="prediction_no_data">Not enough game history to make a prediction. Play more games to enable predictions.</string>
 </resources>

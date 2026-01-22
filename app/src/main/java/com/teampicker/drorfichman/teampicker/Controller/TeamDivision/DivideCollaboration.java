@@ -16,7 +16,7 @@ public class DivideCollaboration extends DividerBase {
 
     @Override
     int gradeOption(Context ctx, OptionalDivision option) {
-        return option.winRateStdDiv(ctx, params);
+        return option.getBalanceScore(ctx, params);
     }
 
     @Override

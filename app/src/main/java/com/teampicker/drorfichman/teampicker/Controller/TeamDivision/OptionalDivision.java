@@ -4,13 +4,14 @@ import android.content.Context;
 
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.Collaboration;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper;
+import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.TeamPrediction;
 import com.teampicker.drorfichman.teampicker.Data.BuilderPlayerCollaborationStatistics;
 import com.teampicker.drorfichman.teampicker.Data.TeamData;
-import com.teampicker.drorfichman.teampicker.tools.MathTools;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 
 /**
- * Created by drorfichman on 9/17/16.
+ * Represents a potential team division for optimization.
+ * Uses TeamPrediction.calculateBalanceScore for consistent calculations.
  */
 public class OptionalDivision {
     public TeamData players1 = new TeamData();
@@ -24,54 +25,39 @@ public class OptionalDivision {
     }
 
     /**
-     * Get 2 team diff of total win rate
+     * Calculate balance score for this division.
+     * Lower score = more balanced teams.
+     * <p>
+     * Uses TeamPrediction.calculateBalanceScore as the single source of truth
+     * for team balance calculation.
+     *
+     * @param ctx Context for accessing settings
+     * @param params Collaboration statistics parameters
+     * @return Balance score (0 = perfectly balanced, higher = more imbalanced)
      */
-    private int getChemistryWinRateDiff(Collaboration collaborationData) {
-        int collaborationWinRate1 = collaborationData.getCollaborationWinRate(players1.players);
-        int collaborationWinRate2 = collaborationData.getCollaborationWinRate(players2.players);
+    public int getBalanceScore(Context ctx, BuilderPlayerCollaborationStatistics params) {
+        // Get collaboration data for chemistry calculation
+        Collaboration collaborationData = CollaborationHelper.getCollaborationData(
+                ctx, players1.players, players2.players, params);
 
-        return Math.abs(collaborationWinRate1 - collaborationWinRate2);
-    }
+        // Calculate chemistry win rates
+        int team1Chemistry = collaborationData.getCollaborationWinRate(players1.players);
+        int team2Chemistry = collaborationData.getCollaborationWinRate(players2.players);
 
-    /**
-     * Get 2 team sum of std dev from 50% win rate based on in-team collaboration
-     */
-    private int getCollaborationWinRateStdDevFromOptimal(Collaboration collaborationData) {
-        int expectedStdDev1 = collaborationData.getExpectedWinRateStdDiv(players1.players);
-        int expectedStdDev2 = collaborationData.getExpectedWinRateStdDiv(players2.players);
-        if (expectedStdDev1 > 0 && expectedStdDev2 > 0)
-            return expectedStdDev1 + expectedStdDev2;
-        else
-            return -1;
-    }
+        // Calculate historical win rates and grade sums
+        int team1WinRate = players1.getWinRate();
+        int team2WinRate = players2.getWinRate();
+        int team1GradeSum = players1.getSum();
+        int team2GradeSum = players2.getSum();
 
-    public int winRateStdDiv(Context ctx, BuilderPlayerCollaborationStatistics params) {
-        Collaboration collaborationData = CollaborationHelper.getCollaborationData(ctx, players1.players, players2.players, params);
-
-        // default : 40% team success (winRateDiff), 40% justice for edge players (collaborationStdDev), 20% personal abilities (gradeDiff)
+        // Get weights from settings
         DivisionWeight weights = SettingsHelper.getDivisionWeight(ctx);
 
-        int chemistryWinRateDiff = getChemistryWinRateDiff(collaborationData); // rank 0 - 20
-        int chemistry = MathTools.getPercentageOf(chemistryWinRateDiff, 20);
-
-        int collaborationStdDev = getCollaborationWinRateStdDevFromOptimal(collaborationData); // rank 0 - 30
-        int stdDev = MathTools.getPercentageOf(collaborationStdDev, 30);
-
-        int gradeDiff = getGradeDiff(); // rank 0 - 20
-        int grade = MathTools.getPercentageOf(gradeDiff, 20);
-
-        int res = (int) (((double) chemistry * weights.chemistry()) + ((double) stdDev * weights.stdDev()) + ((double) grade * weights.grade()));
-
-/*
-//        Log.d("DIV1", "WR : " + chemistry + " (" +  chemistryWinRateDiff + "), Std50 : " + stdDev + " (" +  collaborationStdDev + "), Grade : " + grade + " (" + gradeDiff + "), total : " + res);
-//        int wr = Math.min(chemistryWinRateDiff / 2, 10);
-//        int c = Math.min(collaborationStdDev / 3, 10);
-//        int g = Math.min(gradeDiff / 4, 5);
-//        Log.d("DIV2", "WR : " + chemistryWinRateDiff + " (" +  wr + "), Std50 : " + collaborationStdDev + " (" +  c + "), Grade : " + gradeDiff + " (" + g + "), total : " + (chemistryWinRateDiff + collaborationStdDev + gradeDiff) + " [" + (g + wr + c) + "]");
-//        int res2 = wr + c + g;
-//        Log.d("DIV3", res2 + " / 25 = " + res2*100/25 + " == " + res);
-*/
-
-        return res;
+        // Use TeamPrediction for consistent calculation
+        return TeamPrediction.calculateBalanceScore(
+                team1Chemistry, team2Chemistry,
+                team1WinRate, team2WinRate,
+                team1GradeSum, team2GradeSum,
+                weights);
     }
 }

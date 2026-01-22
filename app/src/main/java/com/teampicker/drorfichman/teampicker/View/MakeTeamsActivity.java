@@ -38,6 +38,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotificat
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.Collaboration;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.CollaborationHelper;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.PlayerCollaboration;
+import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.TeamPrediction;
 import com.teampicker.drorfichman.teampicker.Controller.TeamDivision.TeamDivision;
 import com.teampicker.drorfichman.teampicker.Data.Configurations;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
@@ -133,6 +134,13 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     protected View analysisHeaders1, analysisHeaders2;
 
+    // Prediction UI
+    private View predictionHeader;
+    private TextView predictionTeam1Percent, predictionTeam2Percent;
+    private Button predictionInfoButton;
+    private Button revealPredictionButton;
+    private TeamPrediction currentPrediction;
+
     @Nullable
     public static Intent getIntent(Context ctx) {
         ArrayList<Player> comingPlayers = DbHelper.getComingPlayers(ctx, 0);
@@ -215,6 +223,15 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
         analysisHeaders1 = findViewById(R.id.analysis_headers_1);
         analysisHeaders2 = findViewById(R.id.analysis_headers_2);
+
+        // Prediction UI
+        predictionHeader = findViewById(R.id.prediction_header);
+        predictionTeam1Percent = findViewById(R.id.prediction_team1_percent);
+        predictionTeam2Percent = findViewById(R.id.prediction_team2_percent);
+        predictionInfoButton = findViewById(R.id.prediction_info_button);
+        predictionInfoButton.setOnClickListener(v -> showPredictionExplanationDialog());
+        revealPredictionButton = findViewById(R.id.reveal_prediction_button);
+        revealPredictionButton.setOnClickListener(v -> showRevealPredictionDialog());
         
         weatherDisplay = findViewById(R.id.weather_display);
         weatherEmoji = findViewById(R.id.weather_emoji);
@@ -611,6 +628,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
         // Hide weather when in result mode
         weatherDisplay.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
 
+        // Hide prediction header when in result mode
+        predictionHeader.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+
         // Show/hide score display
         scoreDisplayContainer.setVisibility(mSetResult ? View.VISIBLE : View.GONE);
     }
@@ -804,39 +824,36 @@ public class MakeTeamsActivity extends AppCompatActivity {
         TeamData team1Data = new TeamData(players1, count);
         TeamData team2Data = new TeamData(players2, count);
 
-        if (isAnalysisMode()) {
-            team1Data.forecastWinRate = analysisResult.getCollaborationWinRate(team1Data.players);
-            team1Data.forecastStdDev = analysisResult.getExpectedWinRateStdDiv(team1Data.players);
-            team2Data.forecastWinRate = analysisResult.getCollaborationWinRate(team2Data.players);
-            team2Data.forecastStdDev = analysisResult.getExpectedWinRateStdDiv(team2Data.players);
-            if (team1Data.forecastWinRate > 0 && team2Data.forecastWinRate > 0) {
-                int sum = team1Data.forecastWinRate + team2Data.forecastWinRate;
-                team1Data.forecastWinRate = (int) Math.round((double) team1Data.forecastWinRate * 100 / sum);
-                team2Data.forecastWinRate = 100 - team1Data.forecastWinRate;
-            }
-        }
+        // Always calculate prediction (not just in analysis mode)
+        currentPrediction = TeamPrediction.calculate(this, players1, players2);
 
-        if (isAnalysisMode())
-            headlines.setText(R.string.team_data_headline_forecast);
-        else
-            headlines.setText(R.string.team_data_headline);
+        // Update prediction header
+        updatePredictionHeader();
 
-        updateTeamData(teamData1, findViewById(R.id.team1_public_stats), team1Data);
-        updateTeamData(teamData2, findViewById(R.id.team2_public_stats), team2Data);
+        // Always use unified headline (removed separate forecast headline)
+        headlines.setText(R.string.team_data_headline);
+
+        // Pass chemistry values to updateTeamData
+        updateTeamData(teamData1, findViewById(R.id.team1_public_stats), team1Data, currentPrediction.team1ChemistryWinRate);
+        updateTeamData(teamData2, findViewById(R.id.team2_public_stats), team2Data, currentPrediction.team2ChemistryWinRate);
     }
 
-    private void updateTeamData(TextView stats, TextView publicStats, TeamData players) {
-
-        // TODO improve visual stats table
-
-        String collaborationWinRate = "";
-        String teamStdDev = "";
-        if (isAnalysisMode()) {
-            if (players.forecastWinRate != 0) {
-                collaborationWinRate = getString(R.string.team_data_forecast, players.forecastWinRate);
-                teamStdDev = getString(R.string.team_data_win_rate_stdev, players.forecastStdDev);
-            }
+    private void updatePredictionHeader() {
+        if (currentPrediction != null && currentPrediction.hasData()) {
+            predictionTeam1Percent.setText(getString(R.string.progress_percentage, currentPrediction.team1Probability));
+            predictionTeam2Percent.setText(getString(R.string.progress_percentage, currentPrediction.team2Probability));
+            predictionHeader.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
+        } else {
+            predictionTeam1Percent.setText("--");
+            predictionTeam2Percent.setText("--");
+            predictionHeader.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         }
+    }
+
+    private void updateTeamData(TextView stats, TextView publicStats, TeamData players, int chemistryWinRate) {
+
+        // Chemistry is now always displayed
+        String chemistry = chemistryWinRate > 0 ? getString(R.string.team_data_chemistry, chemistryWinRate) : "";
 
         stats.setText(getString(R.string.team_data,
                 players.getAllCount(),
@@ -844,8 +861,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 players.getStdDev(),
                 players.getSuccess(),
                 players.getWinRate(),
-                teamStdDev,
-                collaborationWinRate));
+                chemistry));
 
         int age = players.getAge();
         publicStats.setText(age > 0 ? getString(R.string.team_public_stats, age) : "");
@@ -1189,6 +1205,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         teamStatsLayout.setVisibility(View.INVISIBLE);
         buttonsLayout.setVisibility(View.INVISIBLE);
         benchListLayout.setVisibility(View.INVISIBLE);
+        predictionHeader.setVisibility(View.INVISIBLE);
         setWeatherData(false);
 
         list1.setAdapter(null);
@@ -1204,6 +1221,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         
         teamStatsLayout.setVisibility(View.VISIBLE);
         buttonsLayout.setVisibility(View.VISIBLE);
+        predictionHeader.setVisibility(mSetResult ? View.GONE : View.VISIBLE);
         setWeatherData(true);
     }
     //endregion
@@ -1298,6 +1316,39 @@ public class MakeTeamsActivity extends AppCompatActivity {
         }
         
         WeatherSettingsDialog.show(this, this::fetchWeatherData);
+    }
+    //endregion
+
+    //region Prediction Dialogs
+    private void showPredictionExplanationDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle(R.string.prediction_explanation_title);
+
+        // Choose explanation based on current shuffle mode
+        if (selectedDivision == TeamDivision.DivisionStrategy.Optimize) {
+            builder.setMessage(R.string.prediction_explanation_stats_mode);
+        } else {
+            builder.setMessage(R.string.prediction_explanation_other_mode);
+        }
+
+        builder.setPositiveButton(R.string.done, (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void showRevealPredictionDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle(R.string.prediction_reveal_title);
+
+        if (currentPrediction != null && currentPrediction.hasData()) {
+            builder.setMessage(getString(R.string.prediction_reveal_message,
+                    currentPrediction.team1Probability,
+                    currentPrediction.team2Probability));
+        } else {
+            builder.setMessage(R.string.prediction_no_data);
+        }
+
+        builder.setPositiveButton(R.string.done, (dialog, which) -> dialog.dismiss());
+        builder.show();
     }
     //endregion
 }
