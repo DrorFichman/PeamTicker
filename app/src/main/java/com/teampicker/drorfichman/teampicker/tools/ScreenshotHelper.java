@@ -46,7 +46,7 @@ public class ScreenshotHelper {
         }
     }
 
-    private static Uri saveImageUri(Context context, Bitmap bitmap) throws IOException {
+    public static Uri saveImageUri(Context context, Bitmap bitmap) throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String fileName = "IMG_" + timeStamp + ".webp";
 
@@ -101,7 +101,7 @@ public class ScreenshotHelper {
         return imageFile;
     }
 
-    private static Bitmap getBitmapFromView(View view) {
+    public static Bitmap getBitmapFromView(View view) {
         view.setDrawingCacheEnabled(true);
         Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
         view.setDrawingCacheEnabled(false);
@@ -162,10 +162,132 @@ public class ScreenshotHelper {
     }
 
     private static void openScreenshot(Context context, Uri uri) {
+        openScreenshot(context, uri, null);
+    }
+
+    /**
+     * Open screenshot with optional pre-filled text for sharing
+     * @param context The context
+     * @param uri The image URI
+     * @param shareText Optional text to include with the image (null for no text)
+     */
+    public static void openScreenshot(Context context, Uri uri, String shareText) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setDataAndType(uri, "image/*");
         intent.putExtra(Intent.EXTRA_STREAM, uri);
+        
+        // Add text if provided
+        if (shareText != null && !shareText.isEmpty()) {
+            intent.putExtra(Intent.EXTRA_TEXT, shareText);
+        }
+        
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(intent, "Share Teams"));
+    }
+
+    /**
+     * Share directly to WhatsApp with pre-filled text
+     * @param context The context
+     * @param uri The image URI
+     * @param shareText Text to include with the image
+     */
+    public static void shareToWhatsApp(Context context, Uri uri, String shareText) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("image/*");
+        intent.setPackage("com.whatsapp");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        
+        if (shareText != null && !shareText.isEmpty()) {
+            intent.putExtra(Intent.EXTRA_TEXT, shareText);
+        }
+        
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        
+        try {
+            context.startActivity(intent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // WhatsApp not installed, fall back to general share
+            Toast.makeText(context, "WhatsApp not installed. Opening share menu...", Toast.LENGTH_SHORT).show();
+            openScreenshot(context, uri, shareText);
+        }
+    }
+
+    /**
+     * Generate default share text for team lineups
+     * @param context The context for string resources
+     * @param teamSize The number of players per team
+     * @return Formatted share text
+     */
+    public static String generateTeamShareText(Context context, int teamSize) {
+        return generateTeamShareText(context, teamSize, null);
+    }
+
+    /**
+     * Generate share text for team lineups with optional game date
+     * @param context The context for string resources
+     * @param teamSize The number of players per team
+     * @param gameDate Optional game date string (null for no date)
+     * @return Formatted share text
+     */
+    public static String generateTeamShareText(Context context, int teamSize, String gameDate) {
+        StringBuilder text = new StringBuilder();
+        
+        if (gameDate != null && !gameDate.isEmpty()) {
+            text.append("⚽ Game on ").append(gameDate).append("\n\n");
+        } else {
+            text.append("⚽ Today's Teams\n\n");
+        }
+        
+        text.append("Teams are ready! ");
+        text.append(teamSize).append(" vs ").append(teamSize);
+        text.append("\n\nSee you on the field! 🔥");
+        
+        return text.toString();
+    }
+
+    /**
+     * Generate share text for game results
+     * @param context The context
+     * @param team1Score Team 1 score
+     * @param team2Score Team 2 score
+     * @param gameDate Optional game date
+     * @return Formatted share text
+     */
+    public static String generateResultShareText(Context context, int team1Score, int team2Score, String gameDate) {
+        StringBuilder text = new StringBuilder();
+        
+        text.append("⚽ Final Score");
+        if (gameDate != null && !gameDate.isEmpty()) {
+            text.append(" - ").append(gameDate);
+        }
+        text.append("\n\n");
+        
+        text.append("🔵 Team 1: ").append(team1Score).append("\n");
+        text.append("🟠 Team 2: ").append(team2Score).append("\n\n");
+        
+        if (team1Score > team2Score) {
+            text.append("🏆 Team 1 wins!");
+        } else if (team2Score > team1Score) {
+            text.append("🏆 Team 2 wins!");
+        } else {
+            text.append("🤝 It's a tie!");
+        }
+        
+        text.append("\n\nGreat game everyone! 👏");
+        
+        return text.toString();
+    }
+
+    /**
+     * Generate "invite friends" share text for app promotion
+     * @param context The context
+     * @return Formatted invite text
+     */
+    public static String generateAppInviteText(Context context) {
+        return "⚽ Check out Team Picker!\n\n" +
+               "I'm using this app to create fair teams for our games. " +
+               "It has AI-powered balancing, WhatsApp integration, and tracks player statistics.\n\n" +
+               "Free on Google Play:\n" +
+               "https://play.google.com/store/apps/details?id=com.teampicker.drorfichman.teampicker";
     }
 }

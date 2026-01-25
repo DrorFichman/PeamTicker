@@ -38,6 +38,7 @@ import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
+import com.teampicker.drorfichman.teampicker.tools.SocialShareHelper;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.analytics.UserProperty;
@@ -296,6 +297,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_getting_started) {
             showGettingStartedDialog();
+        } else if (id == R.id.nav_invite_friends) {
+            SocialShareHelper.shareAppInvite(this);
         } else if (id == R.id.nav_about) {
             showAbout();
         } else if (id == R.id.nav_data_sync) {
