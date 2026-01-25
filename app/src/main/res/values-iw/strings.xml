@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    App-->
+    <string name="app_name">PeamTicker</string>
+    <string name="main_title">בוחר קבוצות</string>
+    <string name="pick_teams_title">בחירת קבוצות</string>
+    <string name="pick_teams_title_results">תוצאות</string>
+    <string name="pick_teams_title_analysis">ניתוח</string>
+    <string name="games_with_count">משחקים (%1$d)</string>
+    <string name="stats_with_count">%1$d שחקנים\n%2$d משחקים</string>
+    <string name="games_player_count">%1$d שחקנים</string>
+    <string name="search_title">חיפוש</string>
+
+    <!--    Drawer-->
+    <string name="navigation_drawer_open">פתח תפריט ניווט</string>
+    <string name="navigation_drawer_close">סגור תפריט ניווט</string>
+
+    <!--    Headlines-->
+    <string name="name">שם</string>
+    <string name="grade">דירוג</string>
+    <string name="date">תאריך</string>
+    <string name="score">תוצאה</string>
+    <string name="grade_description">דירוג (0-99)</string>
+    <string name="attributes">מאפיינים</string>
+    <string name="age">גיל</string>
+    <string name="age_description">גיל (תאריך לידה)</string>
+    <string name="plus_minus">+/-</string>
+    <string name="success">הצלחה</string>
+    <string name="games">משחקים</string>
+    <string name="win_rate">אחוז ניצחונות</string>
+    <string name="success_vs">הצלחה\nנגד</string>
+    <string name="games_vs">משחקים\nנגד</string>
+    <string name="success_with">הצלחה\nעם</string>
+    <string name="games_with">משחקים\nעם</string>
+    <string name="basic_info">מידע בסיסי</string>
+    <string name="properties">מאפיינים</string>
+    <string name="gk">שוער</string>
+    <string name="defender">מגן</string>
+    <string name="playmaker">יוצר משחק</string>
+    <string name="unbreakable">בלתי שביר</string>
+    <string name="extra">נוסף</string>
+    <string name="injured">פצוע</string>
+    <string name="injured_help_title">שחקן פצוע</string>
+    <string name="injured_help_message">סמן שחקן כפצוע כאשר הוא לא משחק ברמה הרגילה שלו.\n\nבבחירת קבוצות עם אופטימיזציה של AI, הכימיה של שחקנים פצועים עם אחרים תתעלם, אך הדירוג ואחוז הניצחונות שלהם עדיין יישקלו.\n\nזה עוזר לאזן קבוצות בצורה הוגנת כאשר שחקן מתאושש.</string>
+    <string name="show_injured_players">הצג שחקנים פצועים</string>
+    <string name="injured_grade_change_title">לעדכן דירוג?</string>
+    <string name="injured_marked_message">סימנת שחקן זה כפצוע. האם תרצה להתאים את הדירוג שלו כדי לשקף את רמת הביצועים הנוכחית שלו?</string>
+    <string name="injury_cleared_message">השחקן כבר לא מסומן כפצוע. האם תרצה לשחזר את הדירוג שלו?</string>
+    <string name="update_grade">עדכן</string>
+    <string name="skip">דלג</string>
+
+    <!--    Empty State-->
+    <string name="empty_players_icon">אין שחקנים</string>
+    <string name="empty_players_title">עדיין אין שחקנים</string>
+    <string name="empty_players_message">ייבא שחקנים מאנשי הקשר שלך או הדבק הודעות WhatsApp כדי להתחיל במהירות.</string>
+    <string name="empty_players_import_button">ייבוא מאנשי קשר</string>
+    <string name="empty_players_paste_button">הדבקה מ-WhatsApp</string>
+    <string name="empty_players_or_add">או הקש על + למעלה כדי להוסיף שחקנים ידנית</string>
+    <string name="empty_injured_icon">אין שחקנים פצועים</string>
+    <string name="empty_injured_title">אין שחקנים פצועים</string>
+    <string name="empty_injured_message">חדשות טובות! אף אחד מהשחקנים שלך לא מסומן כרגע כפצוע.\n\nתוכל לסמן שחקן כפצוע ממסך הפרטים של השחקן.</string>
+
+    <!--    Buttons-->
+    <string name="save">שמור</string>
+    <string name="done">סיום</string>
+    <string name="cancel">ביטול</string>
+    <string name="yes">כן</string>
+    <string name="edit">ערוך</string>
+    <string name="copy_game">העתק</string>
+    <string name="delete">מחק</string>
+    <string name="new_player">שחקן חדש</string>
+    <string name="move_players">העברות\nוספסל</string>
+    <string name="move_players_bench">העברות\n(%1$d בספסל)</string>
+    <string name="bench_players">ספסל</string>
+    <string name="shuffle_age">לפי גיל</string>
+    <string name="shuffle_grade">לפי דירוג</string>
+    <string name="shuffle_stats">לפי סטטיסטיקה</string>
+    <string name="clear_all_coming">נקה נוכחות</string>
+    <string name="action_send_statistics">שלח סטטיסטיקה</string>
+    <string name="action_analysis">ניתוח</string>
+    <string name="action_share">שתף</string>
+    <string name="action_enter_results">הזן תוצאות</string>
+    <string name="player_missed_game">שחקן החמיץ את המשחק</string>
+    <string name="player_mvp">סמן כ-MVP</string>
+    <string name="action_empty_bench_left">נקה ספסל (שמאל)</string>
+    <string name="action_empty_bench_right">נקה ספסל (ימין)</string>
+    <string name="action_switch_team_colors">החלף צבעים</string>
+    <string name="action_button_results">תוצאות</string>
+    <string name="teams_bench_title">ספסל (גרור שחקנים לכאן כשהם לא משחקים)</string>
+    <string name="team_save_sync_to_cloud">סנכרן לענן</string>
+
+    <!--    Navigation-->
+    <string name="nav_players">שחקנים</string>
+    <string name="nav_games_history">היסטוריית משחקים</string>
+    <string name="nav_statistics">סטטיסטיקה</string>
+    <string name="nav_backup_to_file">גיבוי לקובץ</string>
+    <string name="nav_import_from_file">ייבוא מקובץ</string>
+    <string name="nav_sync_to_cloud">סנכרן לענן</string>
+    <string name="nav_pull_from_cloud">משוך מהענן</string>
+    <string name="sync_status_synced">מסונכרן</string>
+    <string name="sync_status_unsynced">%d לא מסונכרנים</string>
+    <string name="nav_settings">הגדרות</string>
+    <string name="nav_getting_started">תחילת עבודה</string>
+    <string name="nav_invite_friends">הזמן חברים</string>
+    <string name="nav_about">אודות</string>
+
+    <!--    Menus-->
+    <string name="add_player">הוסף שחקן</string>
+    <string name="paste_players">הדבק שחקנים</string>
+    <string name="import_contacts">ייבוא מאנשי קשר</string>
+
+    <!--    Import Contacts-->
+    <string name="import_contacts_first_time_hint">שחקנים יובאו! הקש על כל שחקן כדי לערוך את הפרטים שלו.</string>
+    <string name="import_contacts_result_title">שחקנים יובאו</string>
+    <string name="import_contacts_added_players">נוספו השחקנים הבאים:</string>
+    <string name="import_contacts_skipped_existing">דולגו (כבר קיימים):</string>
+    <string name="import_contacts_success">%1$d שחקן(ים) יובאו בהצלחה</string>
+    <string name="import_contacts_select_title">בחר אנשי קשר לייבוא</string>
+    <string name="import_contacts_done">ייבא</string>
+    <string name="import_contacts_permission_denied">נדרשת הרשאת אנשי קשר כדי לייבא שחקנים</string>
+    <string name="import_contacts_no_contacts">לא נמצאו אנשי קשר</string>
+    <string name="import_contacts_search_hint">חפש אנשי קשר…</string>
+    <string name="clear_search">נקה חיפוש</string>
+    <string name="import_contacts_selected_count">%1$d נבחרו</string>
+    <string name="import_contacts_confirm_exit_title">לבטל את הבחירה?</string>
+    <string name="import_contacts_confirm_exit_message">יש לך %1$d איש(י) קשר נבחרים. האם אתה בטוח שברצונך לצאת מבלי לייבא אותם?</string>
+    <string name="import_contacts_discard">בטל</string>
+
+    <!--    Shared Contact-->
+    <string name="shared_contact_exists">שחקן \"%1$s\" כבר קיים</string>
+    <string name="shared_contact_exists_archived">שחקן \"%1$s\" קיים בארכיון</string>
+    <string name="shared_contact_read_error">לא ניתן לקרוא איש קשר</string>
+    <string name="shared_contact_parse_error">לא ניתן לנתח שם איש קשר</string>
+    <string name="show_archived">הצג ארכיון שחקנים</string>
+    <string name="make_teams">בחר קבוצות</string>
+    <string name="new_game">משחק חדש</string>
+    <string name="enter_results">הזן תוצאות</string>
+    <string name="action_50_games">50 המשחקים האחרונים</string>
+    <string name="action_all_games">כל המשחקים</string>
+    <string name="part_last_10_games">10 המשחקים האחרונים</string>
+    <string name="part_last_50_games">50 המשחקים האחרונים</string>
+    <string name="part_all_games">כל המשחקים</string>
+    <string name="stats_50_games">50 משחקים</string>
+    <string name="stats_10_games">10 משחקים</string>
+    <string name="stats_all_games">כל המשחקים</string>
+
+    <!--    Settings-->
+    <string name="setting_team_color_scheme_black_white">שחור — לבן</string>
+    <string name="setting_team_color_scheme_orange_blue">כתום — כחול</string>
+    <string name="setting_team_color_scheme_orange_yellow">כתום — צהוב</string>
+    <string name="setting_title_divide_attempts">ניסיונות חלוקה</string>
+    <string name="setting_summary_divide_attempts">מספר חלוקות קבוצות לשקול (1-1000)</string>
+    <string name="setting_title_grade_weight">משקל דירוג</string>
+    <string name="setting_summary_grade_weight">אחוז משקל דירוג (0%-100%)</string>
+    <string name="setting_title_color_scheme">צבעי קבוצות</string>
+    <string name="setting_summary_color_scheme">הצגת קבוצות - בחר ערכת צבעים</string>
+    <string name="setting_title_clear_tutorial">אפס הדרכות</string>
+    <string name="setting_summary_clear_tutorial">אפס שלבי הדרכה שדולגו</string>
+    <string name="setting_title_show_hints">הצג רמזים</string>
+    <string name="setting_summary_show_hints">הצג רמזי הדרכה בניווט באפליקציה</string>
+    <string name="setting_title_show_grades">הצג דירוגים</string>
+    <string name="setting_summary_show_grades">הצג דירוגי שחקנים</string>
+    <string name="setting_title_auto_sync_games">סנכרון אוטומטי</string>
+    <string name="setting_summary_auto_sync_games">סנכרן אוטומטית משחקים חדשים לענן</string>
+
+    <!--    Messages-->
+    <string name="parentheses">(%1$d)</string>
+    <string name="team_data_headline"> שחקנים \n דירוג \n הצלחה \n אחוז ניצחונות \n כימיה </string>
+    <string name="team_data"> %1$d \n %2$.1f (&#177;%3$.1f) \n %4$d \n %5$d%% \n %6$s </string>
+    <string name="team_data_chemistry"> %1$d%%</string>
+    <string name="team_public_stats"> גיל: %1$d </string>
+    <string name="player_stat">משחקים: %1$s \nניצחונות: %2$s</string>
+    <string name="stats_player_games">%1$d (%2$d%%)</string>
+    <string name="player_wins_participation">%1$s (%2$s)</string>
+    <string name="player_participation_statistics">%1$s + \n(M:%2$d, W:%3$02d%%)</string>
+    <string name="player_analysis">(W:%1$02d%% D:%2$02d) [%3$s]</string>
+    <string name="player_analysis_collaborator">(W:%1$02d%% D:%2$02d) [S:%3$s]</string>
+    <string name="player_analysis_selected">(W:%1$02d%% D:%2$02d) [%3$s]</string>
+    <string name="player_analysis_selected_win_rate">%1$02d%%</string>
+    <string name="player_analysis_selected_games">%1$02d</string>
+    <string name="operation_move">לחץ לחיצה ארוכה על שורת שחקן כדי להתחיל גרירה ושחרור</string>
+    <string name="operation_divide_by_collaboration">* AI בתהליך :)</string>
+    <string name="optimizing_teams">מאזן קבוצות…</string>
+    <string name="progress_percentage">%1$d%%</string>
+    <string name="progress_best_score">ציון איזון הטוב ביותר: %1$s</string>
+    <string name="analysis_progress_update">%1$d%% (%2$s)</string>
+    <string name="operation_analysis">* לחץ על השחקנים לניתוח מעמיק\n* לחץ על האייקון לצאת ממצב ניתוח</string>
+    <string name="copy_players_success">חלוקת קבוצות הוחלה</string>
+    <string name="main_make_teams">קבוצות (%1$d)</string>
+    <string name="main_auth_required">נדרשת התחברות Google</string>
+    <string name="main_cloud_not_allowed">תכונת ענן אינה מורשית\nפרטים ב-Play Store</string>
+    <string name="main_connectivity">בעיית קישוריות</string>
+    <string name="main_sign_in">התחבר</string>
+    <string name="main_login">התחברות</string>
+    <string name="main_logout">התנתק</string>
+    <string name="main_sign_out_dialog_title">להתנתק?</string>
+    <string name="main_sign_out_dialog_message">תכונות ענן לא יהיו זמינות.</string>
+
+    <!--    Tutorials-->
+    <string name="tutorial_progress">%1$d%%</string>
+    <string name="tutorial_headline">תחילת עבודה - הדרכות</string>
+    <string name="tutorial_dismiss_message">בטל הודעות הדרכה</string>
+    <string name="tutorial_create_player_title">צור שחקנים</string>
+    <string name="tutorial_create_player_message">צור שחקנים ידנית דרך אייקון \"+\" בחלק העליון של המסך.\n\nאו \"הדבק שחקנים\" מהודעות WhatsApp בהתבסס על שמות אנשי קשר</string>
+    <string name="tutorial_attendance_title">ציין שחקנים משתתפים</string>
+    <string name="tutorial_attendance_message">לפני בחירת קבוצות, תצטרך לבחור אילו שחקנים ישתתפו במשחק הקרוב.\n\nסמן את תיבת הסימון המשויכת לכל שחקן משתתף.\n\nתוכל גם להדביק הודעות WhatsApp כדי לאתר שחקנים במהירות.</string>
+    <string name="tutorial_start_pick_teams_title">בחר קבוצות</string>
+    <string name="tutorial_start_pick_teams_message">תוכל להתחיל לבחור את הקבוצות, פשוט לחץ על כפתור \"קבוצות\" למטה</string>
+    <string name="tutorial_pick_teams_title">בחר קבוצות</string>
+    <string name="tutorial_pick_teams_message">\"ערבב\" קבוצות בהתבסס על דירוגים.\n(תוכל לבחור מצב ערבוב שונה על ידי לחיצה על 3 הנקודות. לא מומלץ לערבב לפי סטטיסטיקה לפני שיש לך 10 משחקים של נתונים).\n\n\"העבר\" שחקנים על ידי לחיצה ארוכה וגרירה. השתמש בספסל למחליפים.\n\nשתף תמונה של הקבוצות (ללא דירוגים) דרך כל אפליקציית הודעות.</string>
+    <string name="tutorial_save_results_title">שמור תוצאת משחק</string>
+    <string name="tutorial_save_results_message">ברגע שהמשחק מסתיים, תוכל להזין את התוצאות.\nזה פותח את הדרך להיסטוריית משחקים, סטטיסטיקה אישית, והיכולת לבחור קבוצות בהתבסס על אחוז ניצחונות וכימיה של שחקנים.\n\nהזן \"תוצאות\" במסך \"קבוצות\".</string>
+    <string name="tutorial_game_history_title">היסטוריית משחקים</string>
+    <string name="tutorial_game_history_message">בחר כל משחק בכרטיסייה \"משחקים\" כדי לצפות בקבוצות שלו ובפעולות.</string>
+    <string name="tutorial_cloud_title">תכונות ענן</string>
+    <string name="tutorial_cloud_message">סנכרן את השחקנים והמשחקים שלך לענן, כגיבוי, או כשאתה מתכנן למשוך את הנתונים במכשיר אחר.\n\nראשית, התחבר עם חשבון Google שלך דרך התפריט הצדדי.\nלאחר מכן \"סנכרן\" בתפריט הצדדי.</string>
+    <string name="tutorial_team_analysis_title">ניתוח קבוצות</string>
+    <string name="tutorial_team_analysis_message">עכשיו, שמסופקת היסטוריית משחקים מספקת - לחץ על אייקון \"ניתוח\" בסרגל העליון כדי לצפות באחוזי ניצחון אישיים.\n\nלחץ על שחקן כדי לצפות בכימיה האישית שלו עם שאר השחקנים המשתתפים.</string>
+    <string name="tutorial_team_shuffle_stats_title">בחירת קבוצות - מצב AI</string>
+    <string name="tutorial_team_shuffle_stats_message">עבור למצב בחירת קבוצות מותאם דרך 3 הנקודות מתחת לכפתור \"ערבב\".\n\nמצב \"סטטיסטיקה\" ייצור קבוצות אופציונליות בהתבסס על אחוזי ניצחונות וכימיה של שחקנים.</string>
+    <string name="tutorial_completed_title">הדרכות הושלמו</string>
+    <string name="tutorial_completed_message">הדרכות יהיו זמינות בתפריט הצדדי תחת \"תחילת עבודה\"</string>
+
+    <!--    Player Insights-->
+    <string name="insights_tab_title">תובנות</string>
+    <string name="insights_win_rate_title">אחוז ניצחונות לאורך זמן</string>
+    <string name="insights_moving_win_rate">אחוז ניצחונות 50 המשחקים האחרונים</string>
+    <string name="insights_cumulative_win_rate">אחוז ניצחונות כל הזמנים</string>
+    <string name="insights_win_rate_label">אחוז ניצחונות %</string>
+    <string name="insights_games_label">משחקים</string>
+    <string name="insights_window_label">גודל חלון:</string>
+    <string name="insights_show_cumulative">הצג אחוז מצטבר</string>
+    <string name="insights_window_10">10 המשחקים האחרונים</string>
+    <string name="insights_window_25">25 המשחקים האחרונים</string>
+    <string name="insights_window_50">50 המשחקים האחרונים</string>
+    <string name="insights_show_touch_data">הצג נתונים במגע</string>
+    <string name="insights_no_data">אין מספיק נתוני משחק להצגת תובנות. שחק לפחות %1$d משחקים כדי לראות סטטיסטיקה.</string>
+
+    <!--    Insights Chip Labels-->
+    <string name="insights_chip_win_rate">אחוז ניצחונות</string>
+    <string name="insights_chip_chemistry">כימיה</string>
+    <string name="insights_chip_activity">השתתפות</string>
+
+    <!--    Player Collaboration Chart-->
+    <string name="insights_collaboration_title">שיתוף פעולה - הצלחה עם שחקנים</string>
+    <string name="insights_collaboration_no_data">אין מספיק נתוני שיתוף פעולה. שחק לפחות %1$d משחקים עם שחקנים אחרים.</string>
+    <string name="insights_success_with_label">הצלחה עם</string>
+    <string name="insights_success_against_label">הצלחה נגד</string>
+
+    <!--    Team Collaboration Chart-->
+    <string name="team_collaboration_chart_title">%1$s - שיתוף פעולה קבוצתי</string>
+    <string name="team_collaboration_chart_title_with_games">%1$s - שיתוף פעולה קבוצתי (%2$d המשחקים האחרונים)</string>
+    <string name="team_collaboration_no_data">אין מספיק משחקים עם חברי קבוצה. שחק לפחות %1$d משחקים.</string>
+    <string name="team_collaboration_x_axis_label">מספר משחקים</string>
+    <string name="team_collaboration_y_axis_label">הצלחה</string>
+
+    <!--    Player Participation Chart-->
+    <string name="insights_participation_title">השתתפות לאורך זמן</string>
+    <string name="total_games_played">סך המשחקים ששוחקו</string>
+    <string name="total_games_count">%1$d משחקים</string>
+    <string name="player_games_header">%1$s (%2$d משחקים)</string>
+    <string name="overall_win_rate">אחוז ניצחונות כולל</string>
+    <string name="win_rate_value">%1$d%%</string>
+    <string name="insights_participation_no_data">אין מספיק נתוני משחק. שחק לפחות %1$d משחקים כדי לראות פעילות.</string>
+    <string name="insights_wins_label">ניצחונות</string>
+    <string name="insights_ties_label">תיקו</string>
+    <string name="insights_losses_label">הפסדים</string>
+
+    <!--    Games Charts-->
+    <string name="games_tab_history">היסטוריה</string>
+    <string name="games_tab_charts">גרפים</string>
+    <string name="charts_tab_distribution">ניקוד</string>
+    <string name="charts_tab_trend">לאורך זמן</string>
+    <string name="charts_goal_diff_distribution_title">התפלגות הפרשי שערים</string>
+    <string name="charts_goal_diff_distribution_description">אחוז משחקים המסתיימים עם כל הפרש ניקוד</string>
+    <string name="charts_goal_diff_trend_title">מגמת הפרשי שערים</string>
+    <string name="charts_goal_diff_trend_description">ממוצע נע של הפרשי שערים לאורך זמן</string>
+    <string name="charts_close_games_percentage">משחקים תחרותיים (הפרש &lt; 3)</string>
+    <string name="charts_avg_goal_diff">הפרש שערים ממוצע</string>
+    <string name="charts_last_n_games">%1$d המשחקים האחרונים</string>
+    <string name="charts_avg_last_n_games">ממוצע (%1$d האחרונים)</string>
+    <string name="charts_median_last_n_games">חציון (%1$d האחרונים)</string>
+    <string name="charts_no_data">אין מספיק נתוני משחק. שחק לפחות %1$d משחקים כדי לראות גרפים.</string>
+
+    <!--    Statistics Tab Charts-->
+    <string name="stats_tab_stats">סטטיסטיקה</string>
+    <string name="stats_tab_charts">גרפים</string>
+    <string name="stats_charts_tab_seniority">ניסיון</string>
+    <string name="stats_charts_tab_success">הצלחה</string>
+
+    <!--    Player Experience Distribution Chart-->
+    <string name="stats_seniority_chart_title">התפלגות ניסיון שחקנים</string>
+    <string name="stats_seniority_chart_description">ספירה מצטברת לפי רמת ניסיון</string>
+    <string name="stats_seniority_no_data">אין מספיק נתוני משחק. שחק לפחות %1$d משחקים כדי לראות את התפלגות הניסיון.</string>
+    <string name="stats_seniority_current_avg">ממוצע נוכחי (25 משחקים)</string>
+    <string name="stats_seniority_current_value">חדשים: %.0f | חוזרים: %.0f | קבועים: %.0f</string>
+    <string name="stats_seniority_new_players">חדשים (&lt;10)</string>
+    <string name="stats_seniority_returning_players">חוזרים (10-50)</string>
+    <string name="stats_seniority_regulars">קבועים (&gt;50)</string>
+    <string name="stats_seniority_click_hint">לחץ על הגרף כדי לצפות בפרטי שחקן</string>
+    <string name="stats_seniority_player_games">%1$s (%2$d)</string>
+    <string name="stats_game_number">משחק %1$d</string>
+
+    <!--    Player Success Chart-->
+    <string name="stats_success_heatmap_title">הצלחת שחקן לאורך זמן</string>
+    <string name="stats_success_heatmap_description">הצלחה מצטברת (ניצחונות - הפסדים) לשחקנים מובילים</string>
+    <string name="stats_success_no_data">אין מספיק נתוני משחק. שחק לפחות %1$d משחקים כדי לראות את גרף ההצלחה.</string>
+    <string name="stats_success_show_players">הצג שחקנים:</string>
+    <string name="stats_success_all_players">הכל</string>
+
+    <!--    Prediction-->
+    <string name="prediction_label">תחזית</string>
+    <string name="prediction_explanation_title">תחזית ניצחון</string>
+    <string name="prediction_explanation_stats_mode">תחזית זו מבוססת על שילוב משוקלל של:\n\n• כימיה - עד כמה שחקנים מבצעים ביחד בהתבסס על משחקים היסטוריים\n• אחוז ניצחונות - אחוזי ניצחון אישיים של שחקנים\n• דירוגים - דירוגי מיומנות של שחקנים\n\nקבוצות מחולקות כרגע באמצעות מצב סטטיסטיקה, אשר מייעל למשחקים מאוזנים ותחרותיים.</string>
+    <string name="prediction_explanation_other_mode">תחזית זו מבוססת על שילוב משוקלל של:\n\n• כימיה - עד כמה שחקנים מבצעים ביחד בהתבסס על משחקים היסטוריים\n• אחוז ניצחונות - אחוזי ניצחון אישיים של שחקנים\n• דירוגים - דירוגי מיומנות של שחקנים\n\nטיפ: עבור למצב ערבוב \"סטטיסטיקה\" (דרך 3 הנקודות מתחת לערבב) לאיזון קבוצות מותאם AI בהתבסס על גורמים אלה.</string>
+    <string name="prediction_reveal_title">תחזית לפני המשחק</string>
+    <string name="prediction_reveal_message">התחזית לפני המשחק הייתה:\n\n%1$d%% — %2$d%%</string>
+    <string name="prediction_no_data">אין מספיק היסטוריית משחקים כדי לבצע תחזית. שחק משחקים נוספים כדי לאפשר תחזיות.</string>
+</resources>
+
