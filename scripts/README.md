@@ -22,6 +22,67 @@ Admin scripts for managing TeamPicker Firebase data.
    scripts/serviceAccountKey.json
    ```
 
+## user-stats.js
+
+Query Firebase to view statistics for all users or a specific user.
+
+### Usage
+
+```bash
+# Show stats for all users
+node user-stats.js
+
+# Show stats for a specific user
+node user-stats.js --user <userId>
+
+# Or use npm script
+npm run user-stats
+npm run user-stats -- --user <userId>
+```
+
+### What It Shows
+
+For each user, displays:
+- **Email** - user's email address from `/account/email`
+- **Display name** - user's display name from `/account/displayName`
+- **Number of unique players** - count of unique player names in `/playersGames/`
+- **Number of games** - count of games in `/games/`
+- **Last game date** - the most recent game date from `dateString` field
+
+### Examples
+
+**View all users:**
+```bash
+node user-stats.js
+```
+
+Output:
+```
+═══════════════════════════════════════════════════════════════════════════════════════════════════════
+ Email                                │ Display Name         │ Players │ Games │ Last Game Date
+──────────────────────────────────────┼──────────────────────┼─────────┼───────┼──────────────────
+ john.doe@example.com                 │ John Doe             │      15 │   247 │ 2026-01-15
+ jane.smith@example.com               │ Jane Smith           │       8 │    89 │ 2026-01-10
+═══════════════════════════════════════════════════════════════════════════════════════════════════════
+```
+
+**View specific user:**
+```bash
+node user-stats.js --user "abc123def456"
+```
+
+Output:
+```
+════════════════════════════════════════════════════════════════════
+Email:              john.doe@example.com
+Display name:       John Doe
+Number of players:  15
+Number of games:    247
+Last game date:     2026-01-15
+Last game ID:       247
+════════════════════════════════════════════════════════════════════
+```
+
 ## copy-games.js
 
 Copy games from one user to another. **INSERT ONLY** - never overwrites existing data.
