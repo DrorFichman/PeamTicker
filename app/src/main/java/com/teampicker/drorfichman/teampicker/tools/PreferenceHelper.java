@@ -40,6 +40,8 @@ public class PreferenceHelper {
 
     public static String pref_last_synced_game_id = "pref_last_synced_game_id";
     public static String pref_first_contact_import_shown = "pref_first_contact_import_shown";
+    public static String pref_last_review_request_time = "pref_last_review_request_time";
+    public static String pref_review_request_count = "pref_review_request_count";
 
     /**
      * Get the last synced game ID
@@ -67,6 +69,18 @@ public class PreferenceHelper {
         SharedPreferences settings = context.getSharedPreferences(PREF_FILE, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(key, value);
+        editor.apply();
+    }
+
+    /**
+     * Set a long shared preference
+     * @param key - Key to set shared preference
+     * @param value - Value for the key
+     */
+    public static void setSharedPreferenceLong(Context context, String key, long value){
+        SharedPreferences settings = context.getSharedPreferences(PREF_FILE, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong(key, value);
         editor.apply();
     }
 

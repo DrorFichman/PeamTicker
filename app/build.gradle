@@ -64,6 +64,9 @@ dependencies {
     // Konfetti for celebratory confetti animations
     implementation 'nl.dionsegijn:konfetti-xml:2.0.4'
 
+    // Google Play In-App Review
+    implementation 'com.google.android.play:review:2.0.1'
+
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0-alpha05'
     androidTestImplementation 'androidx.test:rules:1.4.0-alpha05'
 

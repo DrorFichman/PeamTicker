@@ -602,6 +602,14 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Get the total count of games saved in the database.
+     * This is equivalent to the maximum game ID.
+     */
+    public static int getTotalGamesCount(Context context) {
+        return getMaxGame(context);
+    }
+
+    /**
      * Get the next game ID to use when creating a new game.
      * This is always max + 1, regardless of whether there's an active game setup.
      */

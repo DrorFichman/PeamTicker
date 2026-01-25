@@ -49,6 +49,7 @@ import com.teampicker.drorfichman.teampicker.Data.TeamEnum;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
 import com.teampicker.drorfichman.teampicker.tools.DateHelper;
+import com.teampicker.drorfichman.teampicker.tools.InAppReviewHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import com.teampicker.drorfichman.teampicker.tools.WeatherService;
@@ -531,6 +532,9 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
             Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.save_results);
             LocalNotifications.sendNotification(this, LocalNotifications.GAME_UPDATE_ACTION);
+
+            // Request in-app review if appropriate (after positive experience)
+            InAppReviewHelper.requestReviewIfAppropriate(this);
 
             // Show celebratory confetti animation
             showConfetti();
