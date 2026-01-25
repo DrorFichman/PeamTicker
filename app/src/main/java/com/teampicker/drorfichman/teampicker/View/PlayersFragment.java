@@ -140,15 +140,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
 
         // Show tutorials in sequence - only one will show at a time
-        // For "new player" tutorial, target the add_player menu item in the toolbar
-        boolean shown = TutorialManager.displayTutorialStepOnMenuItem(activity, 
-                TutorialManager.Tutorials.players, toolbar, R.id.add_player, false);
-        
-        if (!shown) {
-            // For attendance tutorial, target the header row's RSVP title (always visible)
-            View attendanceTarget = getAttendanceTargetView();
-            shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.attendance, attendanceTarget, false);
-        }
+        // For attendance tutorial, target the header row's RSVP title (always visible)
+        View attendanceTarget = getAttendanceTargetView();
+        boolean shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.attendance, attendanceTarget, false);
+
         if (!shown) {
             shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.start_pick_teams, makeTeamsButton, false);
         }

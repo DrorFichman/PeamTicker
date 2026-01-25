@@ -1,9 +1,20 @@
 package com.teampicker.drorfichman.teampicker.tools.cloud;
 
 import android.content.Context;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +39,7 @@ import com.teampicker.drorfichman.teampicker.tools.AuthHelper;
 import com.teampicker.drorfichman.teampicker.tools.DialogHelper;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
+import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetAdminAccounts;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetConfiguration;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetLastGame;
 import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetUsers;
@@ -389,9 +401,11 @@ public class FirebaseHelper implements CloudSync {
         switch (Configurations.getUserCloudState(AuthHelper.getUser())) {
             case Allowed:
                 if (isAdmin()) {
-
-                    GetUsers.query(ctx, result -> {
-                        showUsersDialog(ctx, result, handler);
+                    // For admins, first fetch admin accounts, then show dialog with all users available
+                    GetAdminAccounts.query(ctx, adminAccounts -> {
+                        GetUsers.query(ctx, allUsers -> {
+                            showUsersDialog(ctx, adminAccounts, allUsers, handler);
+                        });
                     });
 
                 } else {
@@ -422,36 +436,224 @@ public class FirebaseHelper implements CloudSync {
         }
     }
 
-    private void showUsersDialog(Context ctx, ArrayList<AccountData> users, SyncProgress handler) {
-        Log.d("showUsersDialog", users.size() + " users ");
+    /**
+     * Shows a dialog for selecting a user to pull data from.
+     * Initially displays only admin accounts, with options to search or show all accounts.
+     *
+     * @param ctx The context
+     * @param adminAccounts List of admin accounts to show initially
+     * @param allUsers Complete list of all users for search/show all
+     * @param handler Progress handler
+     */
+    private void showUsersDialog(Context ctx, ArrayList<AccountData> adminAccounts, 
+                                  ArrayList<AccountData> allUsers, SyncProgress handler) {
+        Log.d("showUsersDialog", adminAccounts.size() + " admin accounts, " + allUsers.size() + " total users");
         // Hide progress while showing dialog
         handler.showSyncProgress(null, 0);
+
+        // Inflate custom dialog layout
+        View dialogView = LayoutInflater.from(ctx).inflate(R.layout.dialog_user_picker, null);
         
-        ArrayList<String> l = new ArrayList<>();
-        for (AccountData a : users) {
-            if (a != null && a.displayName != null) {
-                l.add(a.displayName);
+        EditText searchEdit = dialogView.findViewById(R.id.user_search);
+        ImageView clearButton = dialogView.findViewById(R.id.user_search_clear);
+        Button showAllBtn = dialogView.findViewById(R.id.show_all_accounts_btn);
+        TextView infoText = dialogView.findViewById(R.id.user_info_text);
+        ListView listView = dialogView.findViewById(R.id.user_list);
+
+        // Create adapter with initially only admin accounts
+        UserPickerAdapter adapter = new UserPickerAdapter(ctx, adminAccounts, allUsers);
+        listView.setAdapter(adapter);
+
+        // Handle clear button click
+        clearButton.setOnClickListener(v -> {
+            searchEdit.setText("");
+        });
+
+        // Handle search text changes
+        searchEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // When user starts searching, automatically expand to all users
+                if (s.length() > 0) {
+                    adapter.setShowAllAccounts(true);
+                    showAllBtn.setText("Show Admin Accounts Only");
+                    infoText.setText("Searching all accounts");
+                } else if (adapter.isShowingAllAccounts()) {
+                    infoText.setText("Showing all accounts");
+                } else {
+                    infoText.setText("Showing admin accounts");
+                }
+                
+                adapter.getFilter().filter(s);
+                // Show/hide clear button
+                clearButton.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
             }
-        }
 
-        String[] list = l.toArray(new String[l.size()]);
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-        builder.setTitle("Pick a user");
-        builder.setItems(list, (dialog, which) -> {
+        // Handle "Show All Accounts" button
+        showAllBtn.setOnClickListener(v -> {
+            boolean isShowingAll = adapter.isShowingAllAccounts();
+            adapter.setShowAllAccounts(!isShowingAll);
+            
+            if (!isShowingAll) {
+                // Now showing all
+                showAllBtn.setText("Show Admin Accounts Only");
+                infoText.setText("Showing all accounts (" + allUsers.size() + " users)");
+            } else {
+                // Now showing admin only
+                showAllBtn.setText("Show All Accounts");
+                infoText.setText("Showing admin accounts (" + adminAccounts.size() + " users)");
+            }
+            
+            // Re-apply current search filter
+            adapter.getFilter().filter(searchEdit.getText());
+        });
+
+        // Build and show dialog
+        AlertDialog dialog = new AlertDialog.Builder(ctx)
+                .setTitle("Pick a user")
+                .setView(dialogView)
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        // Handle list item click
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            AccountData selectedUser = adapter.getItem(position);
+            if (selectedUser != null) {
+                // Dismiss dialog immediately
+                dialog.dismiss();
 
             // Fetch data from the selected user
-            AuthHelper.fetchFor(users.get(which));
+                AuthHelper.fetchFor(selectedUser);
             fetchData(ctx, (status, progress) -> {
                 if (status == null) {
                     // Clear selection once done
                     AuthHelper.fetchFor(null);
-                    Toast.makeText(ctx, ctx.getString(R.string.toast_success_pull_completed, users.get(which).displayName), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx, ctx.getString(R.string.toast_success_pull_completed, 
+                                selectedUser.displayName), Toast.LENGTH_LONG).show();
                 }
                 handler.showSyncProgress(status, progress);
             });
+            }
         });
-        builder.show();
+
+        dialog.show();
+    }
+
+    /**
+     * Adapter for the user picker dialog with filtering support.
+     */
+    private static class UserPickerAdapter extends BaseAdapter implements Filterable {
+        private final Context context;
+        private final ArrayList<AccountData> adminAccounts;
+        private final ArrayList<AccountData> allAccounts;
+        private ArrayList<AccountData> displayedAccounts;
+        private ArrayList<AccountData> filteredAccounts;
+        private boolean showAllAccounts = false;
+        private final Filter filter;
+        private CharSequence currentFilter = "";
+
+        UserPickerAdapter(Context context, ArrayList<AccountData> adminAccounts, 
+                         ArrayList<AccountData> allAccounts) {
+            this.context = context;
+            this.adminAccounts = new ArrayList<>(adminAccounts);
+            this.allAccounts = new ArrayList<>(allAccounts);
+            this.displayedAccounts = new ArrayList<>(adminAccounts);
+            this.filteredAccounts = new ArrayList<>(adminAccounts);
+
+            this.filter = new Filter() {
+                @Override
+                protected FilterResults performFiltering(CharSequence constraint) {
+                    FilterResults results = new FilterResults();
+                    ArrayList<AccountData> filtered;
+                    
+                    // Determine which list to filter from
+                    ArrayList<AccountData> sourceList = showAllAccounts ? allAccounts : adminAccounts;
+                    
+                    if (TextUtils.isEmpty(constraint)) {
+                        filtered = new ArrayList<>(sourceList);
+                    } else {
+                        String filterPattern = constraint.toString().toLowerCase().trim();
+                        filtered = new ArrayList<>();
+                        for (AccountData account : sourceList) {
+                            if (account != null && account.displayName != null) {
+                                if (account.displayName.toLowerCase().contains(filterPattern) ||
+                                    (account.email != null && account.email.toLowerCase().contains(filterPattern))) {
+                                    filtered.add(account);
+                                }
+                            }
+                        }
+                    }
+                    
+                    results.values = filtered;
+                    results.count = filtered.size();
+                    return results;
+                }
+
+                @Override
+                @SuppressWarnings("unchecked")
+                protected void publishResults(CharSequence constraint, FilterResults results) {
+                    currentFilter = constraint;
+                    filteredAccounts = (ArrayList<AccountData>) results.values;
+                    notifyDataSetChanged();
+                }
+            };
+        }
+
+        public void setShowAllAccounts(boolean showAll) {
+            this.showAllAccounts = showAll;
+            this.displayedAccounts = showAll ? allAccounts : adminAccounts;
+        }
+
+        public boolean isShowingAllAccounts() {
+            return showAllAccounts;
+        }
+
+        @Override
+        public Filter getFilter() {
+            return filter;
+        }
+
+        @Override
+        public int getCount() {
+            return filteredAccounts.size();
+        }
+
+        @Override
+        public AccountData getItem(int position) {
+            return filteredAccounts.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, android.view.ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(context).inflate(
+                        android.R.layout.simple_list_item_2, parent, false);
+            }
+
+            AccountData account = getItem(position);
+            
+            TextView text1 = convertView.findViewById(android.R.id.text1);
+            TextView text2 = convertView.findViewById(android.R.id.text2);
+
+            if (account != null) {
+                text1.setText(account.displayName);
+                text2.setText(account.email);
+            }
+
+            return convertView;
+        }
     }
 
     private void checkPull(Context ctx, String date, SyncProgress handler) {
