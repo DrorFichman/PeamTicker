@@ -316,4 +316,55 @@
     <string name="prediction_reveal_title">Pre-Game Prediction</string>
     <string name="prediction_reveal_message">The prediction before the game was:\n\n%1$d%% — %2$d%%</string>
     <string name="prediction_no_data">Not enough game history to make a prediction. Play more games to enable predictions.</string>
+
+    <!--    Toast Messages - Errors-->
+    <string name="toast_error_share_failed">Failed to share: %1$s</string>
+    <string name="toast_error_login_failed">Login failed</string>
+    <string name="toast_error_screenshot_failed">Failed to take screenshot: %1$s</string>
+    <string name="toast_error_whatsapp_not_installed">WhatsApp not installed. Opening share menu…</string>
+    <string name="toast_error_permissions_denied">Permissions denied.</string>
+    <string name="toast_error_cloud_stage_players_failed">Failed to stage players: %1$s</string>
+    <string name="toast_error_cloud_stage_games_failed">Failed to stage games: %1$s</string>
+    <string name="toast_error_cloud_stage_player_stats_failed">Failed to stage player stats: %1$s</string>
+    <string name="toast_error_cloud_finalize_sync_failed">Failed to finalize sync: %1$s</string>
+    <string name="toast_error_cloud_no_games">No Games found - sync to cloud first</string>
+    <string name="toast_error_cloud_pull_players_failed">Failed to pull players: %1$s</string>
+    <string name="toast_error_cloud_pull_games_failed">Failed to pull games: %1$s</string>
+    <string name="toast_error_cloud_pull_player_stats_failed">Failed to pull player stats: %1$s</string>
+    <string name="toast_error_cloud_save_data_failed">Failed to save data: %1$s</string>
+    <string name="toast_error_load_contacts_failed">Failed to load contacts</string>
+    <string name="toast_error_paste_process_failed">Failed to process : %1$s</string>
+
+    <!--    Toast Messages - Success-->
+    <string name="toast_success_sync_completed">Sync completed</string>
+    <string name="toast_success_pull_completed">Pull completed from %1$s</string>
+    <string name="toast_success_player_saved">Player saved</string>
+    <string name="toast_success_tutorial_reset">Tutorial reset</string>
+    <string name="toast_success_weather_updated">Weather settings updated</string>
+
+    <!--    Toast Messages - Validation-->
+    <string name="toast_validation_future_date">Future date is not allowed</string>
+    <string name="toast_validation_select_game_edit">Select game to edit</string>
+    <string name="toast_validation_select_game_delete">Select game to delete</string>
+    <string name="toast_validation_player_name_required">Fill player\'s name</string>
+    <string name="toast_validation_player_grade_required">Fill player\'s grade</string>
+    <string name="toast_validation_grade_range">Grade must be between 0-99</string>
+    <string name="toast_validation_year_range">Year must be between 1900-now</string>
+    <string name="toast_validation_player_name_in_use">Player name is already in use</string>
+    <string name="toast_validation_invalid_grade">Invalid grade</string>
+
+    <!--    Toast Messages - Instructions-->
+    <string name="toast_instruction_select_players_first">First - select attending players</string>
+    <string name="toast_instruction_weather_disabled">Weather feature is currently disabled</string>
+    <string name="toast_instruction_paste_whatsapp">Copy some whatsapp messages to set attending players</string>
+    <string name="toast_instruction_paste_multiple">Paste multiple messages</string>
+    <string name="toast_instruction_empty_identifier">Empty identifier can\'t be set</string>
+    <string name="toast_instruction_identifier_cleared">Cleared %1$s</string>
+    <string name="toast_instruction_identifier_set">Set %1$s with %2$s</string>
+    <string name="toast_instruction_player_not_found">%1$s not found</string>
+    <string name="toast_instruction_no_archived_players">No archived players found</string>
+    <string name="toast_instruction_start_before_end">Start time must be before end time</string>
+    <string name="toast_instruction_geocoder_unavailable">Geocoder not available on this device</string>
+    <string name="toast_instruction_location_not_found">Location not found: %1$s</string>
+    <string name="toast_instruction_location_error">Error finding location</string>
 </resources>

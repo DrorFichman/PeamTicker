@@ -96,7 +96,7 @@ public class GamesFragment extends Fragment {
                 MakeTeamsActivity.setResult(makeTeamsIntent);
                 startActivity(makeTeamsIntent);
             } else {
-                Toast.makeText(getContext(), "First - select attending players", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_select_players_first), Toast.LENGTH_SHORT).show();
             }
         });
     }

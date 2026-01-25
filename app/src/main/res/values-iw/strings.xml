@@ -316,5 +316,56 @@
     <string name="prediction_reveal_title">תחזית לפני המשחק</string>
     <string name="prediction_reveal_message">התחזית לפני המשחק הייתה:\n\n%1$d%% — %2$d%%</string>
     <string name="prediction_no_data">אין מספיק היסטוריית משחקים כדי לבצע תחזית. שחק משחקים נוספים כדי לאפשר תחזיות.</string>
+
+    <!--    Toast Messages - Errors-->
+    <string name="toast_error_share_failed">שיתוף נכשל: %1$s</string>
+    <string name="toast_error_login_failed">כניסה נכשלה</string>
+    <string name="toast_error_screenshot_failed">צילום מסך נכשל: %1$s</string>
+    <string name="toast_error_whatsapp_not_installed">WhatsApp לא מותקן. פותח תפריט שיתוף…</string>
+    <string name="toast_error_permissions_denied">הרשאות נדחו.</string>
+    <string name="toast_error_cloud_stage_players_failed">העלאת שחקנים נכשלה: %1$s</string>
+    <string name="toast_error_cloud_stage_games_failed">העלאת משחקים נכשלה: %1$s</string>
+    <string name="toast_error_cloud_stage_player_stats_failed">העלאת סטטיסטיקות שחקנים נכשלה: %1$s</string>
+    <string name="toast_error_cloud_finalize_sync_failed">השלמת סנכרון נכשלה: %1$s</string>
+    <string name="toast_error_cloud_no_games">לא נמצאו משחקים - סנכרן לענן תחילה</string>
+    <string name="toast_error_cloud_pull_players_failed">משיכת שחקנים נכשלה: %1$s</string>
+    <string name="toast_error_cloud_pull_games_failed">משיכת משחקים נכשלה: %1$s</string>
+    <string name="toast_error_cloud_pull_player_stats_failed">משיכת סטטיסטיקות שחקנים נכשלה: %1$s</string>
+    <string name="toast_error_cloud_save_data_failed">שמירת נתונים נכשלה: %1$s</string>
+    <string name="toast_error_load_contacts_failed">טעינת אנשי קשר נכשלה</string>
+    <string name="toast_error_paste_process_failed">עיבוד נכשל : %1$s</string>
+
+    <!--    Toast Messages - Success-->
+    <string name="toast_success_sync_completed">סנכרון הושלם</string>
+    <string name="toast_success_pull_completed">משיכה הושלמה מ-%1$s</string>
+    <string name="toast_success_player_saved">שחקן נשמר</string>
+    <string name="toast_success_tutorial_reset">הדרכה אופסה</string>
+    <string name="toast_success_weather_updated">הגדרות מזג אוויר עודכנו</string>
+
+    <!--    Toast Messages - Validation-->
+    <string name="toast_validation_future_date">תאריך עתידי אינו מורשה</string>
+    <string name="toast_validation_select_game_edit">בחר משחק לעריכה</string>
+    <string name="toast_validation_select_game_delete">בחר משחק למחיקה</string>
+    <string name="toast_validation_player_name_required">מלא את שם השחקן</string>
+    <string name="toast_validation_player_grade_required">מלא את דירוג השחקן</string>
+    <string name="toast_validation_grade_range">דירוג חייב להיות בין 0-99</string>
+    <string name="toast_validation_year_range">שנה חייבת להיות בין 1900-עכשיו</string>
+    <string name="toast_validation_player_name_in_use">שם שחקן כבר בשימוש</string>
+    <string name="toast_validation_invalid_grade">דירוג לא תקין</string>
+
+    <!--    Toast Messages - Instructions-->
+    <string name="toast_instruction_select_players_first">תחילה - בחר שחקנים משתתפים</string>
+    <string name="toast_instruction_weather_disabled">תכונת מזג אוויר מושבתת כרגע</string>
+    <string name="toast_instruction_paste_whatsapp">העתק הודעות WhatsApp כדי להגדיר שחקנים משתתפים</string>
+    <string name="toast_instruction_paste_multiple">הדבק מספר הודעות</string>
+    <string name="toast_instruction_empty_identifier">מזהה ריק לא ניתן להגדרה</string>
+    <string name="toast_instruction_identifier_cleared">נוקה %1$s</string>
+    <string name="toast_instruction_identifier_set">הוגדר %1$s עם %2$s</string>
+    <string name="toast_instruction_player_not_found">%1$s לא נמצא</string>
+    <string name="toast_instruction_no_archived_players">לא נמצאו שחקנים בארכיון</string>
+    <string name="toast_instruction_start_before_end">זמן התחלה חייב להיות לפני זמן סיום</string>
+    <string name="toast_instruction_geocoder_unavailable">Geocoder לא זמין במכשיר זה</string>
+    <string name="toast_instruction_location_not_found">מיקום לא נמצא: %1$s</string>
+    <string name="toast_instruction_location_error">שגיאה במציאת מיקום</string>
 </resources>
 

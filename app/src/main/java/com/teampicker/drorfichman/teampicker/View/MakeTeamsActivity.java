@@ -647,7 +647,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
         DatePickerDialog d = new DatePickerDialog(this, (datePicker, year, month, day) -> {
             Calendar selectedDate = new Calendar.Builder().setDate(year, month, day).build();
             if (selectedDate.getTimeInMillis() > Calendar.getInstance().getTimeInMillis())
-                Toast.makeText(this, "Future date is not allowed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_validation_future_date), Toast.LENGTH_SHORT).show();
             else
                 setGameDate(selectedDate);
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE));
@@ -792,7 +792,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
                 exitSendMode();
                 Snackbar.make(list1, "We're ready! you can now share your screenshot :)", Snackbar.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Permissions denied.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_error_permissions_denied), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -1315,7 +1315,7 @@ public class MakeTeamsActivity extends AppCompatActivity {
     private void showWeatherSettingsDialog() {
         // Skip if feature is disabled
         if (!Configurations.isWeatherFeatureEnabled()) {
-            Toast.makeText(this, "Weather feature is currently disabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_instruction_weather_disabled), Toast.LENGTH_SHORT).show();
             return;
         }
         

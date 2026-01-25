@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    App-->
+    <string name="app_name">PeamTicker</string>
+    <string name="main_title">Выбор Команд</string>
+    <string name="pick_teams_title">Выбрать Команды</string>
+    <string name="pick_teams_title_results">Результаты</string>
+    <string name="pick_teams_title_analysis">Анализ</string>
+    <string name="games_with_count">Игры (%1$d)</string>
+    <string name="stats_with_count">%1$d игроков\n%2$d игр</string>
+    <string name="games_player_count">%1$d игроков</string>
+    <string name="search_title">Поиск</string>
+
+    <!--    Drawer-->
+    <string name="navigation_drawer_open">Открыть меню навигации</string>
+    <string name="navigation_drawer_close">Закрыть меню навигации</string>
+
+    <!--    Headlines-->
+    <string name="name">Имя</string>
+    <string name="grade">Рейтинг</string>
+    <string name="date">Дата</string>
+    <string name="score">Счёт</string>
+    <string name="grade_description">Рейтинг (0–99)</string>
+    <string name="attributes">Атрибуты</string>
+    <string name="age">Возраст</string>
+    <string name="age_description">Возраст (дата рождения)</string>
+    <string name="plus_minus">+/-</string>
+    <string name="success">Успех</string>
+    <string name="games">Игры</string>
+    <string name="win_rate">Процент побед</string>
+    <string name="success_vs">Успех\nПротив</string>
+    <string name="games_vs">Игры\nПротив</string>
+    <string name="success_with">Успех\nС</string>
+    <string name="games_with">Игры\nС</string>
+    <string name="basic_info">Основная Информация</string>
+    <string name="properties">Свойства</string>
+    <string name="gk">ВР</string>
+    <string name="defender">Защитник</string>
+    <string name="playmaker">Плеймейкер</string>
+    <string name="unbreakable">Несгибаемый</string>
+    <string name="extra">Дополнительно</string>
+    <string name="injured">Травмирован</string>
+    <string name="injured_help_title">Травмированный Игрок</string>
+    <string name="injured_help_message">Отметьте игрока как травмированного, когда он не играет на своём обычном уровне.\n\nПри выборе команд с оптимизацией ИИ, химия травмированных игроков с другими будет игнорироваться, но их рейтинг и процент побед всё равно будут учитываться.\n\nЭто помогает справедливо сбалансировать команды, когда игрок восстанавливается.</string>
+    <string name="show_injured_players">Показать Травмированных Игроков</string>
+    <string name="injured_grade_change_title">Обновить Рейтинг?</string>
+    <string name="injured_marked_message">Вы отметили этого игрока как травмированного. Хотите ли вы скорректировать его рейтинг, чтобы отразить текущий уровень производительности?</string>
+    <string name="injury_cleared_message">Игрок больше не отмечен как травмированный. Хотите ли вы восстановить его рейтинг?</string>
+    <string name="update_grade">Обновить</string>
+    <string name="skip">Пропустить</string>
+
+    <!--    Empty State-->
+    <string name="empty_players_icon">Нет игроков</string>
+    <string name="empty_players_title">Пока Нет Игроков</string>
+    <string name="empty_players_message">Импортируйте игроков из ваших контактов или вставьте сообщения WhatsApp для быстрого начала.</string>
+    <string name="empty_players_import_button">Импортировать из Контактов</string>
+    <string name="empty_players_paste_button">Вставить из WhatsApp</string>
+    <string name="empty_players_or_add">Или нажмите + вверху, чтобы добавить игроков вручную</string>
+    <string name="empty_injured_icon">Нет травмированных игроков</string>
+    <string name="empty_injured_title">Нет Травмированных Игроков</string>
+    <string name="empty_injured_message">Хорошие новости! Никто из ваших игроков в настоящее время не отмечен как травмированный.\n\nВы можете отметить игрока как травмированного на экране его деталей.</string>
+
+    <!--    Buttons-->
+    <string name="save">Сохранить</string>
+    <string name="done">Готово</string>
+    <string name="cancel">Отмена</string>
+    <string name="yes">да</string>
+    <string name="edit">Редактировать</string>
+    <string name="copy_game">Копировать</string>
+    <string name="delete">Удалить</string>
+    <string name="new_player">Новый Игрок</string>
+    <string name="move_players">Трансферы\nи Скамейка</string>
+    <string name="move_players_bench">Трансферы\n(%1$d на скамейке)</string>
+    <string name="bench_players">Скамейка</string>
+    <string name="shuffle_age">По Возрасту</string>
+    <string name="shuffle_grade">По Рейтингу</string>
+    <string name="shuffle_stats">По Статистике</string>
+    <string name="clear_all_coming">Очистить Посещаемость</string>
+    <string name="action_send_statistics">Отправить Статистику</string>
+    <string name="action_analysis">Анализ</string>
+    <string name="action_share">Поделиться</string>
+    <string name="action_enter_results">Ввести Результаты</string>
+    <string name="player_missed_game">Игрок пропустил игру</string>
+    <string name="player_mvp">Отметить как MVP</string>
+    <string name="action_empty_bench_left">Очистить Скамейку (слева)</string>
+    <string name="action_empty_bench_right">Очистить Скамейку (справа)</string>
+    <string name="action_switch_team_colors">Сменить Цвета</string>
+    <string name="action_button_results">Результаты</string>
+    <string name="teams_bench_title">Скамейка (перетащите игроков сюда, когда они не играют)</string>
+    <string name="team_save_sync_to_cloud">Синхронизировать с облаком</string>
+
+    <!--    Navigation-->
+    <string name="nav_players">Игроки</string>
+    <string name="nav_games_history">История Игр</string>
+    <string name="nav_statistics">Статистика</string>
+    <string name="nav_backup_to_file">Резервная копия в файл</string>
+    <string name="nav_import_from_file">Импортировать из файла</string>
+    <string name="nav_sync_to_cloud">Синхронизировать с облаком</string>
+    <string name="nav_pull_from_cloud">Загрузить из облака</string>
+    <string name="sync_status_synced">Синхронизировано</string>
+    <string name="sync_status_unsynced">%d не синхронизировано</string>
+    <string name="nav_settings">Настройки</string>
+    <string name="nav_getting_started">Начало Работы</string>
+    <string name="nav_invite_friends">Пригласить Друзей</string>
+    <string name="nav_about">О Приложении</string>
+
+    <!--    Menus-->
+    <string name="add_player">Добавить Игрока</string>
+    <string name="paste_players">Вставить Игроков</string>
+    <string name="import_contacts">Импортировать из Контактов</string>
+
+    <!--    Import Contacts-->
+    <string name="import_contacts_first_time_hint">Игроки импортированы! Нажмите на любого игрока, чтобы отредактировать его данные.</string>
+    <string name="import_contacts_result_title">Игроки Импортированы</string>
+    <string name="import_contacts_added_players">Добавлены следующие игроки:</string>
+    <string name="import_contacts_skipped_existing">Пропущены (уже существуют):</string>
+    <string name="import_contacts_success">%1$d игрок(ов) успешно импортировано</string>
+    <string name="import_contacts_select_title">Выберите Контакты для Импорта</string>
+    <string name="import_contacts_done">Импортировать</string>
+    <string name="import_contacts_permission_denied">Требуется разрешение на доступ к контактам для импорта игроков</string>
+    <string name="import_contacts_no_contacts">Контакты не найдены</string>
+    <string name="import_contacts_search_hint">Поиск контактов…</string>
+    <string name="clear_search">Очистить поиск</string>
+    <string name="import_contacts_selected_count">%1$d выбрано</string>
+    <string name="import_contacts_confirm_exit_title">Отменить выбор?</string>
+    <string name="import_contacts_confirm_exit_message">У вас выбрано %1$d контакт(ов). Вы уверены, что хотите выйти без их импорта?</string>
+    <string name="import_contacts_discard">Отменить</string>
+
+    <!--    Shared Contact-->
+    <string name="shared_contact_exists">Игрок \"%1$s\" уже существует</string>
+    <string name="shared_contact_exists_archived">Игрок \"%1$s\" существует в архиве</string>
+    <string name="shared_contact_read_error">Не удалось прочитать контакт</string>
+    <string name="shared_contact_parse_error">Не удалось разобрать имя контакта</string>
+    <string name="show_archived">Показать Архив Игроков</string>
+    <string name="make_teams">Выбрать Команды</string>
+    <string name="new_game">Новая Игра</string>
+    <string name="enter_results">Ввести Результаты</string>
+    <string name="action_50_games">Последние 50 игр</string>
+    <string name="action_all_games">Все игры</string>
+    <string name="part_last_10_games">последние 10 игр</string>
+    <string name="part_last_50_games">последние 50 игр</string>
+    <string name="part_all_games">все игры</string>
+    <string name="stats_50_games">50 игр</string>
+    <string name="stats_10_games">10 игр</string>
+    <string name="stats_all_games">все игры</string>
+
+    <!--    Settings - values are saved in preferences - don't change-->
+    <string name="setting_team_color_scheme_black_white">Чёрный — Белый</string>
+    <string name="setting_team_color_scheme_orange_blue">Оранжевый — Синий</string>
+    <string name="setting_team_color_scheme_orange_yellow">Оранжевый — Жёлтый</string>
+
+    <string name="setting_title_divide_attempts">Попытки Разделения</string>
+    <string name="setting_summary_divide_attempts">Количество разделений команд для рассмотрения (1–1000)</string>
+    <string name="setting_title_grade_weight">Вес Рейтинга</string>
+    <string name="setting_summary_grade_weight">Процент веса рейтинга (0%–100%)</string>
+    <string name="setting_title_color_scheme">Цвета Команд</string>
+    <string name="setting_summary_color_scheme">Визуализация команд - выберите цветовую схему</string>
+    <string name="setting_title_clear_tutorial">Сбросить Обучение</string>
+    <string name="setting_summary_clear_tutorial">Сбросить пропущенные шаги обучения</string>
+    <string name="setting_title_show_hints">Показывать Подсказки</string>
+    <string name="setting_summary_show_hints">Отображать подсказки обучения при навигации по приложению</string>
+    <string name="setting_title_show_grades">Показывать Рейтинги</string>
+    <string name="setting_summary_show_grades">Показывать рейтинги игроков</string>
+    <string name="setting_title_auto_sync_games">Автосинхронизация</string>
+    <string name="setting_summary_auto_sync_games">Автоматически синхронизировать новые игры с облаком</string>
+
+    <!--    Messages-->
+    <string name="parentheses">(%1$d)</string>
+    <string name="team_data_headline"> Игроки \n Рейтинг \n Успех \n Процент Побед \n Химия </string>
+    <string name="team_data"> %1$d \n %2$.1f (&#177;%3$.1f) \n %4$d \n %5$d%% \n %6$s </string>
+    <string name="team_data_chemistry"> %1$d%%</string>
+    <string name="team_public_stats"> Возраст: %1$d </string>
+    <string name="player_stat">Игры: %1$s \nПобеды: %2$s</string>
+    <string name="stats_player_games">%1$d (%2$d%%)</string>
+    <string name="player_wins_participation">%1$s (%2$s)</string>
+    <string name="player_participation_statistics">%1$s + \n(И:%2$d, П:%3$02d%%)</string>
+    <string name="player_analysis">(П:%1$02d%% И:%2$02d) [%3$s]</string>
+    <string name="player_analysis_collaborator">(П:%1$02d%% И:%2$02d) [У:%3$s]</string>
+    <string name="player_analysis_selected">(П:%1$02d%% И:%2$02d) [%3$s]</string>
+    <string name="player_analysis_selected_win_rate">%1$02d%%</string>
+    <string name="player_analysis_selected_games">%1$02d</string>
+    <string name="operation_move">Долгое нажатие на строку игрока для начала перетаскивания</string>
+    <string name="operation_divide_by_collaboration">* ИИ в процессе :)</string>
+    <string name="optimizing_teams">Оптимизация Команд…</string>
+    <string name="progress_percentage">%1$d%%</string>
+    <string name="progress_best_score">Лучший балл баланса: %1$s</string>
+    <string name="analysis_progress_update">%1$d%% (%2$s)</string>
+    <string name="operation_analysis">* Нажмите на игроков для более глубокого анализа \n* Нажмите на иконку для выхода из режима анализа</string>
+    <string name="copy_players_success">Разделение команд применено</string>
+    <string name="main_make_teams">Команды (%1$d)</string>
+    <string name="main_auth_required">Требуется вход через Google</string>
+    <string name="main_cloud_not_allowed">Функция облака не разрешена \nПодробности в Play Store</string>
+    <string name="main_connectivity">Проблема с подключением</string>
+    <string name="main_sign_in">Войти</string>
+    <string name="main_login">Вход</string>
+    <string name="main_logout">Выйти</string>
+    <string name="main_sign_out_dialog_title">Выйти?</string>
+    <string name="main_sign_out_dialog_message">Функции облака будут недоступны.</string>
+
+    <!--    Tutorials-->
+    <string name="tutorial_progress">%1$d%%</string>
+    <string name="tutorial_headline">Начало Работы - Обучение</string>
+    <string name="tutorial_dismiss_message">Отклонить сообщения обучения</string>
+    <string name="tutorial_create_player_title">Создать Игроков</string>
+    <string name="tutorial_create_player_message">Создавайте игроков вручную через иконку \"+\" в верхней части экрана.\n\nИли \"Вставьте Игроков\" из сообщений WhatsApp на основе имён контактов</string>
+    <string name="tutorial_attendance_title">Указать Присутствующих Игроков</string>
+    <string name="tutorial_attendance_message">Перед выбором команд вам нужно будет выбрать, какие игроки будут присутствовать на предстоящей игре.\n\nОтметьте флажок, связанный с каждым присутствующим игроком.\n\nВы также можете вставить сообщения WhatsApp для быстрого поиска игроков.</string>
+    <string name="tutorial_start_pick_teams_title">Выбрать Команды</string>
+    <string name="tutorial_start_pick_teams_message">Вы можете начать выбирать команды, просто нажмите кнопку \"Команды\" ниже</string>
+    <string name="tutorial_pick_teams_title">Выбрать Команды</string>
+    <string name="tutorial_pick_teams_message">\"Перемешайте\" команды на основе рейтингов.\n(вы можете выбрать другой режим перемешивания, нажав на 3 точки. Не рекомендуется перемешивать по статистике до того, как у вас будет 10 игр данных).\n\n\"Переместите\" игроков долгим нажатием и перетаскиванием. Используйте скамейку для замен.\n\nПоделитесь изображением команд (без рейтингов) через любое приложение для обмена сообщениями.</string>
+    <string name="tutorial_save_results_title">Сохранить результат игры</string>
+    <string name="tutorial_save_results_message">После окончания игры вы можете ввести результаты.\nЭто открывает путь к истории игр, личной статистике и возможности выбирать команды на основе процента побед и химии игроков.\n\nВведите \"Результаты\" на экране \"Команды\".</string>
+    <string name="tutorial_game_history_title">История Игр</string>
+    <string name="tutorial_game_history_message">Выберите любую игру на вкладке \"Игры\", чтобы просмотреть её команды и действия.</string>
+    <string name="tutorial_cloud_title">Функции Облака</string>
+    <string name="tutorial_cloud_message">Синхронизируйте своих игроков и игры с облаком в качестве резервной копии или когда планируете загрузить данные на другое устройство.\n\nСначала войдите с вашей учётной записью Google через боковое меню.\nЗатем \"Синхронизируйте\" в боковом меню.</string>
+    <string name="tutorial_team_analysis_title">Анализ Команд</string>
+    <string name="tutorial_team_analysis_message">Теперь, когда предоставлена достаточная история игр, нажмите на иконку \"Анализ\" в верхней панели, чтобы наблюдать индивидуальные проценты побед.\n\nНажмите на игрока, чтобы увидеть его личную химию с другими участвующими игроками.</string>
+    <string name="tutorial_team_shuffle_stats_title">Выбор команд - режим ИИ</string>
+    <string name="tutorial_team_shuffle_stats_message">Переключитесь на оптимизированный режим выбора команд через 3 точки под кнопкой \"Перемешать\".\n\nРежим \"Статистика\" сгенерирует варианты команд на основе процентов побед и химии игроков.</string>
+    <string name="tutorial_completed_title">Обучение Завершено</string>
+    <string name="tutorial_completed_message">Обучение будет доступно в боковом меню в разделе \"Начало Работы\"</string>
+
+    <!--    Player Insights-->
+    <string name="insights_tab_title">Аналитика</string>
+    <string name="insights_win_rate_title">Процент Побед Со Временем</string>
+    <string name="insights_moving_win_rate">Процент Побед Последних 50 Игр</string>
+    <string name="insights_cumulative_win_rate">Процент Побед За Всё Время</string>
+    <string name="insights_win_rate_label">Процент Побед %</string>
+    <string name="insights_games_label">Игры</string>
+    <string name="insights_window_label">Размер Окна:</string>
+    <string name="insights_show_cumulative">Показать Накопительный Процент</string>
+    <string name="insights_window_10">Последние 10 Игр</string>
+    <string name="insights_window_25">Последние 25 Игр</string>
+    <string name="insights_window_50">Последние 50 Игр</string>
+    <string name="insights_show_touch_data">Показать данные при касании</string>
+    <string name="insights_no_data">Недостаточно данных об играх для отображения аналитики. Сыграйте как минимум %1$d игр, чтобы увидеть статистику.</string>
+
+    <!--    Insights Chip Labels-->
+    <string name="insights_chip_win_rate">Процент Побед</string>
+    <string name="insights_chip_chemistry">Химия</string>
+    <string name="insights_chip_activity">Участие</string>
+
+    <!--    Player Collaboration Chart-->
+    <string name="insights_collaboration_title">Сотрудничество - Успех с игроками</string>
+    <string name="insights_collaboration_no_data">Недостаточно данных о сотрудничестве. Сыграйте как минимум %1$d игр с другими игроками.</string>
+    <string name="insights_success_with_label">Успех С</string>
+    <string name="insights_success_against_label">Успех Против</string>
+
+    <!--    Team Collaboration Chart (from teams screen) -->
+    <string name="team_collaboration_chart_title">%1$s - Сотрудничество Команды</string>
+    <string name="team_collaboration_chart_title_with_games">%1$s - Сотрудничество Команды (последние %2$d игр)</string>
+    <string name="team_collaboration_no_data">Недостаточно игр с членами команды. Сыграйте как минимум %1$d игр.</string>
+    <string name="team_collaboration_x_axis_label">Количество игр</string>
+    <string name="team_collaboration_y_axis_label">Успех</string>
+
+    <!--    Player Participation Chart-->
+    <string name="insights_participation_title">Участие Со Временем</string>
+    <string name="total_games_played">Всего Сыграно Игр</string>
+    <string name="total_games_count">%1$d игр</string>
+    <string name="player_games_header">%1$s (%2$d игр)</string>
+    <string name="overall_win_rate">Общий Процент Побед</string>
+    <string name="win_rate_value">%1$d%%</string>
+    <string name="insights_participation_no_data">Недостаточно данных об играх. Сыграйте как минимум %1$d игр, чтобы увидеть активность.</string>
+    <string name="insights_wins_label">Победы</string>
+    <string name="insights_ties_label">Ничьи</string>
+    <string name="insights_losses_label">Поражения</string>
+
+    <!--    Games Charts-->
+    <string name="games_tab_history">История</string>
+    <string name="games_tab_charts">Графики</string>
+    <string name="charts_tab_distribution">Счета</string>
+    <string name="charts_tab_trend">Со Временем</string>
+    <string name="charts_goal_diff_distribution_title">Распределение Разницы Голов</string>
+    <string name="charts_goal_diff_distribution_description">Процент игр, заканчивающихся с каждой разницей счёта</string>
+    <string name="charts_goal_diff_trend_title">Тренд Разницы Голов</string>
+    <string name="charts_goal_diff_trend_description">Скользящее среднее разницы голов со временем</string>
+    <string name="charts_close_games_percentage">Конкурентные Игры (разн &lt; 3)</string>
+    <string name="charts_avg_goal_diff">Средняя Разница Голов</string>
+    <string name="charts_last_n_games">Последние %1$d игр</string>
+    <string name="charts_avg_last_n_games">Сред (последние %1$d)</string>
+    <string name="charts_median_last_n_games">Медиана (последние %1$d)</string>
+    <string name="charts_no_data">Недостаточно данных об играх. Сыграйте как минимум %1$d игр, чтобы увидеть графики.</string>
+
+    <!--    Statistics Tab Charts-->
+    <string name="stats_tab_stats">Статистика</string>
+    <string name="stats_tab_charts">Графики</string>
+    <string name="stats_charts_tab_seniority">Опыт</string>
+    <string name="stats_charts_tab_success">Успех</string>
+
+    <!--    Player Experience Distribution Chart-->
+    <string name="stats_seniority_chart_title">Распределение Опыта Игроков</string>
+    <string name="stats_seniority_chart_description">Суммарные подсчёты по уровню опыта</string>
+    <string name="stats_seniority_no_data">Недостаточно данных об играх. Сыграйте как минимум %1$d игр, чтобы увидеть распределение опыта.</string>
+    <string name="stats_seniority_current_avg">Текущее Среднее (25 игр)</string>
+    <string name="stats_seniority_current_value">Новые: %.0f | Возвращающиеся: %.0f | Постоянные: %.0f</string>
+    <string name="stats_seniority_new_players">Новые (&lt;10)</string>
+    <string name="stats_seniority_returning_players">Возвращающиеся (10–50)</string>
+    <string name="stats_seniority_regulars">Постоянные (&gt;50)</string>
+    <string name="stats_seniority_click_hint">Нажмите на график, чтобы просмотреть детали игрока</string>
+    <string name="stats_seniority_player_games">%1$s (%2$d)</string>
+    <string name="stats_game_number">Игра %1$d</string>
+
+    <!--    Player Success Chart-->
+    <string name="stats_success_heatmap_title">Успех Игрока Со Временем</string>
+    <string name="stats_success_heatmap_description">Накопительный успех (победы - поражения) для лучших игроков</string>
+    <string name="stats_success_no_data">Недостаточно данных об играх. Сыграйте как минимум %1$d игр, чтобы увидеть график успеха.</string>
+    <string name="stats_success_show_players">Показать игроков:</string>
+    <string name="stats_success_all_players">Все</string>
+
+    <!--    Prediction-->
+    <string name="prediction_label">Прогноз</string>
+    <string name="prediction_explanation_title">Прогноз Победы</string>
+    <string name="prediction_explanation_stats_mode">Этот прогноз основан на взвешенной комбинации:\n\n• Химия - Насколько хорошо игроки выступают вместе на основе исторических игр\n• Процент Побед - Индивидуальные проценты побед игроков\n• Рейтинги - Рейтинги навыков игроков\n\nКоманды в настоящее время разделяются с использованием режима Статистики, который оптимизирует сбалансированные, конкурентные матчи.</string>
+    <string name="prediction_explanation_other_mode">Этот прогноз основан на взвешенной комбинации:\n\n• Химия - Насколько хорошо игроки выступают вместе на основе исторических игр\n• Процент Побед - Индивидуальные проценты побед игроков\n• Рейтинги - Рейтинги навыков игроков\n\nСовет: Переключитесь на режим перемешивания \"Статистика\" (через 3 точки под Перемешать) для оптимизированного ИИ балансирования команд на основе этих факторов.</string>
+    <string name="prediction_reveal_title">Прогноз Перед Игрой</string>
+    <string name="prediction_reveal_message">Прогноз перед игрой был:\n\n%1$d%% — %2$d%%</string>
+    <string name="prediction_no_data">Недостаточно истории игр для создания прогноза. Сыграйте больше игр, чтобы включить прогнозы.</string>
+
+    <!--    Toast Messages - Errors-->
+    <string name="toast_error_share_failed">Не удалось поделиться: %1$s</string>
+    <string name="toast_error_login_failed">Ошибка входа</string>
+    <string name="toast_error_screenshot_failed">Не удалось сделать скриншот: %1$s</string>
+    <string name="toast_error_whatsapp_not_installed">WhatsApp не установлен. Открывается меню общего доступа…</string>
+    <string name="toast_error_permissions_denied">Разрешения отклонены.</string>
+    <string name="toast_error_cloud_stage_players_failed">Не удалось подготовить игроков: %1$s</string>
+    <string name="toast_error_cloud_stage_games_failed">Не удалось подготовить игры: %1$s</string>
+    <string name="toast_error_cloud_stage_player_stats_failed">Не удалось подготовить статистику игроков: %1$s</string>
+    <string name="toast_error_cloud_finalize_sync_failed">Не удалось завершить синхронизацию: %1$s</string>
+    <string name="toast_error_cloud_no_games">Игры не найдены - сначала синхронизируйте с облаком</string>
+    <string name="toast_error_cloud_pull_players_failed">Не удалось загрузить игроков: %1$s</string>
+    <string name="toast_error_cloud_pull_games_failed">Не удалось загрузить игры: %1$s</string>
+    <string name="toast_error_cloud_pull_player_stats_failed">Не удалось загрузить статистику игроков: %1$s</string>
+    <string name="toast_error_cloud_save_data_failed">Не удалось сохранить данные: %1$s</string>
+    <string name="toast_error_load_contacts_failed">Не удалось загрузить контакты</string>
+    <string name="toast_error_paste_process_failed">Не удалось обработать : %1$s</string>
+
+    <!--    Toast Messages - Success-->
+    <string name="toast_success_sync_completed">Синхронизация завершена</string>
+    <string name="toast_success_pull_completed">Загрузка завершена из %1$s</string>
+    <string name="toast_success_player_saved">Игрок сохранён</string>
+    <string name="toast_success_tutorial_reset">Обучение сброшено</string>
+    <string name="toast_success_weather_updated">Настройки погоды обновлены</string>
+
+    <!--    Toast Messages - Validation-->
+    <string name="toast_validation_future_date">Будущая дата не разрешена</string>
+    <string name="toast_validation_select_game_edit">Выберите игру для редактирования</string>
+    <string name="toast_validation_select_game_delete">Выберите игру для удаления</string>
+    <string name="toast_validation_player_name_required">Заполните имя игрока</string>
+    <string name="toast_validation_player_grade_required">Заполните рейтинг игрока</string>
+    <string name="toast_validation_grade_range">Рейтинг должен быть между 0-99</string>
+    <string name="toast_validation_year_range">Год должен быть между 1900-сейчас</string>
+    <string name="toast_validation_player_name_in_use">Имя игрока уже используется</string>
+    <string name="toast_validation_invalid_grade">Неверный рейтинг</string>
+
+    <!--    Toast Messages - Instructions-->
+    <string name="toast_instruction_select_players_first">Сначала - выберите присутствующих игроков</string>
+    <string name="toast_instruction_weather_disabled">Функция погоды в настоящее время отключена</string>
+    <string name="toast_instruction_paste_whatsapp">Скопируйте несколько сообщений WhatsApp, чтобы установить присутствующих игроков</string>
+    <string name="toast_instruction_paste_multiple">Вставьте несколько сообщений</string>
+    <string name="toast_instruction_empty_identifier">Невозможно установить пустой идентификатор</string>
+    <string name="toast_instruction_identifier_cleared">Очищено %1$s</string>
+    <string name="toast_instruction_identifier_set">Установлено %1$s с %2$s</string>
+    <string name="toast_instruction_player_not_found">%1$s не найден</string>
+    <string name="toast_instruction_no_archived_players">Архивированные игроки не найдены</string>
+    <string name="toast_instruction_start_before_end">Время начала должно быть раньше времени окончания</string>
+    <string name="toast_instruction_geocoder_unavailable">Geocoder недоступен на этом устройстве</string>
+    <string name="toast_instruction_location_not_found">Местоположение не найдено: %1$s</string>
+    <string name="toast_instruction_location_error">Ошибка при поиске местоположения</string>
+</resources>
+

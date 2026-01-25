@@ -431,7 +431,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         if (makeTeamsIntent != null) {
             startActivity(makeTeamsIntent);
         } else {
-            Toast.makeText(getContext(), "First - select attending players", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.toast_instruction_select_players_first), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -507,7 +507,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             showInjuredPlayers = false;
             ArrayList<Player> players = DbHelper.getPlayers(getContext(), 0, showArchivedPlayers);
             if (players.isEmpty()) {
-                Toast.makeText(getContext(), "No archived players found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_no_archived_players), Toast.LENGTH_SHORT).show();
                 showArchivedPlayers = false;
             }
         }
@@ -615,7 +615,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData primaryClip = clipboard.getPrimaryClip();
         if (primaryClip == null) {
-            Toast.makeText(getContext(), "Copy some whatsapp messages to set attending players", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.toast_instruction_paste_whatsapp), Toast.LENGTH_LONG).show();
             return;
         }
         ClipData.Item item = primaryClip.getItemAt(0);
@@ -639,12 +639,12 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 mAutoCreatedPlayers.clear();
                 displayPastedIdentifiers(pasted);
             } else {
-                Toast.makeText(getContext(), "Paste multiple messages", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_paste_multiple), Toast.LENGTH_SHORT).show();
             }
 
         } catch (Exception e) {
             Log.e("Coming", "Failed to process " + pasteData);
-            Toast.makeText(getContext(), "Failed to process : " + pasteData, Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.toast_error_paste_process_failed, pasteData), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -726,7 +726,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
         if (TextUtils.isEmpty(identity)) {
             Log.i("Identifier", "Empty identifier");
-            Toast.makeText(getContext(), "Empty identifier can't be set", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.toast_instruction_empty_identifier), Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -758,7 +758,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 if (!TextUtils.isEmpty(currPlayer)) { // empty name, for current player == clearing
                     Log.i("Identifier", "Count 0 - Clearing " + currPlayer);
                     DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
-                    Toast.makeText(getContext(), "Cleared " + currPlayer, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.toast_instruction_identifier_cleared, currPlayer), Toast.LENGTH_LONG).show();
                     displayPastedIdentifiers(comingSet);
                 } else { // empty name set
                     Log.i("Identifier", "No name set for identifier " + identity);
@@ -770,14 +770,14 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             int count = DbHelper.setPlayerIdentifier(getContext(), newPlayer, identity);
             if (count == 1) { // new player found and updated with the identifier
                 Log.i("Identifier", "Count + " + count + " remove identifier from " + currPlayer);
-                Toast.makeText(getContext(), "Set " + newPlayer + " with " + identity, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_identifier_set, newPlayer, identity), Toast.LENGTH_SHORT).show();
                 if (currPlayer != null) { // clear previous name from the identifier
                     DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
                 }
                 displayPastedIdentifiers(comingSet);
             } else { // new player name not found
                 Log.i("Identifier", "Count 0 - " + newPlayer + " not found");
-                Toast.makeText(getContext(), newPlayer + " not found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_player_not_found, newPlayer), Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());

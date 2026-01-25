@@ -255,7 +255,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
     // Past game attendance (players) cannot be modified to preserve historical integrity.
     public void editGame(Game game) {
         if (game == null) {
-            Toast.makeText(context, "Select game to edit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.toast_validation_select_game_edit), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -265,7 +265,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         DatePickerDialog d = new DatePickerDialog(context, (datePicker, year, month, day) -> {
             Calendar selectedDate = new Calendar.Builder().setDate(year, month, day).build();
             if (selectedDate.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
-                Toast.makeText(context, "Future date is not allowed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.toast_validation_future_date), Toast.LENGTH_SHORT).show();
             } else {
                 updateGameDate(game, DateHelper.getDate(selectedDate.getTimeInMillis()));
                 LocalNotifications.sendNotification(context, LocalNotifications.GAME_UPDATE_ACTION);
@@ -283,7 +283,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
 
     public void deleteGame(Game game) {
         if (game == null) {
-            Toast.makeText(context, "Select game to delete", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.toast_validation_select_game_delete), Toast.LENGTH_SHORT).show();
             return;
         }
 

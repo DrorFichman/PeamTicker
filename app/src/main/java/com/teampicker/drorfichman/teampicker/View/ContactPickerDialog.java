@@ -86,7 +86,7 @@ public class ContactPickerDialog {
             }
         } catch (Exception e) {
             Log.e("ContactPickerDialog", "Failed to query contacts", e);
-            Toast.makeText(context, "Failed to load contacts", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.toast_error_load_contacts_failed), Toast.LENGTH_SHORT).show();
             return null;
         }
         return contactNames;

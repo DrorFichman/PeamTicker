@@ -54,7 +54,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         reset.setOnPreferenceClickListener(preference -> {
             TutorialManager.clearTutorialPreferences(getContext());
             LocalNotifications.sendNotification(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION);
-            Toast.makeText(getContext(), "Tutorial reset", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.toast_success_tutorial_reset), Toast.LENGTH_SHORT).show();
             Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.settings_changed_tutorial_reset);
             return true;
         });

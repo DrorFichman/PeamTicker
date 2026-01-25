@@ -241,7 +241,7 @@ public class FirebaseHelper implements CloudSync {
             writeStagingPlayers(stagingData, ctx, () -> {
                 if (stagingData.error != null) {
                     progress.showSyncProgress(null, 0);
-                    Toast.makeText(ctx, "Failed to stage players: " + stagingData.error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_stage_players_failed, stagingData.error), Toast.LENGTH_LONG).show();
                     return;
                 }
                 
@@ -249,7 +249,7 @@ public class FirebaseHelper implements CloudSync {
                 writeStagingGames(stagingData, ctx, () -> {
                     if (stagingData.error != null) {
                         progress.showSyncProgress(null, 0);
-                        Toast.makeText(ctx, "Failed to stage games: " + stagingData.error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_stage_games_failed, stagingData.error), Toast.LENGTH_LONG).show();
                         return;
                     }
                     
@@ -257,7 +257,7 @@ public class FirebaseHelper implements CloudSync {
                     writeStagingPlayersGames(stagingData, ctx, () -> {
                         if (stagingData.error != null) {
                             progress.showSyncProgress(null, 0);
-                            Toast.makeText(ctx, "Failed to stage player stats: " + stagingData.error, Toast.LENGTH_LONG).show();
+                            Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_stage_player_stats_failed, stagingData.error), Toast.LENGTH_LONG).show();
                             return;
                         }
                         
@@ -370,14 +370,14 @@ public class FirebaseHelper implements CloudSync {
             if (error != null) {
                 Log.e("swapStagingToProduction", "Atomic swap failed: " + error.getMessage());
                 progress.showSyncProgress(null, 0);
-                Toast.makeText(ctx, "Failed to finalize sync: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_finalize_sync_failed, error.getMessage()), Toast.LENGTH_LONG).show();
             } else {
                 // Save the last synced game ID after successful sync
                 PreferenceHelper.setLastSyncedGameId(ctx, stagingData.maxGameId);
                 Log.i("swapStagingToProduction", "Atomic swap completed, saved last synced game ID: " + stagingData.maxGameId);
                 
                 progress.showSyncProgress(null, 100);
-                Toast.makeText(ctx, "Sync completed", Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, ctx.getString(R.string.toast_success_sync_completed), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -402,7 +402,7 @@ public class FirebaseHelper implements CloudSync {
                             checkPull(ctx, game.getDisplayDate(ctx), handler);
                         } else {
                             handler.showSyncProgress(null, 0);
-                            Toast.makeText(ctx, "No Games found - sync to cloud first", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_no_games), Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -446,7 +446,7 @@ public class FirebaseHelper implements CloudSync {
                 if (status == null) {
                     // Clear selection once done
                     AuthHelper.fetchFor(null);
-                    Toast.makeText(ctx, "Pull completed from " + users.get(which).displayName, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx, ctx.getString(R.string.toast_success_pull_completed, users.get(which).displayName), Toast.LENGTH_LONG).show();
                 }
                 handler.showSyncProgress(status, progress);
             });
@@ -494,7 +494,7 @@ public class FirebaseHelper implements CloudSync {
         fetchPlayersFromCloud(cloudData, () -> {
             if (cloudData.error != null) {
                 handler.onProgress(null, 0);
-                Toast.makeText(ctx, "Failed to pull players: " + cloudData.error, Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_pull_players_failed, cloudData.error), Toast.LENGTH_LONG).show();
                 return;
             }
             
@@ -504,7 +504,7 @@ public class FirebaseHelper implements CloudSync {
             fetchGamesFromCloud(cloudData, () -> {
                 if (cloudData.error != null) {
                     handler.onProgress(null, 0);
-                    Toast.makeText(ctx, "Failed to pull games: " + cloudData.error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_pull_games_failed, cloudData.error), Toast.LENGTH_LONG).show();
                     return;
                 }
                 
@@ -514,7 +514,7 @@ public class FirebaseHelper implements CloudSync {
                 fetchAllPlayerGamesFromCloud(cloudData, () -> {
                     if (cloudData.error != null) {
                         handler.onProgress(null, 0);
-                        Toast.makeText(ctx, "Failed to pull player stats: " + cloudData.error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_pull_player_stats_failed, cloudData.error), Toast.LENGTH_LONG).show();
                         return;
                     }
                     
@@ -536,7 +536,7 @@ public class FirebaseHelper implements CloudSync {
                     } catch (Exception e) {
                         Log.e("pullFromCloud", "Transaction failed", e);
                         handler.onProgress(null, 0);
-                        Toast.makeText(ctx, "Failed to save data: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_save_data_failed, e.getMessage()), Toast.LENGTH_LONG).show();
                     }
                 });
             });

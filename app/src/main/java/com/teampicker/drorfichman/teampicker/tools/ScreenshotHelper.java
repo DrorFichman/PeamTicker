@@ -28,6 +28,8 @@ import java.util.Locale;
 
 import androidx.core.content.FileProvider;
 
+import com.teampicker.drorfichman.teampicker.R;
+
 /**
  * Created by drorfichman on 11/11/16.
  */
@@ -41,7 +43,7 @@ public class ScreenshotHelper {
 
             openScreenshot(activity, imageUri);
         } catch (Throwable e) {
-            Toast.makeText(activity, "Failed to take screenshot: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, activity.getString(R.string.toast_error_screenshot_failed, e.getMessage()), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -80,7 +82,7 @@ public class ScreenshotHelper {
 
         } catch (Throwable e) {
             // Handle potential errors
-            Toast.makeText(activity, "Failed to take screenshot: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, activity.getString(R.string.toast_error_screenshot_failed, e.getMessage()), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -207,7 +209,7 @@ public class ScreenshotHelper {
             context.startActivity(intent);
         } catch (android.content.ActivityNotFoundException ex) {
             // WhatsApp not installed, fall back to general share
-            Toast.makeText(context, "WhatsApp not installed. Opening share menu...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.toast_error_whatsapp_not_installed, Toast.LENGTH_SHORT).show();
             openScreenshot(context, uri, shareText);
         }
     }

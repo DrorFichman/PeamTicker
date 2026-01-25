@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    App-->
+    <string name="app_name">PeamTicker</string>
+    <string name="main_title">Selector de Equipos</string>
+    <string name="pick_teams_title">Seleccionar Equipos</string>
+    <string name="pick_teams_title_results">Resultados</string>
+    <string name="pick_teams_title_analysis">Análisis</string>
+    <string name="games_with_count">Partidos (%1$d)</string>
+    <string name="stats_with_count">%1$d jugadores\n%2$d partidos</string>
+    <string name="games_player_count">%1$d jugadores</string>
+    <string name="search_title">Buscar</string>
+
+    <!--    Drawer-->
+    <string name="navigation_drawer_open">Abrir menú de navegación</string>
+    <string name="navigation_drawer_close">Cerrar menú de navegación</string>
+
+    <!--    Headlines-->
+    <string name="name">Nombre</string>
+    <string name="grade">Calificación</string>
+    <string name="date">Fecha</string>
+    <string name="score">Puntuación</string>
+    <string name="grade_description">Calificación (0–99)</string>
+    <string name="attributes">Atributos</string>
+    <string name="age">Edad</string>
+    <string name="age_description">Edad (fecha de nacimiento)</string>
+    <string name="plus_minus">+/-</string>
+    <string name="success">Éxito</string>
+    <string name="games">Partidos</string>
+    <string name="win_rate">Tasa de victorias</string>
+    <string name="success_vs">Éxito\nContra</string>
+    <string name="games_vs">Partidos\nContra</string>
+    <string name="success_with">Éxito\nCon</string>
+    <string name="games_with">Partidos\nCon</string>
+    <string name="basic_info">Información Básica</string>
+    <string name="properties">Propiedades</string>
+    <string name="gk">POR</string>
+    <string name="defender">Defensor</string>
+    <string name="playmaker">Creador</string>
+    <string name="unbreakable">Inquebrantable</string>
+    <string name="extra">Extra</string>
+    <string name="injured">Lesionado</string>
+    <string name="injured_help_title">Jugador Lesionado</string>
+    <string name="injured_help_message">Marca a un jugador como lesionado cuando no esté jugando a su nivel normal.\n\nAl seleccionar equipos con optimización de IA, se ignorará la química de los jugadores lesionados con otros, pero su calificación y tasa de victorias seguirán siendo consideradas.\n\nEsto ayuda a equilibrar los equipos de manera justa cuando un jugador se está recuperando.</string>
+    <string name="show_injured_players">Ver Jugadores Lesionados</string>
+    <string name="injured_grade_change_title">¿Actualizar Calificación?</string>
+    <string name="injured_marked_message">Has marcado a este jugador como lesionado. ¿Te gustaría ajustar su calificación para reflejar su nivel de rendimiento actual?</string>
+    <string name="injury_cleared_message">El jugador ya no está marcado como lesionado. ¿Te gustaría restaurar su calificación?</string>
+    <string name="update_grade">Actualizar</string>
+    <string name="skip">Omitir</string>
+
+    <!--    Empty State-->
+    <string name="empty_players_icon">Sin jugadores</string>
+    <string name="empty_players_title">Aún No Hay Jugadores</string>
+    <string name="empty_players_message">Importa jugadores desde tus contactos o pega mensajes de WhatsApp para comenzar rápidamente.</string>
+    <string name="empty_players_import_button">Importar desde Contactos</string>
+    <string name="empty_players_paste_button">Pegar desde WhatsApp</string>
+    <string name="empty_players_or_add">O toca + arriba para agregar jugadores manualmente</string>
+    <string name="empty_injured_icon">Sin jugadores lesionados</string>
+    <string name="empty_injured_title">Sin Jugadores Lesionados</string>
+    <string name="empty_injured_message">¡Buenas noticias! Ninguno de tus jugadores está marcado actualmente como lesionado.\n\nPuedes marcar a un jugador como lesionado desde su pantalla de detalles.</string>
+
+    <!--    Buttons-->
+    <string name="save">Guardar</string>
+    <string name="done">Hecho</string>
+    <string name="cancel">Cancelar</string>
+    <string name="yes">sí</string>
+    <string name="edit">Editar</string>
+    <string name="copy_game">Copiar</string>
+    <string name="delete">Eliminar</string>
+    <string name="new_player">Nuevo Jugador</string>
+    <string name="move_players">Transferencias\ny Banca</string>
+    <string name="move_players_bench">Transferencias\n(%1$d en banca)</string>
+    <string name="bench_players">Banca</string>
+    <string name="shuffle_age">Por Edad</string>
+    <string name="shuffle_grade">Por Calificación</string>
+    <string name="shuffle_stats">Por Estadísticas</string>
+    <string name="clear_all_coming">Limpiar Asistencia</string>
+    <string name="action_send_statistics">Enviar Estadísticas</string>
+    <string name="action_analysis">Análisis</string>
+    <string name="action_share">Compartir</string>
+    <string name="action_enter_results">Ingresar Resultados</string>
+    <string name="player_missed_game">El jugador faltó al partido</string>
+    <string name="player_mvp">Marcar como MVP</string>
+    <string name="action_empty_bench_left">Vaciar Banca (izquierda)</string>
+    <string name="action_empty_bench_right">Vaciar Banca (derecha)</string>
+    <string name="action_switch_team_colors">Cambiar Colores</string>
+    <string name="action_button_results">Resultados</string>
+    <string name="teams_bench_title">Banca (arrastra jugadores aquí cuando no estén jugando)</string>
+    <string name="team_save_sync_to_cloud">Sincronizar con la nube</string>
+
+    <!--    Navigation-->
+    <string name="nav_players">Jugadores</string>
+    <string name="nav_games_history">Historial de Partidos</string>
+    <string name="nav_statistics">Estadísticas</string>
+    <string name="nav_backup_to_file">Copia de seguridad a archivo</string>
+    <string name="nav_import_from_file">Importar desde archivo</string>
+    <string name="nav_sync_to_cloud">Sincronizar con la nube</string>
+    <string name="nav_pull_from_cloud">Descargar desde la nube</string>
+    <string name="sync_status_synced">Sincronizado</string>
+    <string name="sync_status_unsynced">%d sin sincronizar</string>
+    <string name="nav_settings">Configuración</string>
+    <string name="nav_getting_started">Comenzar</string>
+    <string name="nav_invite_friends">Invitar Amigos</string>
+    <string name="nav_about">Acerca de</string>
+
+    <!--    Menus-->
+    <string name="add_player">Agregar Jugador</string>
+    <string name="paste_players">Pegar Jugadores</string>
+    <string name="import_contacts">Importar desde Contactos</string>
+
+    <!--    Import Contacts-->
+    <string name="import_contacts_first_time_hint">¡Jugadores importados! Toca cualquier jugador para editar sus detalles.</string>
+    <string name="import_contacts_result_title">Jugadores Importados</string>
+    <string name="import_contacts_added_players">Se agregaron los siguientes jugadores:</string>
+    <string name="import_contacts_skipped_existing">Omitidos (ya existen):</string>
+    <string name="import_contacts_success">%1$d jugador(es) importados exitosamente</string>
+    <string name="import_contacts_select_title">Seleccionar Contactos para Importar</string>
+    <string name="import_contacts_done">Importar</string>
+    <string name="import_contacts_permission_denied">Se requiere permiso de contactos para importar jugadores</string>
+    <string name="import_contacts_no_contacts">No se encontraron contactos</string>
+    <string name="import_contacts_search_hint">Buscar contactos…</string>
+    <string name="clear_search">Limpiar búsqueda</string>
+    <string name="import_contacts_selected_count">%1$d seleccionados</string>
+    <string name="import_contacts_confirm_exit_title">¿Descartar selección?</string>
+    <string name="import_contacts_confirm_exit_message">Tienes %1$d contacto(s) seleccionado(s). ¿Estás seguro de que quieres salir sin importarlos?</string>
+    <string name="import_contacts_discard">Descartar</string>
+
+    <!--    Shared Contact-->
+    <string name="shared_contact_exists">El jugador \"%1$s\" ya existe</string>
+    <string name="shared_contact_exists_archived">El jugador \"%1$s\" existe en el archivo</string>
+    <string name="shared_contact_read_error">No se pudo leer el contacto</string>
+    <string name="shared_contact_parse_error">No se pudo analizar el nombre del contacto</string>
+    <string name="show_archived">Ver Archivo de Jugadores</string>
+    <string name="make_teams">Seleccionar Equipos</string>
+    <string name="new_game">Nuevo Partido</string>
+    <string name="enter_results">Ingresar Resultados</string>
+    <string name="action_50_games">Últimos 50 partidos</string>
+    <string name="action_all_games">Todos los partidos</string>
+    <string name="part_last_10_games">últimos 10 partidos</string>
+    <string name="part_last_50_games">últimos 50 partidos</string>
+    <string name="part_all_games">todos los partidos</string>
+    <string name="stats_50_games">50 partidos</string>
+    <string name="stats_10_games">10 partidos</string>
+    <string name="stats_all_games">todos los partidos</string>
+
+    <!--    Settings - values are saved in preferences - don't change-->
+    <string name="setting_team_color_scheme_black_white">Negro — Blanco</string>
+    <string name="setting_team_color_scheme_orange_blue">Naranja — Azul</string>
+    <string name="setting_team_color_scheme_orange_yellow">Naranja — Amarillo</string>
+
+    <string name="setting_title_divide_attempts">Intentos de División</string>
+    <string name="setting_summary_divide_attempts">Número de divisiones de equipos a considerar (1–1000)</string>
+    <string name="setting_title_grade_weight">Peso de Calificación</string>
+    <string name="setting_summary_grade_weight">Porcentaje de peso de calificación (0%–100%)</string>
+    <string name="setting_title_color_scheme">Colores de Equipos</string>
+    <string name="setting_summary_color_scheme">Visualización de equipos - selecciona esquema de colores</string>
+    <string name="setting_title_clear_tutorial">Restablecer Tutoriales</string>
+    <string name="setting_summary_clear_tutorial">Restablecer pasos de tutoriales omitidos</string>
+    <string name="setting_title_show_hints">Mostrar Sugerencias</string>
+    <string name="setting_summary_show_hints">Mostrar sugerencias de tutorial al navegar por la aplicación</string>
+    <string name="setting_title_show_grades">Mostrar Calificaciones</string>
+    <string name="setting_summary_show_grades">Mostrar calificaciones de jugadores</string>
+    <string name="setting_title_auto_sync_games">Sincronización Automática</string>
+    <string name="setting_summary_auto_sync_games">Sincronizar automáticamente nuevos partidos con la nube</string>
+
+    <!--    Messages-->
+    <string name="parentheses">(%1$d)</string>
+    <string name="team_data_headline"> Jugadores \n Calificación \n Éxito \n Tasa de Victorias \n Química </string>
+    <string name="team_data"> %1$d \n %2$.1f (&#177;%3$.1f) \n %4$d \n %5$d%% \n %6$s </string>
+    <string name="team_data_chemistry"> %1$d%%</string>
+    <string name="team_public_stats"> Edad: %1$d </string>
+    <string name="player_stat">Partidos: %1$s \nVictorias: %2$s</string>
+    <string name="stats_player_games">%1$d (%2$d%%)</string>
+    <string name="player_wins_participation">%1$s (%2$s)</string>
+    <string name="player_participation_statistics">%1$s + \n(P:%2$d, V:%3$02d%%)</string>
+    <string name="player_analysis">(V:%1$02d%% P:%2$02d) [%3$s]</string>
+    <string name="player_analysis_collaborator">(V:%1$02d%% P:%2$02d) [E:%3$s]</string>
+    <string name="player_analysis_selected">(V:%1$02d%% P:%2$02d) [%3$s]</string>
+    <string name="player_analysis_selected_win_rate">%1$02d%%</string>
+    <string name="player_analysis_selected_games">%1$02d</string>
+    <string name="operation_move">Mantén presionada la fila del jugador para comenzar a arrastrar y soltar</string>
+    <string name="operation_divide_by_collaboration">* IA en progreso :)</string>
+    <string name="optimizing_teams">Optimizando Equipos…</string>
+    <string name="progress_percentage">%1$d%%</string>
+    <string name="progress_best_score">Mejor puntuación de equilibrio: %1$s</string>
+    <string name="analysis_progress_update">%1$d%% (%2$s)</string>
+    <string name="operation_analysis">* Haz clic en los jugadores para un análisis más profundo \n* Haz clic en el icono para salir del modo de análisis</string>
+    <string name="copy_players_success">División de equipos aplicada</string>
+    <string name="main_make_teams">Equipos (%1$d)</string>
+    <string name="main_auth_required">Se requiere inicio de sesión con Google</string>
+    <string name="main_cloud_not_allowed">La función de nube no está permitida \nDetalles en Play Store</string>
+    <string name="main_connectivity">Problema de conectividad</string>
+    <string name="main_sign_in">Iniciar sesión</string>
+    <string name="main_login">Iniciar sesión</string>
+    <string name="main_logout">Cerrar sesión</string>
+    <string name="main_sign_out_dialog_title">¿Cerrar sesión?</string>
+    <string name="main_sign_out_dialog_message">Las funciones de nube no estarán disponibles.</string>
+
+    <!--    Tutorials-->
+    <string name="tutorial_progress">%1$d%%</string>
+    <string name="tutorial_headline">Comenzar - Tutoriales</string>
+    <string name="tutorial_dismiss_message">Descartar mensajes de tutorial</string>
+    <string name="tutorial_create_player_title">Crear Jugadores</string>
+    <string name="tutorial_create_player_message">Crea jugadores manualmente a través del icono \"+\" en la parte superior de la pantalla.\n\nO \"Pegar Jugadores\" desde mensajes de WhatsApp basados en nombres de contactos</string>
+    <string name="tutorial_attendance_title">Especificar Jugadores Asistentes</string>
+    <string name="tutorial_attendance_message">Antes de seleccionar equipos, deberás seleccionar qué jugadores asistirán al próximo partido.\n\nMarca la casilla asociada con cada jugador asistente.\n\nTambién puedes pegar mensajes de WhatsApp para ubicar jugadores rápidamente.</string>
+    <string name="tutorial_start_pick_teams_title">Seleccionar Equipos</string>
+    <string name="tutorial_start_pick_teams_message">Puedes comenzar a seleccionar los equipos, solo haz clic en el botón \"Equipos\" a continuación</string>
+    <string name="tutorial_pick_teams_title">Seleccionar Equipos</string>
+    <string name="tutorial_pick_teams_message">\"Mezcla\" equipos basados en calificaciones.\n(puedes seleccionar un modo diferente de mezcla haciendo clic en los 3 puntos. No se recomienda mezclar por estadísticas antes de tener 10 partidos de datos).\n\n\"Transfiere\" jugadores manteniendo presionado y arrastrando. Usa la banca para sustituciones.\n\nComparte una imagen de los equipos (excluyendo calificaciones) a través de cualquier aplicación de mensajería.</string>
+    <string name="tutorial_save_results_title">Guardar resultado del partido</string>
+    <string name="tutorial_save_results_message">Una vez que termine el partido, puedes ingresar los resultados.\nAbre el camino para el historial de partidos, estadísticas personales y la capacidad de seleccionar equipos basados en la tasa de victorias y la química de los jugadores.\n\nIngresa \"Resultados\" en la pantalla de \"Equipos\".</string>
+    <string name="tutorial_game_history_title">Historial de Partidos</string>
+    <string name="tutorial_game_history_message">Selecciona cualquier partido en la pestaña \"Partidos\" para ver sus equipos y acciones.</string>
+    <string name="tutorial_cloud_title">Funciones de Nube</string>
+    <string name="tutorial_cloud_message">Sincroniza tus jugadores y partidos con la nube, como respaldo, o cuando planees descargar los datos en otro dispositivo.\n\nPrimero, inicia sesión con tu cuenta de Google a través del menú lateral.\nLuego \"Sincroniza\" en el menú lateral.</string>
+    <string name="tutorial_team_analysis_title">Análisis de Equipos</string>
+    <string name="tutorial_team_analysis_message">Ahora que se proporciona suficiente historial de partidos, haz clic en el icono de \"Análisis\" en la barra superior para observar las tasas de victorias individuales.\n\nHaz clic en un jugador para ver su química personal con los otros jugadores participantes.</string>
+    <string name="tutorial_team_shuffle_stats_title">Seleccionar equipos - modo IA</string>
+    <string name="tutorial_team_shuffle_stats_message">Cambia al modo de selección de equipos optimizado a través de los 3 puntos debajo del botón \"Mezclar\".\n\nEl modo \"Estadísticas\" generará equipos opcionales basados en tasas de victorias y química de jugadores.</string>
+    <string name="tutorial_completed_title">Tutoriales Completados</string>
+    <string name="tutorial_completed_message">Los tutoriales estarán disponibles en el menú lateral en \"Comenzar\"</string>
+
+    <!--    Player Insights-->
+    <string name="insights_tab_title">Perspectivas</string>
+    <string name="insights_win_rate_title">Tasa de Victorias a lo Largo del Tiempo</string>
+    <string name="insights_moving_win_rate">Tasa de Victorias de los Últimos 50 Partidos</string>
+    <string name="insights_cumulative_win_rate">Tasa de Victorias de Todos los Tiempos</string>
+    <string name="insights_win_rate_label">Tasa de Victorias %</string>
+    <string name="insights_games_label">Partidos</string>
+    <string name="insights_window_label">Tamaño de Ventana:</string>
+    <string name="insights_show_cumulative">Mostrar Tasa Acumulativa</string>
+    <string name="insights_window_10">Últimos 10 Partidos</string>
+    <string name="insights_window_25">Últimos 25 Partidos</string>
+    <string name="insights_window_50">Últimos 50 Partidos</string>
+    <string name="insights_show_touch_data">Mostrar datos al tocar</string>
+    <string name="insights_no_data">No hay suficientes datos de partidos para mostrar perspectivas. Juega al menos %1$d partidos para ver estadísticas.</string>
+
+    <!--    Insights Chip Labels-->
+    <string name="insights_chip_win_rate">Tasa de Victorias</string>
+    <string name="insights_chip_chemistry">Química</string>
+    <string name="insights_chip_activity">Participación</string>
+
+    <!--    Player Collaboration Chart-->
+    <string name="insights_collaboration_title">Colaboración - Éxito con jugadores</string>
+    <string name="insights_collaboration_no_data">No hay suficientes datos de colaboración. Juega al menos %1$d partidos con otros jugadores.</string>
+    <string name="insights_success_with_label">Éxito Con</string>
+    <string name="insights_success_against_label">Éxito Contra</string>
+
+    <!--    Team Collaboration Chart (from teams screen) -->
+    <string name="team_collaboration_chart_title">%1$s - Colaboración de Equipo</string>
+    <string name="team_collaboration_chart_title_with_games">%1$s - Colaboración de Equipo (últimos %2$d partidos)</string>
+    <string name="team_collaboration_no_data">No hay suficientes partidos con miembros del equipo. Juega al menos %1$d partidos.</string>
+    <string name="team_collaboration_x_axis_label">Número de partidos</string>
+    <string name="team_collaboration_y_axis_label">Éxito</string>
+
+    <!--    Player Participation Chart-->
+    <string name="insights_participation_title">Participación a lo Largo del Tiempo</string>
+    <string name="total_games_played">Total de Partidos Jugados</string>
+    <string name="total_games_count">%1$d partidos</string>
+    <string name="player_games_header">%1$s (%2$d partidos)</string>
+    <string name="overall_win_rate">Tasa de Victorias General</string>
+    <string name="win_rate_value">%1$d%%</string>
+    <string name="insights_participation_no_data">No hay suficientes datos de partidos. Juega al menos %1$d partidos para ver actividad.</string>
+    <string name="insights_wins_label">Victorias</string>
+    <string name="insights_ties_label">Empates</string>
+    <string name="insights_losses_label">Derrotas</string>
+
+    <!--    Games Charts-->
+    <string name="games_tab_history">Historial</string>
+    <string name="games_tab_charts">Gráficos</string>
+    <string name="charts_tab_distribution">Puntuaciones</string>
+    <string name="charts_tab_trend">A lo Largo del Tiempo</string>
+    <string name="charts_goal_diff_distribution_title">Distribución de Diferencia de Goles</string>
+    <string name="charts_goal_diff_distribution_description">Porcentaje de partidos que terminan con cada diferencia de puntuación</string>
+    <string name="charts_goal_diff_trend_title">Tendencia de Diferencia de Goles</string>
+    <string name="charts_goal_diff_trend_description">Promedio móvil de diferencia de goles a lo largo del tiempo</string>
+    <string name="charts_close_games_percentage">Partidos Competitivos (dif &lt; 3)</string>
+    <string name="charts_avg_goal_diff">Diferencia de Goles Promedio</string>
+    <string name="charts_last_n_games">Últimos %1$d partidos</string>
+    <string name="charts_avg_last_n_games">Prom (últimos %1$d)</string>
+    <string name="charts_median_last_n_games">Mediana (últimos %1$d)</string>
+    <string name="charts_no_data">No hay suficientes datos de partidos. Juega al menos %1$d partidos para ver gráficos.</string>
+
+    <!--    Statistics Tab Charts-->
+    <string name="stats_tab_stats">Estadísticas</string>
+    <string name="stats_tab_charts">Gráficos</string>
+    <string name="stats_charts_tab_seniority">Experiencia</string>
+    <string name="stats_charts_tab_success">Éxito</string>
+
+    <!--    Player Experience Distribution Chart-->
+    <string name="stats_seniority_chart_title">Distribución de Experiencia de Jugadores</string>
+    <string name="stats_seniority_chart_description">Conteos apilados por nivel de experiencia</string>
+    <string name="stats_seniority_no_data">No hay suficientes datos de partidos. Juega al menos %1$d partidos para ver la distribución de experiencia.</string>
+    <string name="stats_seniority_current_avg">Promedio Actual (25 partidos)</string>
+    <string name="stats_seniority_current_value">Nuevos: %.0f | Recurrentes: %.0f | Regulares: %.0f</string>
+    <string name="stats_seniority_new_players">Nuevos (&lt;10)</string>
+    <string name="stats_seniority_returning_players">Recurrentes (10–50)</string>
+    <string name="stats_seniority_regulars">Regulares (&gt;50)</string>
+    <string name="stats_seniority_click_hint">Haz clic en el gráfico para ver detalles del jugador</string>
+    <string name="stats_seniority_player_games">%1$s (%2$d)</string>
+    <string name="stats_game_number">Partido %1$d</string>
+
+    <!--    Player Success Chart-->
+    <string name="stats_success_heatmap_title">Éxito del Jugador a lo Largo del Tiempo</string>
+    <string name="stats_success_heatmap_description">Éxito acumulativo (victorias - derrotas) para los mejores jugadores</string>
+    <string name="stats_success_no_data">No hay suficientes datos de partidos. Juega al menos %1$d partidos para ver el gráfico de éxito.</string>
+    <string name="stats_success_show_players">Mostrar jugadores:</string>
+    <string name="stats_success_all_players">Todos</string>
+
+    <!--    Prediction-->
+    <string name="prediction_label">Predicción</string>
+    <string name="prediction_explanation_title">Predicción de Victoria</string>
+    <string name="prediction_explanation_stats_mode">Esta predicción se basa en una combinación ponderada de:\n\n• Química - Qué tan bien se desempeñan los jugadores juntos basándose en partidos históricos\n• Tasa de Victorias - Tasas de victorias individuales de los jugadores\n• Calificaciones - Calificaciones de habilidad de los jugadores\n\nLos equipos actualmente se dividen usando el modo Estadísticas, que optimiza para partidos equilibrados y competitivos.</string>
+    <string name="prediction_explanation_other_mode">Esta predicción se basa en una combinación ponderada de:\n\n• Química - Qué tan bien se desempeñan los jugadores juntos basándose en partidos históricos\n• Tasa de Victorias - Tasas de victorias individuales de los jugadores\n• Calificaciones - Calificaciones de habilidad de los jugadores\n\nConsejo: Cambia al modo de mezcla \"Estadísticas\" (a través de los 3 puntos debajo de Mezclar) para equilibrio de equipos optimizado por IA basado en estos factores.</string>
+    <string name="prediction_reveal_title">Predicción Previa al Partido</string>
+    <string name="prediction_reveal_message">La predicción antes del partido fue:\n\n%1$d%% — %2$d%%</string>
+    <string name="prediction_no_data">No hay suficiente historial de partidos para hacer una predicción. Juega más partidos para habilitar predicciones.</string>
+
+    <!--    Toast Messages - Errors-->
+    <string name="toast_error_share_failed">Error al compartir: %1$s</string>
+    <string name="toast_error_login_failed">Error de inicio de sesión</string>
+    <string name="toast_error_screenshot_failed">Error al tomar captura de pantalla: %1$s</string>
+    <string name="toast_error_whatsapp_not_installed">WhatsApp no instalado. Abriendo menú de compartir…</string>
+    <string name="toast_error_permissions_denied">Permisos denegados.</string>
+    <string name="toast_error_cloud_stage_players_failed">Error al preparar jugadores: %1$s</string>
+    <string name="toast_error_cloud_stage_games_failed">Error al preparar partidos: %1$s</string>
+    <string name="toast_error_cloud_stage_player_stats_failed">Error al preparar estadísticas de jugadores: %1$s</string>
+    <string name="toast_error_cloud_finalize_sync_failed">Error al finalizar sincronización: %1$s</string>
+    <string name="toast_error_cloud_no_games">No se encontraron partidos - sincroniza con la nube primero</string>
+    <string name="toast_error_cloud_pull_players_failed">Error al descargar jugadores: %1$s</string>
+    <string name="toast_error_cloud_pull_games_failed">Error al descargar partidos: %1$s</string>
+    <string name="toast_error_cloud_pull_player_stats_failed">Error al descargar estadísticas de jugadores: %1$s</string>
+    <string name="toast_error_cloud_save_data_failed">Error al guardar datos: %1$s</string>
+    <string name="toast_error_load_contacts_failed">Error al cargar contactos</string>
+    <string name="toast_error_paste_process_failed">Error al procesar : %1$s</string>
+
+    <!--    Toast Messages - Success-->
+    <string name="toast_success_sync_completed">Sincronización completada</string>
+    <string name="toast_success_pull_completed">Descarga completada desde %1$s</string>
+    <string name="toast_success_player_saved">Jugador guardado</string>
+    <string name="toast_success_tutorial_reset">Tutorial restablecido</string>
+    <string name="toast_success_weather_updated">Configuración del clima actualizada</string>
+
+    <!--    Toast Messages - Validation-->
+    <string name="toast_validation_future_date">No se permite fecha futura</string>
+    <string name="toast_validation_select_game_edit">Selecciona partido para editar</string>
+    <string name="toast_validation_select_game_delete">Selecciona partido para eliminar</string>
+    <string name="toast_validation_player_name_required">Completa el nombre del jugador</string>
+    <string name="toast_validation_player_grade_required">Completa la calificación del jugador</string>
+    <string name="toast_validation_grade_range">La calificación debe estar entre 0-99</string>
+    <string name="toast_validation_year_range">El año debe estar entre 1900-ahora</string>
+    <string name="toast_validation_player_name_in_use">El nombre del jugador ya está en uso</string>
+    <string name="toast_validation_invalid_grade">Calificación inválida</string>
+
+    <!--    Toast Messages - Instructions-->
+    <string name="toast_instruction_select_players_first">Primero - selecciona jugadores asistentes</string>
+    <string name="toast_instruction_weather_disabled">La función del clima está actualmente deshabilitada</string>
+    <string name="toast_instruction_paste_whatsapp">Copia algunos mensajes de WhatsApp para establecer jugadores asistentes</string>
+    <string name="toast_instruction_paste_multiple">Pega múltiples mensajes</string>
+    <string name="toast_instruction_empty_identifier">No se puede establecer identificador vacío</string>
+    <string name="toast_instruction_identifier_cleared">Limpiado %1$s</string>
+    <string name="toast_instruction_identifier_set">Establecido %1$s con %2$s</string>
+    <string name="toast_instruction_player_not_found">%1$s no encontrado</string>
+    <string name="toast_instruction_no_archived_players">No se encontraron jugadores archivados</string>
+    <string name="toast_instruction_start_before_end">La hora de inicio debe ser anterior a la hora de finalización</string>
+    <string name="toast_instruction_geocoder_unavailable">Geocoder no disponible en este dispositivo</string>
+    <string name="toast_instruction_location_not_found">Ubicación no encontrada: %1$s</string>
+    <string name="toast_instruction_location_error">Error al encontrar ubicación</string>
+</resources>
+

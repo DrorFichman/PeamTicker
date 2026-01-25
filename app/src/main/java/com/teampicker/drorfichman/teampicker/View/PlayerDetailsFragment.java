@@ -130,7 +130,7 @@ public class PlayerDetailsFragment extends Fragment {
 
         LocalNotifications.sendNotification(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION);
 
-        Toast.makeText(getContext(), "Player saved", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.toast_success_player_saved), Toast.LENGTH_SHORT).show();
         if (updateListener != null) {
             updateListener.onUpdate(player.mName);
         } else if (getActivity() != null) {
@@ -142,7 +142,7 @@ public class PlayerDetailsFragment extends Fragment {
     private String verifyName() {
         String newName = FirebaseHelper.sanitizeKey(vName.getText().toString().trim());
         if (TextUtils.isEmpty(newName)) {
-            Toast.makeText(getContext(), "Fill player's name", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.toast_validation_player_name_required), Toast.LENGTH_SHORT).show();
             return "";
         }
         return newName;
@@ -151,13 +151,13 @@ public class PlayerDetailsFragment extends Fragment {
     private int verifyGrade() {
         String stringGrade = vGrade.getText().toString();
         if (TextUtils.isEmpty(stringGrade)) {
-            Toast.makeText(getContext(), "Fill player's grade", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.toast_validation_player_grade_required), Toast.LENGTH_SHORT).show();
             return -1;
         }
 
         int newGrade = Integer.parseInt(stringGrade);
         if (newGrade > 99 || newGrade < 0) {
-            Toast.makeText(getContext(), "Grade must be between 0-99", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.toast_validation_grade_range), Toast.LENGTH_SHORT).show();
             return -1;
         }
 
@@ -168,7 +168,7 @@ public class PlayerDetailsFragment extends Fragment {
         if (player != null) {
             if (!player.mName.equals(name)) {
                 if (!DbHelper.updatePlayerName(getContext(), player, name)) {
-                    Toast.makeText(getContext(), "Player name is already in use", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.toast_validation_player_name_in_use), Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
@@ -176,7 +176,7 @@ public class PlayerDetailsFragment extends Fragment {
         } else {
             Player p = new Player(name, grade);
             if (!DbHelper.insertPlayer(getContext(), p)) {
-                Toast.makeText(getContext(), "Player name is already in use", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_validation_player_name_in_use), Toast.LENGTH_SHORT).show();
                 return false;
             }
             player = p;
@@ -196,7 +196,7 @@ public class PlayerDetailsFragment extends Fragment {
             int newDay = Integer.parseInt(date.split("/")[0]);
 
             if (newYear < 1900 || newYear > Calendar.getInstance().get(Calendar.YEAR)) {
-                Toast.makeText(getContext(), "Year must be between 1900-now", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_validation_year_range), Toast.LENGTH_SHORT).show();
                 return false;
             }
 
@@ -261,10 +261,10 @@ public class PlayerDetailsFragment extends Fragment {
                             if (newGrade >= 0 && newGrade <= 99) {
                                 vGrade.setText(String.valueOf(newGrade));
                             } else {
-                                Toast.makeText(getContext(), "Grade must be between 0-99", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getString(R.string.toast_validation_grade_range), Toast.LENGTH_SHORT).show();
                             }
                         } catch (NumberFormatException e) {
-                            Toast.makeText(getContext(), "Invalid grade", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getString(R.string.toast_validation_invalid_grade), Toast.LENGTH_SHORT).show();
                         }
                     }
                 })

@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    App-->
+    <string name="app_name">PeamTicker</string>
+    <string name="main_title">टीम चयनकर्ता</string>
+    <string name="pick_teams_title">टीमें चुनें</string>
+    <string name="pick_teams_title_results">परिणाम</string>
+    <string name="pick_teams_title_analysis">विश्लेषण</string>
+    <string name="games_with_count">खेल (%1$d)</string>
+    <string name="stats_with_count">%1$d खिलाड़ी\n%2$d खेल</string>
+    <string name="games_player_count">%1$d खिलाड़ी</string>
+    <string name="search_title">खोजें</string>
+
+    <!--    Drawer-->
+    <string name="navigation_drawer_open">नेविगेशन मेनू खोलें</string>
+    <string name="navigation_drawer_close">नेविगेशन मेनू बंद करें</string>
+
+    <!--    Headlines-->
+    <string name="name">नाम</string>
+    <string name="grade">रेटिंग</string>
+    <string name="date">तारीख</string>
+    <string name="score">स्कोर</string>
+    <string name="grade_description">रेटिंग (0–99)</string>
+    <string name="attributes">विशेषताएं</string>
+    <string name="age">उम्र</string>
+    <string name="age_description">उम्र (जन्म तिथि)</string>
+    <string name="plus_minus">+/-</string>
+    <string name="success">सफलता</string>
+    <string name="games">खेल</string>
+    <string name="win_rate">जीत दर</string>
+    <string name="success_vs">सफलता\nविरुद्ध</string>
+    <string name="games_vs">खेल\nविरुद्ध</string>
+    <string name="success_with">सफलता\nके साथ</string>
+    <string name="games_with">खेल\nके साथ</string>
+    <string name="basic_info">बुनियादी जानकारी</string>
+    <string name="properties">गुण</string>
+    <string name="gk">गोलकीपर</string>
+    <string name="defender">डिफेंडर</string>
+    <string name="playmaker">प्लेमेकर</string>
+    <string name="unbreakable">अटूट</string>
+    <string name="extra">अतिरिक्त</string>
+    <string name="injured">घायल</string>
+    <string name="injured_help_title">घायल खिलाड़ी</string>
+    <string name="injured_help_message">किसी खिलाड़ी को घायल के रूप में चिह्नित करें जब वे अपने सामान्य स्तर पर नहीं खेल रहे हों।\n\nएआई अनुकूलन के साथ टीम चयन करते समय, घायल खिलाड़ियों की दूसरों के साथ केमिस्ट्री को नज़रअंदाज़ किया जाएगा, लेकिन उनकी रेटिंग और जीत दर को अभी भी माना जाएगा।\n\nयह खिलाड़ी के ठीक होने पर टीमों को निष्पक्ष रूप से संतुलित करने में मदद करता है।</string>
+    <string name="show_injured_players">घायल खिलाड़ियों को दिखाएं</string>
+    <string name="injured_grade_change_title">रेटिंग अपडेट करें?</string>
+    <string name="injured_marked_message">आपने इस खिलाड़ी को घायल के रूप में चिह्नित किया है। क्या आप उनकी वर्तमान प्रदर्शन स्तर को प्रतिबिंबित करने के लिए उनकी रेटिंग समायोजित करना चाहेंगे?</string>
+    <string name="injury_cleared_message">खिलाड़ी को अब घायल के रूप में चिह्नित नहीं किया गया है। क्या आप उनकी रेटिंग बहाल करना चाहेंगे?</string>
+    <string name="update_grade">अपडेट करें</string>
+    <string name="skip">छोड़ें</string>
+
+    <!--    Empty State-->
+    <string name="empty_players_icon">कोई खिलाड़ी नहीं</string>
+    <string name="empty_players_title">अभी तक कोई खिलाड़ी नहीं</string>
+    <string name="empty_players_message">अपने संपर्कों से खिलाड़ी आयात करें या जल्दी शुरू करने के लिए WhatsApp संदेश पेस्ट करें।</string>
+    <string name="empty_players_import_button">संपर्कों से आयात करें</string>
+    <string name="empty_players_paste_button">WhatsApp से पेस्ट करें</string>
+    <string name="empty_players_or_add">या मैन्युअल रूप से खिलाड़ी जोड़ने के लिए ऊपर + पर टैप करें</string>
+    <string name="empty_injured_icon">कोई घायल खिलाड़ी नहीं</string>
+    <string name="empty_injured_title">कोई घायल खिलाड़ी नहीं</string>
+    <string name="empty_injured_message">अच्छी खबर! आपके किसी भी खिलाड़ी को वर्तमान में घायल के रूप में चिह्नित नहीं किया गया है।\n\nआप किसी खिलाड़ी को उनकी विवरण स्क्रीन से घायल के रूप में चिह्नित कर सकते हैं।</string>
+
+    <!--    Buttons-->
+    <string name="save">सहेजें</string>
+    <string name="done">पूर्ण</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="yes">हां</string>
+    <string name="edit">संपादित करें</string>
+    <string name="copy_game">कॉपी करें</string>
+    <string name="delete">हटाएं</string>
+    <string name="new_player">नया खिलाड़ी</string>
+    <string name="move_players">स्थानांतरण\nऔर बेंच</string>
+    <string name="move_players_bench">स्थानांतरण\n(%1$d बेंच पर)</string>
+    <string name="bench_players">बेंच</string>
+    <string name="shuffle_age">उम्र के अनुसार</string>
+    <string name="shuffle_grade">रेटिंग के अनुसार</string>
+    <string name="shuffle_stats">आंकड़ों के अनुसार</string>
+    <string name="clear_all_coming">उपस्थिति साफ़ करें</string>
+    <string name="action_send_statistics">आंकड़े भेजें</string>
+    <string name="action_analysis">विश्लेषण</string>
+    <string name="action_share">साझा करें</string>
+    <string name="action_enter_results">परिणाम दर्ज करें</string>
+    <string name="player_missed_game">खिलाड़ी ने खेल नहीं खेला</string>
+    <string name="player_mvp">MVP के रूप में चिह्नित करें</string>
+    <string name="action_empty_bench_left">बेंच खाली करें (बाएं)</string>
+    <string name="action_empty_bench_right">बेंच खाली करें (दाएं)</string>
+    <string name="action_switch_team_colors">रंग बदलें</string>
+    <string name="action_button_results">परिणाम</string>
+    <string name="teams_bench_title">बेंच (जब खिलाड़ी नहीं खेल रहे हों तो यहां खींचें)</string>
+    <string name="team_save_sync_to_cloud">क्लाउड के साथ सिंक करें</string>
+
+    <!--    Navigation-->
+    <string name="nav_players">खिलाड़ी</string>
+    <string name="nav_games_history">खेलों का इतिहास</string>
+    <string name="nav_statistics">आंकड़े</string>
+    <string name="nav_backup_to_file">फ़ाइल में बैकअप</string>
+    <string name="nav_import_from_file">फ़ाइल से आयात करें</string>
+    <string name="nav_sync_to_cloud">क्लाउड के साथ सिंक करें</string>
+    <string name="nav_pull_from_cloud">क्लाउड से डाउनलोड करें</string>
+    <string name="sync_status_synced">सिंक किया गया</string>
+    <string name="sync_status_unsynced">%d सिंक नहीं किया गया</string>
+    <string name="nav_settings">सेटिंग्स</string>
+    <string name="nav_getting_started">शुरुआत करना</string>
+    <string name="nav_invite_friends">दोस्तों को आमंत्रित करें</string>
+    <string name="nav_about">के बारे में</string>
+
+    <!--    Menus-->
+    <string name="add_player">खिलाड़ी जोड़ें</string>
+    <string name="paste_players">खिलाड़ी पेस्ट करें</string>
+    <string name="import_contacts">संपर्कों से आयात करें</string>
+
+    <!--    Import Contacts-->
+    <string name="import_contacts_first_time_hint">खिलाड़ी आयात किए गए! उनके विवरण संपादित करने के लिए किसी भी खिलाड़ी पर टैप करें।</string>
+    <string name="import_contacts_result_title">खिलाड़ी आयात किए गए</string>
+    <string name="import_contacts_added_players">निम्नलिखित खिलाड़ी जोड़े गए:</string>
+    <string name="import_contacts_skipped_existing">छोड़े गए (पहले से मौजूद):</string>
+    <string name="import_contacts_success">%1$d खिलाड़ी सफलतापूर्वक आयात किए गए</string>
+    <string name="import_contacts_select_title">आयात के लिए संपर्क चुनें</string>
+    <string name="import_contacts_done">आयात करें</string>
+    <string name="import_contacts_permission_denied">खिलाड़ियों को आयात करने के लिए संपर्क अनुमति की आवश्यकता है</string>
+    <string name="import_contacts_no_contacts">कोई संपर्क नहीं मिला</string>
+    <string name="import_contacts_search_hint">संपर्क खोजें…</string>
+    <string name="clear_search">खोज साफ़ करें</string>
+    <string name="import_contacts_selected_count">%1$d चयनित</string>
+    <string name="import_contacts_confirm_exit_title">चयन छोड़ें?</string>
+    <string name="import_contacts_confirm_exit_message">आपके पास %1$d संपर्क चयनित हैं। क्या आप उन्हें आयात किए बिना बाहर निकलना चाहते हैं?</string>
+    <string name="import_contacts_discard">छोड़ें</string>
+
+    <!--    Shared Contact-->
+    <string name="shared_contact_exists">खिलाड़ी \"%1$s\" पहले से मौजूद है</string>
+    <string name="shared_contact_exists_archived">खिलाड़ी \"%1$s\" संग्रह में मौजूद है</string>
+    <string name="shared_contact_read_error">संपर्क पढ़ने में विफल</string>
+    <string name="shared_contact_parse_error">संपर्क नाम पार्स करने में विफल</string>
+    <string name="show_archived">खिलाड़ियों का संग्रह दिखाएं</string>
+    <string name="make_teams">टीमें चुनें</string>
+    <string name="new_game">नया खेल</string>
+    <string name="enter_results">परिणाम दर्ज करें</string>
+    <string name="action_50_games">पिछले 50 खेल</string>
+    <string name="action_all_games">सभी खेल</string>
+    <string name="part_last_10_games">पिछले 10 खेल</string>
+    <string name="part_last_50_games">पिछले 50 खेल</string>
+    <string name="part_all_games">सभी खेल</string>
+    <string name="stats_50_games">50 खेल</string>
+    <string name="stats_10_games">10 खेल</string>
+    <string name="stats_all_games">सभी खेल</string>
+
+    <!--    Settings - values are saved in preferences - don't change-->
+    <string name="setting_team_color_scheme_black_white">काला — सफ़ेद</string>
+    <string name="setting_team_color_scheme_orange_blue">नारंगी — नीला</string>
+    <string name="setting_team_color_scheme_orange_yellow">नारंगी — पीला</string>
+
+    <string name="setting_title_divide_attempts">विभाजन प्रयास</string>
+    <string name="setting_summary_divide_attempts">विचार करने के लिए टीम विभाजनों की संख्या (1–1000)</string>
+    <string name="setting_title_grade_weight">रेटिंग वजन</string>
+    <string name="setting_summary_grade_weight">रेटिंग वजन का प्रतिशत (0%–100%)</string>
+    <string name="setting_title_color_scheme">टीम के रंग</string>
+    <string name="setting_summary_color_scheme">टीम दृश्य - रंग योजना चुनें</string>
+    <string name="setting_title_clear_tutorial">ट्यूटोरियल रीसेट करें</string>
+    <string name="setting_summary_clear_tutorial">छोड़े गए ट्यूटोरियल चरणों को रीसेट करें</string>
+    <string name="setting_title_show_hints">संकेत दिखाएं</string>
+    <string name="setting_summary_show_hints">ऐप नेविगेट करते समय ट्यूटोरियल संकेत प्रदर्शित करें</string>
+    <string name="setting_title_show_grades">रेटिंग दिखाएं</string>
+    <string name="setting_summary_show_grades">खिलाड़ी रेटिंग प्रदर्शित करें</string>
+    <string name="setting_title_auto_sync_games">ऑटो सिंक</string>
+    <string name="setting_summary_auto_sync_games">नए खेलों को क्लाउड के साथ स्वचालित रूप से सिंक करें</string>
+
+    <!--    Messages-->
+    <string name="parentheses">(%1$d)</string>
+    <string name="team_data_headline"> खिलाड़ी \n रेटिंग \n सफलता \n जीत दर \n केमिस्ट्री </string>
+    <string name="team_data"> %1$d \n %2$.1f (&#177;%3$.1f) \n %4$d \n %5$d%% \n %6$s </string>
+    <string name="team_data_chemistry"> %1$d%%</string>
+    <string name="team_public_stats"> उम्र: %1$d </string>
+    <string name="player_stat">खेल: %1$s \nजीत: %2$s</string>
+    <string name="stats_player_games">%1$d (%2$d%%)</string>
+    <string name="player_wins_participation">%1$s (%2$s)</string>
+    <string name="player_participation_statistics">%1$s + \n(ख:%2$d, जी:%3$02d%%)</string>
+    <string name="player_analysis">(जी:%1$02d%% ख:%2$02d) [%3$s]</string>
+    <string name="player_analysis_collaborator">(जी:%1$02d%% ख:%2$02d) [स:%3$s]</string>
+    <string name="player_analysis_selected">(जी:%1$02d%% ख:%2$02d) [%3$s]</string>
+    <string name="player_analysis_selected_win_rate">%1$02d%%</string>
+    <string name="player_analysis_selected_games">%1$02d</string>
+    <string name="operation_move">खींचना और छोड़ना शुरू करने के लिए खिलाड़ी की पंक्ति को लंबे समय तक दबाएं</string>
+    <string name="operation_divide_by_collaboration">* एआई प्रगति में :)</string>
+    <string name="optimizing_teams">टीमें अनुकूलित कर रहे हैं…</string>
+    <string name="progress_percentage">%1$d%%</string>
+    <string name="progress_best_score">सर्वश्रेष्ठ संतुलन स्कोर: %1$s</string>
+    <string name="analysis_progress_update">%1$d%% (%2$s)</string>
+    <string name="operation_analysis">* गहन विश्लेषण के लिए खिलाड़ियों पर टैप करें \n* विश्लेषण मोड से बाहर निकलने के लिए आइकन पर टैप करें</string>
+    <string name="copy_players_success">टीम विभाजन लागू किया गया</string>
+    <string name="main_make_teams">टीमें (%1$d)</string>
+    <string name="main_auth_required">Google लॉगिन आवश्यक है</string>
+    <string name="main_cloud_not_allowed">क्लाउड सुविधा की अनुमति नहीं है \nPlay Store में विवरण</string>
+    <string name="main_connectivity">कनेक्टिविटी समस्या</string>
+    <string name="main_sign_in">साइन इन करें</string>
+    <string name="main_login">लॉगिन</string>
+    <string name="main_logout">लॉगआउट</string>
+    <string name="main_sign_out_dialog_title">साइन आउट करें?</string>
+    <string name="main_sign_out_dialog_message">क्लाउड सुविधाएं उपलब्ध नहीं होंगी।</string>
+
+    <!--    Tutorials-->
+    <string name="tutorial_progress">%1$d%%</string>
+    <string name="tutorial_headline">शुरुआत करना - ट्यूटोरियल</string>
+    <string name="tutorial_dismiss_message">ट्यूटोरियल संदेशों को खारिज करें</string>
+    <string name="tutorial_create_player_title">खिलाड़ी बनाएं</string>
+    <string name="tutorial_create_player_message">स्क्रीन के शीर्ष पर \"+\" आइकन के माध्यम से मैन्युअल रूप से खिलाड़ी बनाएं।\n\nया संपर्क नामों के आधार पर WhatsApp संदेशों से \"खिलाड़ी पेस्ट करें\"</string>
+    <string name="tutorial_attendance_title">उपस्थित खिलाड़ियों को निर्दिष्ट करें</string>
+    <string name="tutorial_attendance_message">टीम चयन से पहले, आपको यह चुनना होगा कि आगामी खेल में कौन से खिलाड़ी उपस्थित होंगे।\n\nप्रत्येक उपस्थित खिलाड़ी से जुड़े चेकबॉक्स पर टिक करें।\n\nआप खिलाड़ियों को जल्दी से खोजने के लिए WhatsApp संदेश भी पेस्ट कर सकते हैं।</string>
+    <string name="tutorial_start_pick_teams_title">टीमें चुनें</string>
+    <string name="tutorial_start_pick_teams_message">आप टीम चुनना शुरू कर सकते हैं, बस नीचे \"टीमें\" बटन पर क्लिक करें</string>
+    <string name="tutorial_pick_teams_title">टीमें चुनें</string>
+    <string name="tutorial_pick_teams_message">रेटिंग के आधार पर टीमों को \"शफल\" करें।\n(आप 3 डॉट्स पर क्लिक करके एक अलग शफल मोड चुन सकते हैं। 10 खेल डेटा होने से पहले आंकड़ों द्वारा शफल करने की अनुशंसा नहीं की जाती है)।\n\nलंबे समय तक दबाकर और खींचकर खिलाड़ियों को \"स्थानांतरित\" करें। प्रतिस्थापन के लिए बेंच का उपयोग करें।\n\nकिसी भी मैसेजिंग ऐप के माध्यम से टीमों की एक छवि साझा करें (रेटिंग को छोड़कर)।</string>
+    <string name="tutorial_save_results_title">खेल परिणाम सहेजें</string>
+    <string name="tutorial_save_results_message">एक बार खेल समाप्त होने के बाद, आप परिणाम दर्ज कर सकते हैं।\nयह खेलों के इतिहास, व्यक्तिगत आंकड़े और खिलाड़ी जीत दर और केमिस्ट्री के आधार पर टीम चयन करने की क्षमता का मार्ग प्रशस्त करता है।\n\n\"टीमें\" स्क्रीन पर \"परिणाम\" दर्ज करें।</string>
+    <string name="tutorial_game_history_title">खेलों का इतिहास</string>
+    <string name="tutorial_game_history_message">इसकी टीमों और कार्यों को देखने के लिए \"खेल\" टैब में किसी भी खेल को चुनें।</string>
+    <string name="tutorial_cloud_title">क्लाउड सुविधाएं</string>
+    <string name="tutorial_cloud_message">अपने खिलाड़ियों और खेलों को क्लाउड के साथ सिंक करें, बैकअप के रूप में, या जब आप डेटा को दूसरे डिवाइस पर डाउनलोड करने की योजना बना रहे हों।\n\nपहले, साइड मेनू के माध्यम से अपने Google खाते के साथ लॉगिन करें।\nफिर साइड मेनू में \"सिंक\" करें।</string>
+    <string name="tutorial_team_analysis_title">टीम विश्लेषण</string>
+    <string name="tutorial_team_analysis_message">अब जब पर्याप्त खेल इतिहास प्रदान किया गया है, व्यक्तिगत जीत दरों का निरीक्षण करने के लिए शीर्ष बार में \"विश्लेषण\" आइकन पर क्लिक करें।\n\nअन्य भाग लेने वाले खिलाड़ियों के साथ उनकी व्यक्तिगत केमिस्ट्री देखने के लिए एक खिलाड़ी पर क्लिक करें।</string>
+    <string name="tutorial_team_shuffle_stats_title">टीम चयन - एआई मोड</string>
+    <string name="tutorial_team_shuffle_stats_message">\"शफल\" बटन के नीचे 3 डॉट्स के माध्यम से अनुकूलित टीम चयन मोड पर स्विच करें।\n\n\"आंकड़े\" मोड खिलाड़ी जीत दर और केमिस्ट्री के आधार पर वैकल्पिक टीमें उत्पन्न करेगा।</string>
+    <string name="tutorial_completed_title">ट्यूटोरियल पूर्ण</string>
+    <string name="tutorial_completed_message">ट्यूटोरियल साइड मेनू में \"शुरुआत करना\" में उपलब्ध होंगे</string>
+
+    <!--    Player Insights-->
+    <string name="insights_tab_title">अंतर्दृष्टि</string>
+    <string name="insights_win_rate_title">समय के साथ जीत दर</string>
+    <string name="insights_moving_win_rate">पिछले 50 खेलों की जीत दर</string>
+    <string name="insights_cumulative_win_rate">सर्वकालिक जीत दर</string>
+    <string name="insights_win_rate_label">जीत दर %</string>
+    <string name="insights_games_label">खेल</string>
+    <string name="insights_window_label">विंडो आकार:</string>
+    <string name="insights_show_cumulative">संचयी दर दिखाएं</string>
+    <string name="insights_window_10">पिछले 10 खेल</string>
+    <string name="insights_window_25">पिछले 25 खेल</string>
+    <string name="insights_window_50">पिछले 50 खेल</string>
+    <string name="insights_show_touch_data">स्पर्श पर डेटा दिखाएं</string>
+    <string name="insights_no_data">अंतर्दृष्टि प्रदर्शित करने के लिए पर्याप्त खेल डेटा नहीं है। आंकड़े देखने के लिए कम से कम %1$d खेल खेलें।</string>
+
+    <!--    Insights Chip Labels-->
+    <string name="insights_chip_win_rate">जीत दर</string>
+    <string name="insights_chip_chemistry">केमिस्ट्री</string>
+    <string name="insights_chip_activity">भागीदारी</string>
+
+    <!--    Player Collaboration Chart-->
+    <string name="insights_collaboration_title">सहयोग - खिलाड़ियों के साथ सफलता</string>
+    <string name="insights_collaboration_no_data">पर्याप्त सहयोग डेटा नहीं है। अन्य खिलाड़ियों के साथ कम से कम %1$d खेल खेलें।</string>
+    <string name="insights_success_with_label">के साथ सफलता</string>
+    <string name="insights_success_against_label">के विरुद्ध सफलता</string>
+
+    <!--    Team Collaboration Chart (from teams screen) -->
+    <string name="team_collaboration_chart_title">%1$s - टीम सहयोग</string>
+    <string name="team_collaboration_chart_title_with_games">%1$s - टीम सहयोग (पिछले %2$d खेल)</string>
+    <string name="team_collaboration_no_data">टीम के सदस्यों के साथ पर्याप्त खेल नहीं हैं। कम से कम %1$d खेल खेलें।</string>
+    <string name="team_collaboration_x_axis_label">खेलों की संख्या</string>
+    <string name="team_collaboration_y_axis_label">सफलता</string>
+
+    <!--    Player Participation Chart-->
+    <string name="insights_participation_title">समय के साथ भागीदारी</string>
+    <string name="total_games_played">कुल खेल खेले गए</string>
+    <string name="total_games_count">%1$d खेल</string>
+    <string name="player_games_header">%1$s (%2$d खेल)</string>
+    <string name="overall_win_rate">समग्र जीत दर</string>
+    <string name="win_rate_value">%1$d%%</string>
+    <string name="insights_participation_no_data">पर्याप्त खेल डेटा नहीं है। गतिविधि देखने के लिए कम से कम %1$d खेल खेलें।</string>
+    <string name="insights_wins_label">जीत</string>
+    <string name="insights_ties_label">ड्रॉ</string>
+    <string name="insights_losses_label">हार</string>
+
+    <!--    Games Charts-->
+    <string name="games_tab_history">इतिहास</string>
+    <string name="games_tab_charts">चार्ट</string>
+    <string name="charts_tab_distribution">स्कोर</string>
+    <string name="charts_tab_trend">समय के साथ</string>
+    <string name="charts_goal_diff_distribution_title">गोल अंतर वितरण</string>
+    <string name="charts_goal_diff_distribution_description">प्रत्येक स्कोर अंतर के साथ समाप्त होने वाले खेलों का प्रतिशत</string>
+    <string name="charts_goal_diff_trend_title">गोल अंतर प्रवृत्ति</string>
+    <string name="charts_goal_diff_trend_description">समय के साथ गोल अंतर का चलती औसत</string>
+    <string name="charts_close_games_percentage">प्रतिस्पर्धी खेल (अंतर &lt; 3)</string>
+    <string name="charts_avg_goal_diff">औसत गोल अंतर</string>
+    <string name="charts_last_n_games">पिछले %1$d खेल</string>
+    <string name="charts_avg_last_n_games">औसत (पिछले %1$d)</string>
+    <string name="charts_median_last_n_games">मध्यिका (पिछले %1$d)</string>
+    <string name="charts_no_data">पर्याप्त खेल डेटा नहीं है। चार्ट देखने के लिए कम से कम %1$d खेल खेलें।</string>
+
+    <!--    Statistics Tab Charts-->
+    <string name="stats_tab_stats">आंकड़े</string>
+    <string name="stats_tab_charts">चार्ट</string>
+    <string name="stats_charts_tab_seniority">अनुभव</string>
+    <string name="stats_charts_tab_success">सफलता</string>
+
+    <!--    Player Experience Distribution Chart-->
+    <string name="stats_seniority_chart_title">खिलाड़ी अनुभव वितरण</string>
+    <string name="stats_seniority_chart_description">अनुभव स्तर द्वारा स्टैक्ड गणनाएं</string>
+    <string name="stats_seniority_no_data">पर्याप्त खेल डेटा नहीं है। अनुभव वितरण देखने के लिए कम से कम %1$d खेल खेलें।</string>
+    <string name="stats_seniority_current_avg">वर्तमान औसत (25 खेल)</string>
+    <string name="stats_seniority_current_value">नए: %.0f | लौटने वाले: %.0f | नियमित: %.0f</string>
+    <string name="stats_seniority_new_players">नए (&lt;10)</string>
+    <string name="stats_seniority_returning_players">लौटने वाले (10–50)</string>
+    <string name="stats_seniority_regulars">नियमित (&gt;50)</string>
+    <string name="stats_seniority_click_hint">खिलाड़ी विवरण देखने के लिए चार्ट पर टैप करें</string>
+    <string name="stats_seniority_player_games">%1$s (%2$d)</string>
+    <string name="stats_game_number">खेल %1$d</string>
+
+    <!--    Player Success Chart-->
+    <string name="stats_success_heatmap_title">समय के साथ खिलाड़ी सफलता</string>
+    <string name="stats_success_heatmap_description">शीर्ष खिलाड़ियों के लिए संचयी सफलता (जीत - हार)</string>
+    <string name="stats_success_no_data">पर्याप्त खेल डेटा नहीं है। सफलता चार्ट देखने के लिए कम से कम %1$d खेल खेलें।</string>
+    <string name="stats_success_show_players">खिलाड़ी दिखाएं:</string>
+    <string name="stats_success_all_players">सभी</string>
+
+    <!--    Prediction-->
+    <string name="prediction_label">पूर्वानुमान</string>
+    <string name="prediction_explanation_title">जीत पूर्वानुमान</string>
+    <string name="prediction_explanation_stats_mode">यह पूर्वानुमान इसके भारित संयोजन पर आधारित है:\n\n• केमिस्ट्री - ऐतिहासिक खेलों के आधार पर खिलाड़ी एक साथ कितने अच्छे प्रदर्शन करते हैं\n• जीत दर - व्यक्तिगत खिलाड़ी जीत दर\n• रेटिंग - खिलाड़ी कौशल रेटिंग\n\nटीमों को वर्तमान में आंकड़े मोड का उपयोग करके विभाजित किया जा रहा है, जो संतुलित, प्रतिस्पर्धी मैचों के लिए अनुकूलित करता है।</string>
+    <string name="prediction_explanation_other_mode">यह पूर्वानुमान इसके भारित संयोजन पर आधारित है:\n\n• केमिस्ट्री - ऐतिहासिक खेलों के आधार पर खिलाड़ी एक साथ कितने अच्छे प्रदर्शन करते हैं\n• जीत दर - व्यक्तिगत खिलाड़ी जीत दर\n• रेटिंग - खिलाड़ी कौशल रेटिंग\n\nसुझाव: इन कारकों के आधार पर एआई-अनुकूलित टीम संतुलन के लिए \"आंकड़े\" शफल मोड (शफल के नीचे 3 डॉट्स के माध्यम से) पर स्विच करें।</string>
+    <string name="prediction_reveal_title">पूर्व-खेल पूर्वानुमान</string>
+    <string name="prediction_reveal_message">खेल से पहले पूर्वानुमान था:\n\n%1$d%% — %2$d%%</string>
+    <string name="prediction_no_data">पूर्वानुमान करने के लिए पर्याप्त खेल इतिहास नहीं है। पूर्वानुमान सक्षम करने के लिए अधिक खेल खेलें।</string>
+
+    <!--    Toast Messages - Errors-->
+    <string name="toast_error_share_failed">साझा करने में विफल: %1$s</string>
+    <string name="toast_error_login_failed">लॉगिन विफल</string>
+    <string name="toast_error_screenshot_failed">स्क्रीनशॉट लेने में विफल: %1$s</string>
+    <string name="toast_error_whatsapp_not_installed">WhatsApp इंस्टॉल नहीं है। साझा करें मेनू खोल रहे हैं…</string>
+    <string name="toast_error_permissions_denied">अनुमति अस्वीकार कर दी गई।</string>
+    <string name="toast_error_cloud_stage_players_failed">खिलाड़ियों को तैयार करने में विफल: %1$s</string>
+    <string name="toast_error_cloud_stage_games_failed">खेलों को तैयार करने में विफल: %1$s</string>
+    <string name="toast_error_cloud_stage_player_stats_failed">खिलाड़ी आंकड़े तैयार करने में विफल: %1$s</string>
+    <string name="toast_error_cloud_finalize_sync_failed">सिंक को अंतिम रूप देने में विफल: %1$s</string>
+    <string name="toast_error_cloud_no_games">कोई खेल नहीं मिला - पहले क्लाउड के साथ सिंक करें</string>
+    <string name="toast_error_cloud_pull_players_failed">खिलाड़ियों को डाउनलोड करने में विफल: %1$s</string>
+    <string name="toast_error_cloud_pull_games_failed">खेलों को डाउनलोड करने में विफल: %1$s</string>
+    <string name="toast_error_cloud_pull_player_stats_failed">खिलाड़ी आंकड़े डाउनलोड करने में विफल: %1$s</string>
+    <string name="toast_error_cloud_save_data_failed">डेटा सहेजने में विफल: %1$s</string>
+    <string name="toast_error_load_contacts_failed">संपर्क लोड करने में विफल</string>
+    <string name="toast_error_paste_process_failed">प्रक्रिया में विफल : %1$s</string>
+
+    <!--    Toast Messages - Success-->
+    <string name="toast_success_sync_completed">सिंक पूर्ण</string>
+    <string name="toast_success_pull_completed">%1$s से डाउनलोड पूर्ण</string>
+    <string name="toast_success_player_saved">खिलाड़ी सहेजा गया</string>
+    <string name="toast_success_tutorial_reset">ट्यूटोरियल रीसेट</string>
+    <string name="toast_success_weather_updated">मौसम सेटिंग्स अपडेट की गईं</string>
+
+    <!--    Toast Messages - Validation-->
+    <string name="toast_validation_future_date">भविष्य की तारीख की अनुमति नहीं है</string>
+    <string name="toast_validation_select_game_edit">संपादित करने के लिए खेल चुनें</string>
+    <string name="toast_validation_select_game_delete">हटाने के लिए खेल चुनें</string>
+    <string name="toast_validation_player_name_required">खिलाड़ी का नाम भरें</string>
+    <string name="toast_validation_player_grade_required">खिलाड़ी की रेटिंग भरें</string>
+    <string name="toast_validation_grade_range">रेटिंग 0-99 के बीच होनी चाहिए</string>
+    <string name="toast_validation_year_range">वर्ष 1900-अब के बीच होना चाहिए</string>
+    <string name="toast_validation_player_name_in_use">खिलाड़ी का नाम पहले से उपयोग में है</string>
+    <string name="toast_validation_invalid_grade">अमान्य रेटिंग</string>
+
+    <!--    Toast Messages - Instructions-->
+    <string name="toast_instruction_select_players_first">पहले - उपस्थित खिलाड़ियों को चुनें</string>
+    <string name="toast_instruction_weather_disabled">मौसम सुविधा वर्तमान में अक्षम है</string>
+    <string name="toast_instruction_paste_whatsapp">उपस्थित खिलाड़ियों को सेट करने के लिए कुछ WhatsApp संदेश कॉपी करें</string>
+    <string name="toast_instruction_paste_multiple">एकाधिक संदेश पेस्ट करें</string>
+    <string name="toast_instruction_empty_identifier">खाली पहचानकर्ता सेट नहीं किया जा सकता</string>
+    <string name="toast_instruction_identifier_cleared">%1$s साफ़ किया गया</string>
+    <string name="toast_instruction_identifier_set">%1$s को %2$s के साथ सेट किया गया</string>
+    <string name="toast_instruction_player_not_found">%1$s नहीं मिला</string>
+    <string name="toast_instruction_no_archived_players">कोई संग्रहीत खिलाड़ी नहीं मिला</string>
+    <string name="toast_instruction_start_before_end">प्रारंभ समय समाप्ति समय से पहले होना चाहिए</string>
+    <string name="toast_instruction_geocoder_unavailable">इस डिवाइस पर Geocoder उपलब्ध नहीं है</string>
+    <string name="toast_instruction_location_not_found">स्थान नहीं मिला: %1$s</string>
+    <string name="toast_instruction_location_error">स्थान खोजने में त्रुटि</string>
+</resources>
+

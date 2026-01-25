@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity
                 // Sign in failed. Either user canceled the sign-in flow using the back button.
                 // Or response.getError().getErrorCode() with additional details
                 Log.w("AccountFB", "Failed login - " + response);
-                Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_error_login_failed), Toast.LENGTH_SHORT).show();
                 // TODO connectivity issues?
             }
 

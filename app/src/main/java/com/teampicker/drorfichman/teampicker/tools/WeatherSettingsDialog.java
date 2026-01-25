@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.teampicker.drorfichman.teampicker.Data.Configurations;
+import com.teampicker.drorfichman.teampicker.R;
 
 import java.util.Calendar;
 import java.util.List;
@@ -37,7 +38,7 @@ public class WeatherSettingsDialog {
     public static void show(Activity activity, OnSettingsUpdatedListener listener) {
         // Check if feature is enabled
         if (!Configurations.isWeatherFeatureEnabled()) {
-            Toast.makeText(activity, "Weather feature is currently disabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, activity.getString(R.string.toast_instruction_weather_disabled), Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -69,7 +70,7 @@ public class WeatherSettingsDialog {
             int endTimeMinutes = endHour * 60 + endMinute;
             
             if (startTimeMinutes >= endTimeMinutes) {
-                Toast.makeText(activity, "Start time must be before end time", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.toast_instruction_start_before_end), Toast.LENGTH_SHORT).show();
                 return;
             }
             
@@ -77,12 +78,12 @@ public class WeatherSettingsDialog {
             if (!locationName.isEmpty() && !locationName.equals(WeatherService.getWeatherLocationName(activity))) {
                 geocodeLocation(activity, locationName, () -> {
                     WeatherService.setWeatherSettings(activity, startHour, startMinute, endHour, endMinute, dayOfWeek);
-                    Toast.makeText(activity, "Weather settings updated", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, activity.getString(R.string.toast_success_weather_updated), Toast.LENGTH_SHORT).show();
                     listener.onSettingsUpdated();
                 });
             } else {
                 WeatherService.setWeatherSettings(activity, startHour, startMinute, endHour, endMinute, dayOfWeek);
-                Toast.makeText(activity, "Weather settings updated", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.toast_success_weather_updated), Toast.LENGTH_SHORT).show();
                 listener.onSettingsUpdated();
             }
         });
@@ -255,7 +256,7 @@ public class WeatherSettingsDialog {
      */
     private static void geocodeLocation(Activity activity, String locationName, Runnable onSuccess) {
         if (!Geocoder.isPresent()) {
-            Toast.makeText(activity, "Geocoder not available on this device", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, activity.getString(R.string.toast_instruction_geocoder_unavailable), Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -276,13 +277,13 @@ public class WeatherSettingsDialog {
                     }
                 } else {
                     activity.runOnUiThread(() -> 
-                        Toast.makeText(activity, "Location not found: " + locationName, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, activity.getString(R.string.toast_instruction_location_not_found, locationName), Toast.LENGTH_SHORT).show()
                     );
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Geocoding error", e);
                 activity.runOnUiThread(() -> 
-                    Toast.makeText(activity, "Error finding location", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, activity.getString(R.string.toast_instruction_location_error), Toast.LENGTH_SHORT).show()
                 );
             }
         }).start();
