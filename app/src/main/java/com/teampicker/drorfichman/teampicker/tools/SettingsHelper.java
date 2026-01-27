@@ -15,6 +15,7 @@ public class SettingsHelper {
     public static final String SETTING_RESET_TUTORIALS = "setting_clear_tutorial";
     public static final String SETTING_SHOW_HINTS = "pref_skip_all_tutorial";
     public static final String SETTING_SHOW_GRADES = "show_grades";
+    public static final String SETTING_TEAM_COUNT = "team_count";
 
     private static int getPreferenceValue(Context ctx, String preferenceKey, int defaultValue) {
         try {
@@ -38,6 +39,11 @@ public class SettingsHelper {
     public static int getDivideAttemptsCount(Context ctx) {
         int divideAttempts = getPreferenceValue(ctx, SETTING_DIVIDE_ATTEMPTS, 200);
         return MathTools.getLimitedValue(divideAttempts, 1, 1000);
+    }
+
+    public static int getTeamCount(Context ctx) {
+        int divideAttempts = getPreferenceValue(ctx, SETTING_TEAM_COUNT, 2);
+        return MathTools.getLimitedValue(divideAttempts, 2, 3);
     }
 
     public static DivisionWeight getDivisionWeight(Context ctx) {

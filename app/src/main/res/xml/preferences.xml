@@ -15,6 +15,15 @@
             android:key="divide_grade_percentage"
             android:summary="@string/setting_summary_grade_weight"
             android:title="@string/setting_title_grade_weight" />
+
+        <ListPreference
+            android:key="team_count"
+            android:title="@string/setting_title_team_count"
+            android:summary="%s"
+            android:defaultValue="2"
+            android:entries="@array/settings_team_count_labels"
+            android:entryValues="@array/settings_team_count_values"
+            android:icon="@drawable/nav_setting" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Appearance">

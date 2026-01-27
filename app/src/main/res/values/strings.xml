@@ -76,6 +76,7 @@
     <string name="shuffle_stats">By Stats</string>
     <string name="clear_all_coming">Clear Attendance</string>
     <string name="action_send_statistics">Send Statistics</string>
+    <string name="action_send">Send</string>
     <string name="action_analysis">Analysis</string>
     <string name="action_share">Share</string>
     <string name="action_enter_results">Enter Results</string>
@@ -162,6 +163,17 @@
     <string name="setting_summary_show_grades">Show players grades</string>
     <string name="setting_title_auto_sync_games">Auto Sync</string>
     <string name="setting_summary_auto_sync_games">Automatically sync new games to cloud</string>
+    <string name="setting_title_team_count">Number of Teams</string>
+    <string name="setting_summary_team_count">Choose 2 or 3 teams</string>
+
+    <!--    3-Team Feature-->
+    <string name="dialog_team_count_title">How many teams?</string>
+    <string name="dialog_team_count_message">Choose how to divide your players</string>
+    <string name="dialog_option_2_teams">2 Teams</string>
+    <string name="dialog_option_3_teams">3 Teams</string>
+    <string name="hint_drag_drop_3teams">Long press to drag and drop players between teams</string>
+    <string name="make_3teams_title">Team Division (3 Teams)</string>
+    <string name="team_3_public_stats">Team 3 Stats</string>
 
     <!--    Messages-->
     <string name="parentheses">"(%1$d)"</string>

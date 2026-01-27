@@ -6,6 +6,7 @@ public enum EventType {
     view_game, edit_game, delete_game, copy_game, // Done
     new_player, player_clicked, player_collaboration_clicked, // Done
     make_teams, send_teams, save_results, shuffle_teams, move_player, analysis_mode, analysis_mode_player_clicked, // Done
+    make_3teams, send_3teams, shuffle_3teams, move_player_3teams, // 3-team feature
     settings_view, settings_changed_color, settings_changed_grades, settings_changed_tutorial_reset, settings_changed_show_hints, settings_changed_division_percentage, settings_changed_division_attempts, // Done
     backup_to_file, import_from_file, sync_to_cloud, pull_from_cloud, // Done
     paste_players, clear_attendance, players_archive, import_contacts, // Done

@@ -117,7 +117,9 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
             im.setVisibility(View.INVISIBLE);
         }
 
-        if (isRecentGamesVisible) {
+        if (!isRecentGamesVisible) {
+            rowView.findViewById(R.id.res_indicators).setVisibility(View.GONE);
+        } else {
             for (int r = 0; r < player.results.size() && r < starView.size(); ++r) {
                 ResultEnum res = player.results.get(r).result;
                 boolean isMVP = player.results.get(r).isMVP;

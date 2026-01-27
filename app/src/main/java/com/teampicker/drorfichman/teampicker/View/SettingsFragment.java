@@ -29,6 +29,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setShowHints();
         setShowGrade();
         setColorScheme();
+        setTeamsCount();
+    }
+
+    private void setTeamsCount() {
+
     }
 
     private void setColorScheme() {

@@ -48,6 +48,7 @@ import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
+import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
@@ -371,6 +372,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     private void setActionButtons() {
         rootView.findViewById(R.id.main_make_teams).setOnClickListener(view -> launchMakeTeams());
+        rootView.findViewById(R.id.main_make_teams).setOnLongClickListener(v -> {
+            TeamCountSelectionDialog.show(getContext(), this::launchTeamsActivity);
+            return true;
+        });
         exitPastedModeButton.setOnClickListener(view -> savePastedPlayersMode());
         cancelPastedModeButton.setOnClickListener(view -> cancelPastedPlayersMode());
     }
@@ -422,11 +427,37 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void launchMakeTeams() {
+        // Check if we have coming players first
         Intent makeTeamsIntent = MakeTeamsActivity.getIntent(getContext());
-        if (makeTeamsIntent != null) {
-            startActivity(makeTeamsIntent);
-        } else {
+        if (makeTeamsIntent == null) {
             Toast.makeText(getContext(), getString(R.string.toast_instruction_select_players_first), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if dialog has been shown before
+        if (!TeamCountSelectionDialog.hasDialogBeenShown(getContext())) {
+            // Show dialog for first time
+            TeamCountSelectionDialog.show(getContext(), teamCount -> {
+                launchTeamsActivity(teamCount);
+            });
+        } else {
+            // Use saved preference
+            int teamCount = SettingsHelper.getTeamCount(getContext());
+            Log.d("team_count", "launchMakeTeams: " + teamCount);
+            launchTeamsActivity(teamCount);
+        }
+    }
+
+    private void launchTeamsActivity(int teamCount) {
+        Intent intent;
+        if (teamCount == 3) {
+            intent = Make3TeamsActivity.getIntent(getContext());
+        } else {
+            intent = MakeTeamsActivity.getIntent(getContext());
+        }
+        
+        if (intent != null) {
+            startActivity(intent);
         }
     }
 

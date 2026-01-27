@@ -10,6 +10,8 @@ public class PreferenceHelper {
     private final static String PREF_FILE = "PLAYERS";
 
     public static String pref_shuffle = "shuffle_strategy";
+    public static String pref_team_count = "team_count";
+    public static String pref_team_count_dialog_shown = "team_count_dialog_shown";
     
     public static String pref_weather_start_hour = "weather_start_hour";
     public static String pref_weather_start_minute = "weather_start_minute";

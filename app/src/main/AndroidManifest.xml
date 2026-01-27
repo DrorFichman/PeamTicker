@@ -69,6 +69,13 @@
             android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity
+            android:name=".View.Make3TeamsActivity"
+            android:exported="true"
+            android:label="@string/make_3teams_title"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity
             android:name=".View.PlayerChemistryActivity"
             android:exported="true"
             android:label="Player's success with/vs teammates"

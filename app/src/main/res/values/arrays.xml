@@ -5,4 +5,14 @@
         <item>@string/setting_team_color_scheme_black_white</item>
         <item>@string/setting_team_color_scheme_orange_yellow</item>
     </array>
+    
+    <string-array name="settings_team_count_labels">
+        <item>2 Teams</item>
+        <item>3 Teams</item>
+    </string-array>
+
+    <string-array name="settings_team_count_values">
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 </resources>
