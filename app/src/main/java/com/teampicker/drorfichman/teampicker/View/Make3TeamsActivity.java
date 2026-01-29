@@ -71,8 +71,6 @@ public class Make3TeamsActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private Button shuffleView, moveView;
-    private Button shuffleOptions;
-
     private View weatherDisplay;
     private TextView weatherEmoji, weatherTemperature, weatherTimeRange;
     private TextView weatherDate;
@@ -129,10 +127,8 @@ public class Make3TeamsActivity extends AppCompatActivity {
         // Buttons
         shuffleView = findViewById(R.id.shuffle);
         moveView = findViewById(R.id.move);
-        shuffleOptions = findViewById(R.id.shuffle_options);
 
         shuffleView.setOnClickListener(view -> onShuffleClicked());
-        shuffleOptions.setOnClickListener(view -> showShuffleOptions());
         moveView.setOnClickListener(view -> toggleMoveMode());
 
         // Set up drag and drop
@@ -217,21 +213,6 @@ public class Make3TeamsActivity extends AppCompatActivity {
     private void onShuffleClicked() {
         divideComingPlayers(selectedDivision);
         Event.logEvent(FirebaseAnalytics.getInstance(this), EventType.shuffle_3teams);
-    }
-
-    private void showShuffleOptions() {
-        PopupMenu popup = new PopupMenu(Make3TeamsActivity.this, shuffleOptions);
-        popup.getMenuInflater().inflate(R.menu.shuffle_options, popup.getMenu());
-        popup.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.divide_by_grade) {
-                setShuffleState(TeamDivision3Teams.DivisionStrategy3Teams.Grade);
-                PreferenceHelper.setSharedPreferenceString(this, PreferenceHelper.pref_shuffle, "grade");
-                divideComingPlayers(selectedDivision);
-                return true;
-            }
-            return false;
-        });
-        popup.show();
     }
     //endregion
 
@@ -388,7 +369,6 @@ public class Make3TeamsActivity extends AppCompatActivity {
 
         final Runnable r = () -> {
             ScreenshotHelper.takeScreenshot(Make3TeamsActivity.this, screenshotArea);
-            Log.d("teams", "Exit send mode - Shot taken");
             exitSendMode();
         };
 
