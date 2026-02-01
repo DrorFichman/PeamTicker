@@ -165,6 +165,8 @@
     <string name="setting_summary_auto_sync_games">Automatically sync new games to cloud</string>
     <string name="setting_title_team_count">Number of Teams</string>
     <string name="setting_summary_team_count">Choose 2 or 3 teams</string>
+    <string name="setting_title_auto_reset_coming">Clear coming players</string>
+    <string name="setting_summary_auto_reset_coming">Automatically clear attending players after saving game results</string>
 
     <!--    3-Team Feature-->
     <string name="dialog_team_count_title">How many teams?</string>

@@ -101,7 +101,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
         setHasOptionsMenu(true);
 
@@ -113,7 +114,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         cancelPastedModeButton = root.findViewById(R.id.cancel_pasted_mode);
         emptyStateContainer = root.findViewById(R.id.empty_state_container);
         emptyInjuredStateContainer = root.findViewById(R.id.empty_injured_state_container);
-        
+
         // Set up empty state buttons
         root.findViewById(R.id.empty_state_paste_button).setOnClickListener(v -> pasteComingPlayers());
         root.findViewById(R.id.empty_state_import_button).setOnClickListener(v -> launchContactPicker());
@@ -126,7 +127,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         return root;
     }
 
-    //region tutorials
+    // region tutorials
     private void showTutorials() {
         if (TutorialManager.isSkipAllTutorials(getContext())) {
             return;
@@ -143,26 +144,31 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         // Show tutorials in sequence - only one will show at a time
         // For attendance tutorial, target the header row's RSVP title (always visible)
         View attendanceTarget = getAttendanceTargetView();
-        boolean shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.attendance, attendanceTarget, false);
+        boolean shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.attendance,
+                attendanceTarget, false);
 
         if (!shown) {
-            shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.start_pick_teams, makeTeamsButton, false);
+            shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.start_pick_teams,
+                    makeTeamsButton, false);
         }
         if (!shown) {
-            // save_results doesn't have a good target on this screen, show as info dialog if applicable
-            shown = TutorialManager.displayTutorialStepAsDialog(activity, TutorialManager.Tutorials.save_results, false);
+            // save_results doesn't have a good target on this screen, show as info dialog
+            // if applicable
+            shown = TutorialManager.displayTutorialStepAsDialog(activity, TutorialManager.Tutorials.save_results,
+                    false);
         }
         if (!shown) {
             // game_history - target the Games tab
             View gamesTabTarget = getGamesTabView(activity);
-            shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.game_history, gamesTabTarget, false);
+            shown = TutorialManager.displayTutorialStep(activity, TutorialManager.Tutorials.game_history,
+                    gamesTabTarget, false);
         }
         if (!shown) {
             // cloud - show as dialog since navigation drawer isn't easily targetable
             TutorialManager.displayTutorialStepAsDialog(activity, TutorialManager.Tutorials.cloud, false);
         }
     }
-    //endregion
+    // endregion
 
     private View getAttendanceTargetView() {
         // Use the header row's RSVP title as target (always visible)
@@ -174,7 +180,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 if (rsvpTitle != null && rsvpTitle.getVisibility() == View.VISIBLE) {
                     return rsvpTitle;
                 }
-                
+
                 // Fallback to the checkbox in header if RSVP title is not visible
                 View checkbox = headerRow.findViewById(R.id.player_coming);
                 if (checkbox != null) {
@@ -182,7 +188,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 }
             }
         }
-        
+
         // Fallback to first player's checkbox if header not available
         if (playersList != null && playersList.getChildCount() > 0) {
             View firstItem = playersList.getChildAt(0);
@@ -190,7 +196,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 return firstItem.findViewById(R.id.player_coming);
             }
         }
-        
+
         return null;
     }
 
@@ -248,9 +254,14 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         super.onCreate(savedInstanceState);
 
         notificationHandler = new PlayerUpdateBroadcast();
-        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION, notificationHandler);
-        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION, notificationHandler);
-        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION, notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION,
+                notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION,
+                notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.SETTING_MODIFIED_ACTION,
+                notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION,
+                notificationHandler);
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this, backPress);
         backPress.setEnabled(false);
@@ -262,7 +273,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                     if (isGranted) {
                         showContactSelectionDialog();
                     } else {
-                        Toast.makeText(getContext(), R.string.import_contacts_permission_denied, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.import_contacts_permission_denied, Toast.LENGTH_LONG)
+                                .show();
                     }
                 });
     }
@@ -282,7 +294,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     public void onResume() {
         super.onResume();
         backPress.setEnabled(handleBackPress());
-        
+
         // Delay tutorial showing to ensure views are ready
         if (rootView != null) {
             rootView.post(this::showTutorials);
@@ -317,19 +329,20 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 refreshPlayers();
             } else {
                 playersAdapter.setFilter(value);
-                int pos = playersAdapter.positionOfFirstFilterItem(() ->
-                        Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show());
+                int pos = playersAdapter.positionOfFirstFilterItem(
+                        () -> Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show());
                 playersList.smoothScrollToPosition(pos);
             }
             backPress.setEnabled(handleBackPress());
         });
-        if (playersAdapter != null) playersAdapter.setFilter(null);
+        if (playersAdapter != null)
+            playersAdapter.setFilter(null);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.make_teams){
+        if (item.getItemId() == R.id.make_teams) {
             launchMakeTeams();
         } else if (item.getItemId() == R.id.paste_coming_players) {
             pasteComingPlayers();
@@ -367,7 +380,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void setComingPlayersCount() {
-        ((Button) rootView.findViewById(R.id.main_make_teams)).setText(getString(R.string.main_make_teams, DbHelper.getComingPlayersCount(getContext())));
+        ((Button) rootView.findViewById(R.id.main_make_teams))
+                .setText(getString(R.string.main_make_teams, DbHelper.getComingPlayersCount(getContext())));
     }
 
     private void setActionButtons() {
@@ -402,7 +416,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         }
         // Uncheck attendance for pasted players that weren't auto-created
         if (mPastedPlayers != null) {
-            ArrayList<Player> existingPasted = DbHelper.getPlayersByIdentifier(getContext(), new ArrayList<>(mPastedPlayers));
+            ArrayList<Player> existingPasted = DbHelper.getPlayersByIdentifier(getContext(),
+                    new ArrayList<>(mPastedPlayers));
             for (Player p : existingPasted) {
                 if (!mAutoCreatedPlayers.contains(p.mName)) {
                     DbHelper.updatePlayerComing(getContext(), p.mName, false);
@@ -423,14 +438,16 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         }
         exitPastedModeButton.setVisibility(showPastedPlayers ? View.VISIBLE : View.GONE);
         // Only show cancel button if there are auto-created players
-        cancelPastedModeButton.setVisibility(showPastedPlayers && !mAutoCreatedPlayers.isEmpty() ? View.VISIBLE : View.GONE);
+        cancelPastedModeButton
+                .setVisibility(showPastedPlayers && !mAutoCreatedPlayers.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void launchMakeTeams() {
         // Check if we have coming players first
         Intent makeTeamsIntent = MakeTeamsActivity.getIntent(getContext());
         if (makeTeamsIntent == null) {
-            Toast.makeText(getContext(), getString(R.string.toast_instruction_select_players_first), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.toast_instruction_select_players_first), Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
 
@@ -455,7 +472,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         } else {
             intent = MakeTeamsActivity.getIntent(getContext());
         }
-        
+
         if (intent != null) {
             startActivity(intent);
         }
@@ -468,7 +485,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     private void setPlayersList(List<Player> players, AdapterView.OnItemClickListener clickHandler) {
         boolean hasPlayers = (players != null && !players.isEmpty());
         playersList.setVisibility(hasPlayers ? View.VISIBLE : View.GONE);
-        
+
         // Show empty state only when no players and not in special modes
         boolean showEmptyState = !hasPlayers && !showPastedPlayers && !showArchivedPlayers && !showInjuredPlayers;
         boolean showEmptyInjuredState = !hasPlayers && showInjuredPlayers;
@@ -533,7 +550,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             showInjuredPlayers = false;
             ArrayList<Player> players = DbHelper.getPlayers(getContext(), 0, showArchivedPlayers);
             if (players.isEmpty()) {
-                Toast.makeText(getContext(), getString(R.string.toast_instruction_no_archived_players), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_no_archived_players),
+                        Toast.LENGTH_SHORT).show();
                 showArchivedPlayers = false;
             }
         }
@@ -561,8 +579,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         if (show) {
             sorting.setHeadlineSorting(rootView, R.id.player_name, this.getString(R.string.name), SortType.name);
             sorting.setHeadlineSorting(rootView, R.id.player_age, this.getString(R.string.age), SortType.age);
-            sorting.setHeadlineSorting(rootView, R.id.player_attributes, this.getString(R.string.attributes), SortType.attributes);
-            sorting.setHeadlineSorting(rootView, R.id.player_recent_performance, this.getString(R.string.plus_minus), SortType.suggestedGrade);
+            sorting.setHeadlineSorting(rootView, R.id.player_attributes, this.getString(R.string.attributes),
+                    SortType.attributes);
+            sorting.setHeadlineSorting(rootView, R.id.player_recent_performance, this.getString(R.string.plus_minus),
+                    SortType.suggestedGrade);
             sorting.setHeadlineSorting(rootView, R.id.player_grade, this.getString(R.string.grade), SortType.grade);
 
             rootView.findViewById(R.id.player_coming).setVisibility(View.GONE);
@@ -590,7 +610,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         refreshPlayers();
     }
 
-    //region player archive & deletion
+    // region player archive & deletion
     private void checkPlayerDeletion(final Player player) {
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(requireContext());
@@ -598,8 +618,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         if (showArchivedPlayers) {
             alertDialogBuilder.setTitle("Do you want to remove the player?")
                     .setCancelable(true)
-                    .setItems(new CharSequence[]
-                                    {"Unarchive", "Remove", "Cancel"},
+                    .setItems(new CharSequence[] { "Unarchive", "Remove", "Cancel" },
                             (dialog, which) -> {
                                 switch (which) {
                                     case 0: // Unarchive
@@ -617,8 +636,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         } else {
             alertDialogBuilder.setTitle("Do you want to archive the player?")
                     .setCancelable(true)
-                    .setItems(new CharSequence[]
-                                    {"Archive", "Cancel"},
+                    .setItems(new CharSequence[] { "Archive", "Cancel" },
                             (dialog, which) -> {
                                 switch (which) {
                                     case 0: // Archive
@@ -631,17 +649,17 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                             });
         }
 
-
         alertDialogBuilder.create().show();
     }
-    //endregion
+    // endregion
 
-    //region pasted players
+    // region pasted players
     private void pasteComingPlayers() {
         ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData primaryClip = clipboard.getPrimaryClip();
         if (primaryClip == null) {
-            Toast.makeText(getContext(), getString(R.string.toast_instruction_paste_whatsapp), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.toast_instruction_paste_whatsapp), Toast.LENGTH_LONG)
+                    .show();
             return;
         }
         ClipData.Item item = primaryClip.getItemAt(0);
@@ -665,12 +683,14 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 mAutoCreatedPlayers.clear();
                 displayPastedIdentifiers(pasted);
             } else {
-                Toast.makeText(getContext(), getString(R.string.toast_instruction_paste_multiple), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_paste_multiple), Toast.LENGTH_SHORT)
+                        .show();
             }
 
         } catch (Exception e) {
             Log.e("Coming", "Failed to process " + pasteData);
-            Toast.makeText(getContext(), getString(R.string.toast_error_paste_process_failed, pasteData), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.toast_error_paste_process_failed, pasteData),
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -700,7 +720,7 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                     // Player exists (archived or not), skip creation
                     continue;
                 }
-                
+
                 Player newPlayer = new Player(playerName, 80);
                 newPlayer.msgDisplayName = identifier;
                 if (DbHelper.insertPlayer(getContext(), newPlayer)) {
@@ -710,12 +730,12 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 }
             }
         }
-        
+
         // Show message for archived players that couldn't be auto-created
         if (!archivedPlayers.isEmpty()) {
-            String message = archivedPlayers.size() == 1 
-                ? "Player \"" + archivedPlayers.get(0) + "\" exists in archive. Unarchive to use."
-                : archivedPlayers.size() + " players exist in archive: " + TextUtils.join(", ", archivedPlayers);
+            String message = archivedPlayers.size() == 1
+                    ? "Player \"" + archivedPlayers.get(0) + "\" exists in archive. Unarchive to use."
+                    : archivedPlayers.size() + " players exist in archive: " + TextUtils.join(", ", archivedPlayers);
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         }
 
@@ -748,11 +768,13 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         setComingPlayersCount();
     }
 
-    private void setComingPlayerIdentity(String currPlayer, String identity, Set<String> comingSet, String[] playerNames) {
+    private void setComingPlayerIdentity(String currPlayer, String identity, Set<String> comingSet,
+            String[] playerNames) {
 
         if (TextUtils.isEmpty(identity)) {
             Log.i("Identifier", "Empty identifier");
-            Toast.makeText(getContext(), getString(R.string.toast_instruction_empty_identifier), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.toast_instruction_empty_identifier), Toast.LENGTH_LONG)
+                    .show();
             return;
         }
 
@@ -760,7 +782,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         builder.setTitle("Enter player name for : \n" + identity);
 
         final AutoCompleteTextView input = new AutoCompleteTextView(getContext());
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, playerNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line,
+                playerNames);
         input.setAdapter(adapter);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setThreshold(1);
@@ -770,7 +793,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         builder.setView(input);
 
         if (TextUtils.isEmpty(currPlayer)) {
-            builder.setNeutralButton("New Player", (dialogInterface, i) -> startActivity(PlayerDetailsActivity.getNewPlayerFromIdentifierIntent(getContext(), identity)));
+            builder.setNeutralButton("New Player", (dialogInterface, i) -> startActivity(
+                    PlayerDetailsActivity.getNewPlayerFromIdentifierIntent(getContext(), identity)));
         }
 
         builder.setPositiveButton("OK", (dialog, which) -> {
@@ -784,7 +808,8 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                 if (!TextUtils.isEmpty(currPlayer)) { // empty name, for current player == clearing
                     Log.i("Identifier", "Count 0 - Clearing " + currPlayer);
                     DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
-                    Toast.makeText(getContext(), getString(R.string.toast_instruction_identifier_cleared, currPlayer), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.toast_instruction_identifier_cleared, currPlayer),
+                            Toast.LENGTH_LONG).show();
                     displayPastedIdentifiers(comingSet);
                 } else { // empty name set
                     Log.i("Identifier", "No name set for identifier " + identity);
@@ -796,14 +821,16 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             int count = DbHelper.setPlayerIdentifier(getContext(), newPlayer, identity);
             if (count == 1) { // new player found and updated with the identifier
                 Log.i("Identifier", "Count + " + count + " remove identifier from " + currPlayer);
-                Toast.makeText(getContext(), getString(R.string.toast_instruction_identifier_set, newPlayer, identity), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_identifier_set, newPlayer, identity),
+                        Toast.LENGTH_SHORT).show();
                 if (currPlayer != null) { // clear previous name from the identifier
                     DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
                 }
                 displayPastedIdentifiers(comingSet);
             } else { // new player name not found
                 Log.i("Identifier", "Count 0 - " + newPlayer + " not found");
-                Toast.makeText(getContext(), getString(R.string.toast_instruction_player_not_found, newPlayer), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.toast_instruction_player_not_found, newPlayer),
+                        Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
@@ -814,17 +841,17 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         }
         dialog.show();
     }
-    //endregion
+    // endregion
 
-    //region import contacts
+    // region import contacts
     private void launchContactPicker() {
         // Check if there are players before import (for dialog decision)
         ArrayList<Player> existingPlayers = DbHelper.getPlayers(getContext(), 0, false);
         hadPlayersBeforeImport = existingPlayers != null && !existingPlayers.isEmpty();
 
         // Check if we have permission
-        if (requireContext().checkSelfPermission(android.Manifest.permission.READ_CONTACTS) 
-                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+        if (requireContext().checkSelfPermission(
+                android.Manifest.permission.READ_CONTACTS) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
             showContactSelectionDialog();
         } else {
             contactPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS);
@@ -878,10 +905,10 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         if (!importedPlayers.isEmpty()) {
             showImportResult(importedPlayers, skippedPlayers);
         } else if (!skippedPlayers.isEmpty()) {
-            Toast.makeText(getContext(), 
-                    skippedPlayers.size() == 1 
-                        ? "Player already exists: " + skippedPlayers.get(0)
-                        : skippedPlayers.size() + " players already exist",
+            Toast.makeText(getContext(),
+                    skippedPlayers.size() == 1
+                            ? "Player already exists: " + skippedPlayers.get(0)
+                            : skippedPlayers.size() + " players already exist",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -893,9 +920,9 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
         if (isFirstImport) {
             // Mark as shown
-            PreferenceHelper.setSharedPreferenceString(getContext(), 
+            PreferenceHelper.setSharedPreferenceString(getContext(),
                     PreferenceHelper.pref_first_contact_import_shown, "1");
-            
+
             // Show first-time snackbar
             Snackbar.make(rootView, R.string.import_contacts_first_time_hint, Snackbar.LENGTH_LONG).show();
         }
@@ -921,14 +948,14 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                     .show();
         } else if (!hadPlayersBeforeImport) {
             // First players - just show a toast
-            Toast.makeText(getContext(), 
-                    getString(R.string.import_contacts_success, importedPlayers.size()), 
+            Toast.makeText(getContext(),
+                    getString(R.string.import_contacts_success, importedPlayers.size()),
                     Toast.LENGTH_SHORT).show();
         }
     }
-    //endregion
+    // endregion
 
-    //region broadcasts
+    // region broadcasts
     class PlayerUpdateBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -939,5 +966,5 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             }
         }
     }
-    //endregion
+    // endregion
 }

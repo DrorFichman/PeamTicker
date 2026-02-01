@@ -14,23 +14,21 @@ import androidx.annotation.NonNull;
  */
 public class PlayerDbHelper {
 
-    private static final String SQL_CREATE_PLAYERS =
-            "CREATE TABLE " + PlayerContract.PlayerEntry.TABLE_NAME + " (" +
-                    PlayerContract.PlayerEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    PlayerContract.PlayerEntry.NAME + " TEXT, " +
-                    PlayerContract.PlayerEntry.GRADE + " INTEGER, " +
-                    PlayerContract.PlayerEntry.IS_COMING + " INTEGER, " +
-                    PlayerContract.PlayerEntry.BIRTH_YEAR + " INTEGER, " +
-                    PlayerContract.PlayerEntry.BIRTH_MONTH + " INTEGER, " +
-                    PlayerContract.PlayerEntry.BIRTH_DAY + " INTEGER, " +
-                    PlayerContract.PlayerEntry.ARCHIVED + " INTEGER DEFAULT 0, " +
-                    PlayerContract.PlayerEntry.ATTRIBUTES + " TEXT DEFAULT '', " +
-                    PlayerContract.PlayerEntry.MSG_IDENTIFIER + " TEXT DEFAULT '', " +
-                    PlayerContract.PlayerEntry.TEAM + " INTEGER " +
-                    " )";
+    private static final String SQL_CREATE_PLAYERS = "CREATE TABLE " + PlayerContract.PlayerEntry.TABLE_NAME + " (" +
+            PlayerContract.PlayerEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            PlayerContract.PlayerEntry.NAME + " TEXT, " +
+            PlayerContract.PlayerEntry.GRADE + " INTEGER, " +
+            PlayerContract.PlayerEntry.IS_COMING + " INTEGER, " +
+            PlayerContract.PlayerEntry.BIRTH_YEAR + " INTEGER, " +
+            PlayerContract.PlayerEntry.BIRTH_MONTH + " INTEGER, " +
+            PlayerContract.PlayerEntry.BIRTH_DAY + " INTEGER, " +
+            PlayerContract.PlayerEntry.ARCHIVED + " INTEGER DEFAULT 0, " +
+            PlayerContract.PlayerEntry.ATTRIBUTES + " TEXT DEFAULT '', " +
+            PlayerContract.PlayerEntry.MSG_IDENTIFIER + " TEXT DEFAULT '', " +
+            PlayerContract.PlayerEntry.TEAM + " INTEGER " +
+            " )";
 
-    public static final String SQL_DROP_PLAYER_TABLE =
-            "DELETE FROM " + PlayerContract.PlayerEntry.TABLE_NAME;
+    public static final String SQL_DROP_PLAYER_TABLE = "DELETE FROM " + PlayerContract.PlayerEntry.TABLE_NAME;
 
     public static String getSqlCreate() {
         return SQL_CREATE_PLAYERS;
@@ -44,16 +42,16 @@ public class PlayerDbHelper {
 
         String where = PlayerContract.PlayerEntry.IS_COMING + " = ? AND " +
                 PlayerContract.PlayerEntry.ARCHIVED + " = ? ";
-        String[] whereArgs = new String[]{"1", "0"}; // coming and not archived
+        String[] whereArgs = new String[] { "1", "0" }; // coming and not archived
 
         Cursor c = db.query(
-                PlayerContract.PlayerEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                whereArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
+                PlayerContract.PlayerEntry.TABLE_NAME, // The table to query
+                projection, // The columns to return
+                where, // The columns for the WHERE clause
+                whereArgs, // The values for the WHERE clause
+                null, // don't group the rows
+                null, // don't filter by row groups
+                null // The sort order
         );
 
         int count = c.getCount();
@@ -62,9 +60,7 @@ public class PlayerDbHelper {
         return count;
     }
 
-    public static
-    @NonNull
-    ArrayList<Player> getComingPlayers(SQLiteDatabase db) {
+    public static @NonNull ArrayList<Player> getComingPlayers(SQLiteDatabase db) {
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -86,16 +82,16 @@ public class PlayerDbHelper {
 
         String where = PlayerContract.PlayerEntry.IS_COMING + " = ? AND " +
                 PlayerContract.PlayerEntry.ARCHIVED + " = ? ";
-        String[] whereArgs = new String[]{"1", "0"}; // coming and not archived
+        String[] whereArgs = new String[] { "1", "0" }; // coming and not archived
 
         Cursor c = db.query(
-                PlayerContract.PlayerEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                whereArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
+                PlayerContract.PlayerEntry.TABLE_NAME, // The table to query
+                projection, // The columns to return
+                where, // The columns for the WHERE clause
+                whereArgs, // The values for the WHERE clause
+                null, // don't group the rows
+                null, // don't filter by row groups
+                sortOrder // The sort order
         );
 
         return getPlayers(c);
@@ -130,15 +126,15 @@ public class PlayerDbHelper {
 
     @NonNull
     public static Player createPlayerFromCursor(Cursor c,
-                                                String player_name,
-                                                String player_msg_identifier,
-                                                String year,
-                                                String month,
-                                                String day,
-                                                String player_grade,
-                                                String is_coming,
-                                                String archived,
-                                                String attributes) {
+            String player_name,
+            String player_msg_identifier,
+            String year,
+            String month,
+            String day,
+            String player_grade,
+            String is_coming,
+            String archived,
+            String attributes) {
 
         Player p = new Player(c.getString(c.getColumnIndex(player_name)), c.getInt(c.getColumnIndex(player_grade)));
         p.isComing = (is_coming != null) ? c.getInt(c.getColumnIndex(is_coming)) == 1 : true;
@@ -173,7 +169,8 @@ public class PlayerDbHelper {
     /**
      * Delete a player from the players table only.
      * IMPORTANT: This does NOT delete records from the player_game table.
-     * Historical game data is preserved so deleted players still appear in past games.
+     * Historical game data is preserved so deleted players still appear in past
+     * games.
      * This is intentional - modifying past game attendance is not allowed.
      */
     public static void deletePlayer(SQLiteDatabase db, String name) {
@@ -181,7 +178,7 @@ public class PlayerDbHelper {
 
         db.delete(PlayerContract.PlayerEntry.TABLE_NAME,
                 PlayerContract.PlayerEntry.NAME + " = ? ",
-                new String[]{name});
+                new String[] { name });
     }
 
     public static void setPlayerAttributes(SQLiteDatabase db, String name, String attributes) {
@@ -217,13 +214,13 @@ public class PlayerDbHelper {
         String sortOrder = PlayerContract.PlayerEntry.NAME + " ASC";
 
         Cursor c = db.query(
-                PlayerContract.PlayerEntry.TABLE_NAME,    // The table to query
-                projection,                               // The columns to return
-                null,                                    // where
-                null,                        // where values
-                null,                            // don't group the rows
-                null,                             // don't filter by row groups
-                sortOrder                                 // The sort order
+                PlayerContract.PlayerEntry.TABLE_NAME, // The table to query
+                projection, // The columns to return
+                null, // where
+                null, // where values
+                null, // don't group the rows
+                null, // don't filter by row groups
+                sortOrder // The sort order
         );
 
         return getPlayers(c);
@@ -247,16 +244,16 @@ public class PlayerDbHelper {
         // How you want the results sorted in the resulting Cursor
         String sortOrder = PlayerContract.PlayerEntry.GRADE + " DESC";
         String where = PlayerContract.PlayerEntry.ARCHIVED + " = ? ";
-        String[] selectionArgs = {showArchived ? "1" : "0"};
+        String[] selectionArgs = { showArchived ? "1" : "0" };
 
         Cursor c = db.query(
-                PlayerContract.PlayerEntry.TABLE_NAME,    // The table to query
-                projection,                               // The columns to return
-                where,                                    // where
-                selectionArgs,                        // where values
-                null,                            // don't group the rows
-                null,                             // don't filter by row groups
-                sortOrder                                 // The sort order
+                PlayerContract.PlayerEntry.TABLE_NAME, // The table to query
+                projection, // The columns to return
+                where, // where
+                selectionArgs, // where values
+                null, // don't group the rows
+                null, // don't filter by row groups
+                sortOrder // The sort order
         );
 
         return getPlayers(c);
@@ -281,7 +278,7 @@ public class PlayerDbHelper {
         String sortOrder = PlayerContract.PlayerEntry.GRADE + " DESC";
         String where = PlayerContract.PlayerEntry.ARCHIVED + " = 0 AND " +
                 PlayerContract.PlayerEntry.ATTRIBUTES + " LIKE ?";
-        String[] selectionArgs = {"%" + PlayerAttribute.isInjured.displayName + "%"};
+        String[] selectionArgs = { "%" + PlayerAttribute.isInjured.displayName + "%" };
 
         Cursor c = db.query(
                 PlayerContract.PlayerEntry.TABLE_NAME,
@@ -290,8 +287,7 @@ public class PlayerDbHelper {
                 selectionArgs,
                 null,
                 null,
-                sortOrder
-        );
+                sortOrder);
 
         return getPlayers(c);
     }
@@ -320,18 +316,19 @@ public class PlayerDbHelper {
         // How you want the results sorted in the resulting Cursor
         String sortOrder = PlayerContract.PlayerEntry.GRADE + " DESC";
         String where = PlayerContract.PlayerEntry.ARCHIVED + " = 0 AND (" +
-//                PlayerContract.PlayerEntry.NAME + " IN (" + String.join(",", queryName) + ") OR " +
+        // PlayerContract.PlayerEntry.NAME + " IN (" + String.join(",", queryName) + ")
+        // OR " +
                 PlayerContract.PlayerEntry.MSG_IDENTIFIER + " IN (" + String.join(",", queryName) + "))";
         String[] selectionArgs = null;
 
         Cursor c = db.query(
-                PlayerContract.PlayerEntry.TABLE_NAME,    // The table to query
-                projection,                               // The columns to return
-                where,                                    // where
-                selectionArgs,                        // where values
-                null,                            // don't group the rows
-                null,                             // don't filter by row groups
-                sortOrder                                 // The sort order
+                PlayerContract.PlayerEntry.TABLE_NAME, // The table to query
+                projection, // The columns to return
+                where, // where
+                selectionArgs, // where values
+                null, // don't group the rows
+                null, // don't filter by row groups
+                sortOrder // The sort order
         );
 
         return getPlayers(c);
@@ -343,7 +340,7 @@ public class PlayerDbHelper {
 
         String where = PlayerContract.PlayerEntry.NAME + " = ?  AND " +
                 PlayerContract.PlayerEntry.ARCHIVED + " = ? ";
-        String[] whereArgs = new String[]{name, "0"};
+        String[] whereArgs = new String[] { name, "0" };
 
         return (DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerEntry.TABLE_NAME));
     }
@@ -359,9 +356,12 @@ public class PlayerDbHelper {
         values.put(PlayerContract.PlayerEntry.NAME, p.mName);
         values.put(PlayerContract.PlayerEntry.GRADE, p.mGrade);
         values.put(PlayerContract.PlayerEntry.IS_COMING, p.isComing ? 1 : 0);
-        if (p.mBirthYear > 0) values.put(PlayerContract.PlayerEntry.BIRTH_YEAR, p.mBirthYear);
-        if (p.mBirthMonth > 0) values.put(PlayerContract.PlayerEntry.BIRTH_MONTH, p.mBirthMonth);
-        if (p.mBirthDay > 0) values.put(PlayerContract.PlayerEntry.BIRTH_DAY, p.mBirthDay);
+        if (p.mBirthYear > 0)
+            values.put(PlayerContract.PlayerEntry.BIRTH_YEAR, p.mBirthYear);
+        if (p.mBirthMonth > 0)
+            values.put(PlayerContract.PlayerEntry.BIRTH_MONTH, p.mBirthMonth);
+        if (p.mBirthDay > 0)
+            values.put(PlayerContract.PlayerEntry.BIRTH_DAY, p.mBirthDay);
         values.put(PlayerContract.PlayerEntry.ATTRIBUTES, p.getAttributes());
         values.put(PlayerContract.PlayerEntry.ARCHIVED, p.archived ? 1 : 0);
         values.put(PlayerContract.PlayerEntry.MSG_IDENTIFIER, p.msgDisplayName);
@@ -383,9 +383,12 @@ public class PlayerDbHelper {
 
     public static void updatePlayerBirth(SQLiteDatabase db, String name, int year, int month, int day) {
         ContentValues values = new ContentValues();
-        if (year > 0) values.put(PlayerContract.PlayerEntry.BIRTH_YEAR, year);
-        if (month > 0) values.put(PlayerContract.PlayerEntry.BIRTH_MONTH, month);
-        if (day > 0) values.put(PlayerContract.PlayerEntry.BIRTH_DAY, day);
+        if (year > 0)
+            values.put(PlayerContract.PlayerEntry.BIRTH_YEAR, year);
+        if (month > 0)
+            values.put(PlayerContract.PlayerEntry.BIRTH_MONTH, month);
+        if (day > 0)
+            values.put(PlayerContract.PlayerEntry.BIRTH_DAY, day);
 
         updatePlayer(db, name, values);
     }
@@ -403,7 +406,7 @@ public class PlayerDbHelper {
         updatePlayer(db, currentName, values);
 
         String where = PlayerContract.PlayerGameEntry.NAME + " = ? ";
-        String[] whereArgs = new String[]{currentName};
+        String[] whereArgs = new String[] { currentName };
         ContentValues values2 = new ContentValues();
         values2.put(PlayerContract.PlayerGameEntry.NAME, newName);
         DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerGameEntry.TABLE_NAME);
@@ -411,7 +414,7 @@ public class PlayerDbHelper {
 
     private static int updatePlayer(SQLiteDatabase db, String name, ContentValues values) {
         String where = PlayerContract.PlayerEntry.NAME + " = ? ";
-        String[] whereArgs = new String[]{name};
+        String[] whereArgs = new String[] { name };
 
         return (DbHelper.updateRecord(db, values, where, whereArgs, PlayerContract.PlayerEntry.TABLE_NAME));
     }
@@ -431,18 +434,17 @@ public class PlayerDbHelper {
         };
 
         String where = PlayerContract.PlayerEntry.NAME + " = ? ";
-        String[] whereArgs = new String[]{name};
+        String[] whereArgs = new String[] { name };
 
         Cursor c = db.query(
-                PlayerContract.PlayerEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                whereArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
+                PlayerContract.PlayerEntry.TABLE_NAME, // The table to query
+                projection, // The columns to return
+                where, // The columns for the WHERE clause
+                whereArgs, // The values for the WHERE clause
+                null, // don't group the rows
+                null, // don't filter by row groups
+                null // The sort order
         );
-
 
         try {
             if (c.moveToFirst()) {
@@ -469,14 +471,16 @@ public class PlayerDbHelper {
 
         ContentValues values = new ContentValues();
         values.put(PlayerContract.PlayerEntry.IS_COMING, 0);
+        values.putNull(PlayerContract.PlayerEntry.TEAM);
 
         DbHelper.updateRecord(db, values, null, null, PlayerContract.PlayerEntry.TABLE_NAME);
     }
 
-    //region Team assignment for current game
+    // region Team assignment for current game
 
     /**
      * Update a player's team assignment for the current game.
+     * 
      * @param team The team to assign, or null to clear the assignment
      */
     public static void updatePlayerTeam(SQLiteDatabase db, String name, TeamEnum team) {
@@ -508,7 +512,7 @@ public class PlayerDbHelper {
 
         String sortOrder = PlayerContract.PlayerEntry.GRADE + " DESC";
         String where = PlayerContract.PlayerEntry.TEAM + " = ?";
-        String[] whereArgs = new String[]{String.valueOf(team.ordinal())};
+        String[] whereArgs = new String[] { String.valueOf(team.ordinal()) };
 
         Cursor c = db.query(
                 PlayerContract.PlayerEntry.TABLE_NAME,
@@ -517,14 +521,14 @@ public class PlayerDbHelper {
                 whereArgs,
                 null,
                 null,
-                sortOrder
-        );
+                sortOrder);
 
         return getPlayers(c);
     }
 
     /**
-     * Check if any player has a team assignment (i.e., there's an active game setup).
+     * Check if any player has a team assignment (i.e., there's an active game
+     * setup).
      */
     public static boolean hasActiveGame(SQLiteDatabase db) {
         String query = "SELECT COUNT(*) FROM " + PlayerContract.PlayerEntry.TABLE_NAME +
@@ -547,5 +551,5 @@ public class PlayerDbHelper {
         DbHelper.updateRecord(db, values, null, null, PlayerContract.PlayerEntry.TABLE_NAME);
         Log.d("PlayerDbHelper", "Cleared all team assignments");
     }
-    //endregion
+    // endregion
 }

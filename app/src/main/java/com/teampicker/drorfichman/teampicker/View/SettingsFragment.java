@@ -30,6 +30,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setShowGrade();
         setColorScheme();
         setTeamsCount();
+        setAutoResetComingPlayers();
     }
 
     private void setTeamsCount() {
@@ -67,10 +68,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     private void setShowHints() {
         androidx.preference.SwitchPreferenceCompat showHints = findPreference(SettingsHelper.SETTING_SHOW_HINTS);
-        
+
         // Initialize switch based on old preference if new preference not yet set
-        android.content.SharedPreferences defaultPrefs = 
-                androidx.preference.PreferenceManager.getDefaultSharedPreferences(getContext());
+        android.content.SharedPreferences defaultPrefs = androidx.preference.PreferenceManager
+                .getDefaultSharedPreferences(getContext());
         if (!defaultPrefs.contains(SettingsHelper.SETTING_SHOW_HINTS)) {
             // Check old custom preference - if key exists, user had dismissed tutorials
             boolean oldSkipAll = com.teampicker.drorfichman.teampicker.tools.PreferenceHelper
@@ -79,7 +80,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             // Switch is "Show Hints" - set to false if user had previously dismissed
             showHints.setChecked(!oldSkipAll);
         }
-        
+
         showHints.setOnPreferenceChangeListener((preference, newValue) -> {
             Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.settings_changed_show_hints);
             return true;
@@ -88,8 +89,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     private void setDivisionGradePercentage() {
         EditTextPreference gradeWeight = findPreference(SettingsHelper.SETTING_DIVIDE_GRADE);
-        gradeWeight.setOnBindEditTextListener(editText ->
-        {
+        gradeWeight.setOnBindEditTextListener(editText -> {
             editText.setText(String.valueOf(SettingsHelper.getDivisionWeight(getContext()).gradeDisplay()));
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
             editText.setSingleLine();
@@ -105,8 +105,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     private void setDivisionAttemptsPreference() {
         EditTextPreference attemptsPref = findPreference(SettingsHelper.SETTING_DIVIDE_ATTEMPTS);
-        attemptsPref.setOnBindEditTextListener(editText ->
-        {
+        attemptsPref.setOnBindEditTextListener(editText -> {
             editText.setText(String.valueOf(SettingsHelper.getDivideAttemptsCount(getContext())));
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
             editText.setSingleLine();
@@ -116,6 +115,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             Event event = new Event(EventType.settings_changed_division_attempts);
             event.set(ParameterType.percentage, String.valueOf(newValue));
             event.log(FirebaseAnalytics.getInstance(getContext()));
+            return true;
+        });
+    }
+
+    private void setAutoResetComingPlayers() {
+        androidx.preference.SwitchPreferenceCompat autoReset = findPreference(SettingsHelper.SETTING_AUTO_RESET_COMING);
+        autoReset.setOnPreferenceChangeListener((preference, newValue) -> {
+            Event.logEvent(FirebaseAnalytics.getInstance(getActivity()), EventType.settings_changed_auto_reset_coming);
             return true;
         });
     }

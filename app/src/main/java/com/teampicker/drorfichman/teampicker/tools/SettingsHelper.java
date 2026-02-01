@@ -16,10 +16,12 @@ public class SettingsHelper {
     public static final String SETTING_SHOW_HINTS = "pref_skip_all_tutorial";
     public static final String SETTING_SHOW_GRADES = "show_grades";
     public static final String SETTING_TEAM_COUNT = "team_count";
+    public static final String SETTING_AUTO_RESET_COMING = "auto_reset_coming_players";
 
     private static int getPreferenceValue(Context ctx, String preferenceKey, int defaultValue) {
         try {
-            String value = PreferenceManager.getDefaultSharedPreferences(ctx).getString(preferenceKey, String.valueOf(defaultValue));
+            String value = PreferenceManager.getDefaultSharedPreferences(ctx).getString(preferenceKey,
+                    String.valueOf(defaultValue));
             return Integer.parseInt(value);
         } catch (Exception e) {
             Log.e(preferenceKey, "failed getting " + preferenceKey, e);
@@ -29,7 +31,8 @@ public class SettingsHelper {
 
     private static String getPreferenceValue(Context ctx, String preferenceKey, String defaultValue) {
         try {
-            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(preferenceKey, String.valueOf(defaultValue));
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(preferenceKey,
+                    String.valueOf(defaultValue));
         } catch (Exception e) {
             Log.e(preferenceKey, "failed getting " + preferenceKey, e);
         }
@@ -61,5 +64,9 @@ public class SettingsHelper {
 
     public static boolean getShowGrades(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_SHOW_GRADES, true);
+    }
+
+    public static boolean getAutoResetComingPlayers(Context ctx) {
+        return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(SETTING_AUTO_RESET_COMING, false);
     }
 }
