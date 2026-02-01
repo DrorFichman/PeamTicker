@@ -10,55 +10,79 @@
         android:id="@+id/stats_chip_games"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/tab_bar_with_top_border"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="4dp">
+        android:padding="8dp">
 
-        <com.google.android.material.chip.ChipGroup
+        <RadioGroup
             android:id="@+id/stats_chip_group_games"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:chipSpacing="6dp"
-            app:selectionRequired="true"
-            app:singleSelection="true">
+            android:layout_weight="3"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-            <com.google.android.material.chip.Chip
+            <RadioButton
                 android:id="@+id/stat_chip_10_games"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/charts_tab_pill_background"
+                android:button="@null"
+                android:gravity="center"
+                android:minHeight="@dimen/chart_pill_min_height"
+                android:padding="10dp"
                 android:text="@string/stats_10_games"
-                android:theme="@style/Theme.MaterialComponents.Light" />
+                android:textColor="@color/charts_tab_text_color"
+                android:textSize="13sp" />
 
-            <com.google.android.material.chip.Chip
+            <RadioButton
                 android:id="@+id/stat_chip_50_games"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/charts_tab_pill_background"
+                android:button="@null"
+                android:gravity="center"
+                android:minHeight="@dimen/chart_pill_min_height"
+                android:padding="10dp"
                 android:text="@string/stats_50_games"
-                android:theme="@style/Theme.MaterialComponents.Light" />
+                android:textColor="@color/charts_tab_text_color"
+                android:textSize="13sp" />
 
-            <com.google.android.material.chip.Chip
+            <RadioButton
                 android:id="@+id/stat_chip_all_games"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/charts_tab_pill_background"
+                android:button="@null"
                 android:checked="true"
+                android:gravity="center"
+                android:minHeight="@dimen/chart_pill_min_height"
+                android:padding="10dp"
                 android:text="@string/stats_all_games"
-                android:theme="@style/Theme.MaterialComponents.Light" />
+                android:textColor="@color/charts_tab_text_color"
+                android:textSize="13sp" />
 
-        </com.google.android.material.chip.ChipGroup>
+        </RadioGroup>
 
         <TextView
             android:id="@+id/stats_total_values"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginStart="8dp"
-            android:maxLines="2"
+            android:layout_weight="1"
             android:ellipsize="end"
-            android:textColor="#666666"
+            android:gravity="center"
+            android:maxLines="2"
+            android:textColor="@android:color/white"
             android:textSize="12sp" />
 
     </LinearLayout>

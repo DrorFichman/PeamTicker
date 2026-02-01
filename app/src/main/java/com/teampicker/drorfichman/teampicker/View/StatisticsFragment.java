@@ -21,7 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.chip.ChipGroup;
+import android.widget.RadioGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerStatisticsAdapter;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
@@ -62,7 +62,8 @@ public class StatisticsFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
         setHasOptionsMenu(true);
 
@@ -74,12 +75,12 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void setGamesCountSelection(View root) {
-        ((ChipGroup) root.findViewById(R.id.stats_chip_group_games)).setOnCheckedChangeListener(
-                (group, checkedChip) -> {
-                    if (checkedChip == R.id.stat_chip_10_games) {
+        ((RadioGroup) root.findViewById(R.id.stats_chip_group_games)).setOnCheckedChangeListener(
+                (group, checkedId) -> {
+                    if (checkedId == R.id.stat_chip_10_games) {
                         games = 10;
                         refreshPlayers(true);
-                    } else if (checkedChip == R.id.stat_chip_50_games) {
+                    } else if (checkedId == R.id.stat_chip_50_games) {
                         games = 50;
                         refreshPlayers(true);
                     } else {
@@ -93,9 +94,12 @@ public class StatisticsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         notificationHandler = new StatisticsFragment.StatisticsResultBroadcast();
-        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION, notificationHandler);
-        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION, notificationHandler);
-        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION, notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION,
+                notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION,
+                notificationHandler);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION,
+                notificationHandler);
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this, backPress);
         backPress.setEnabled(false);
@@ -118,7 +122,8 @@ public class StatisticsFragment extends Fragment {
         setHeadlines(root);
 
         playersList.setOnItemClickListener((adapterView, view, i, l) -> {
-            Intent intent = PlayerDetailsActivity.getEditPlayerIntent(getContext(), (String) view.getTag(R.id.player_id));
+            Intent intent = PlayerDetailsActivity.getEditPlayerIntent(getContext(),
+                    (String) view.getTag(R.id.player_id));
             startActivity(intent);
         });
 
@@ -168,17 +173,20 @@ public class StatisticsFragment extends Fragment {
         filterView = new FilterView(view, value -> {
             currentFilterValue = value;
             playersAdapter.setFilter(value);
-            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem(() ->
-                    Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));
+            playersList.smoothScrollToPosition(playersAdapter.positionOfFirstFilterItem(
+                    () -> Snackbar.make(requireContext(), playersList, "no results", Snackbar.LENGTH_SHORT).show()));
             backPress.setEnabled(handleBackPress());
         });
-        if (playersAdapter != null) playersAdapter.setFilter(null);
+        if (playersAdapter != null)
+            playersAdapter.setFilter(null);
     }
 
     private int getGamesCountFilter() {
         int gameCount = DbHelper.getGames(getContext()).size();
-        if (games > 0) return Math.min(games, gameCount);
-        else return gameCount;
+        if (games > 0)
+            return Math.min(games, gameCount);
+        else
+            return gameCount;
     }
 
     private void setHeadlines(View root) {
@@ -187,7 +195,8 @@ public class StatisticsFragment extends Fragment {
         sorting.setHeadlineSorting(titles, R.id.player_name, this.getString(R.string.name), SortType.name);
         sorting.setHeadlineSorting(titles, R.id.stat_success, this.getString(R.string.success), SortType.success);
         sorting.setHeadlineSorting(titles, R.id.stat_games_count, this.getString(R.string.games), SortType.games);
-        sorting.setHeadlineSorting(titles, R.id.stat_wins_percentage, this.getString(R.string.win_rate), SortType.winPercentage);
+        sorting.setHeadlineSorting(titles, R.id.stat_wins_percentage, this.getString(R.string.win_rate),
+                SortType.winPercentage);
 
         sorting.setSelected(root.findViewById(R.id.stat_success));
     }
@@ -226,7 +235,7 @@ public class StatisticsFragment extends Fragment {
         refreshPlayers(true);
     }
 
-    //region broadcasts
+    // region broadcasts
     class StatisticsResultBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -234,5 +243,5 @@ public class StatisticsFragment extends Fragment {
             refreshPlayers(true);
         }
     }
-    //endregion
+    // endregion
 }

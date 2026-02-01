@@ -43,7 +43,7 @@ import java.util.Locale;
  * Fragment displaying a line chart of moving average goal difference over time.
  * Lower values indicate more competitive/balanced games.
  */
-public class GoalDiffMedianChartFragment extends Fragment {
+public class GoalDiffTimeChartFragment extends Fragment {
 
     private static final int MIN_GAMES_FOR_DISPLAY = 10;
     private static final int WINDOW_SIZE_SMALL = 10;
@@ -61,12 +61,12 @@ public class GoalDiffMedianChartFragment extends Fragment {
     private SimpleDateFormat dateFormat;
     private GameUpdateBroadcast notificationHandler;
 
-    public GoalDiffMedianChartFragment() {
+    public GoalDiffTimeChartFragment() {
         super(R.layout.fragment_goal_diff_median_chart);
     }
 
-    public static GoalDiffMedianChartFragment newInstance() {
-        return new GoalDiffMedianChartFragment();
+    public static GoalDiffTimeChartFragment newInstance() {
+        return new GoalDiffTimeChartFragment();
     }
 
     @Override

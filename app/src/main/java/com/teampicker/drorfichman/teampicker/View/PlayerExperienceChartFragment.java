@@ -36,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +46,7 @@ import java.util.Map;
  * Fragment displaying a stacked area chart showing player experience distribution over time.
  * Three categories: New (<10 games), Returning (10-50 games), Regulars (>50 games).
  */
-public class PlayerSeniorityChartFragment extends Fragment {
+public class PlayerExperienceChartFragment extends Fragment {
 
     private static final int MIN_GAMES_FOR_DISPLAY = 60;
     private static final int WINDOW_SIZE = 25;
@@ -79,12 +78,12 @@ public class PlayerSeniorityChartFragment extends Fragment {
     private SimpleDateFormat dateFormat;
     private GameUpdateBroadcast notificationHandler;
 
-    public PlayerSeniorityChartFragment() {
+    public PlayerExperienceChartFragment() {
         super(R.layout.fragment_player_seniority_chart);
     }
 
-    public static PlayerSeniorityChartFragment newInstance() {
-        return new PlayerSeniorityChartFragment();
+    public static PlayerExperienceChartFragment newInstance() {
+        return new PlayerExperienceChartFragment();
     }
 
     @Override

@@ -99,11 +99,11 @@ public class StatsChartsContainerFragment extends Fragment {
         public Fragment createFragment(int position) {
             switch (position) {
                 case TAB_SENIORITY:
-                    return PlayerSeniorityChartFragment.newInstance();
+                    return PlayerExperienceChartFragment.newInstance();
                 case TAB_SUCCESS:
-                    return PlayerSuccessHeatmapFragment.newInstance();
+                    return PlayerSuccessChartFragment.newInstance();
                 default:
-                    return PlayerSeniorityChartFragment.newInstance();
+                    return PlayerExperienceChartFragment.newInstance();
             }
         }
 

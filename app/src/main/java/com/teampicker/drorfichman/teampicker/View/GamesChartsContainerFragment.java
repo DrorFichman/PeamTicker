@@ -101,7 +101,7 @@ public class GamesChartsContainerFragment extends Fragment {
                 case TAB_DISTRIBUTION:
                     return GoalDiffDistributionChartFragment.newInstance();
                 case TAB_TREND:
-                    return GoalDiffMedianChartFragment.newInstance();
+                    return GoalDiffTimeChartFragment.newInstance();
                 default:
                     return GoalDiffDistributionChartFragment.newInstance();
             }

@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
  * Fragment displaying a line chart of player success (wins - losses) over time
  * for top participating players, with a spinner to select number of players to display.
  */
-public class PlayerSuccessHeatmapFragment extends Fragment {
+public class PlayerSuccessChartFragment extends Fragment {
 
     private static final int MIN_GAMES_FOR_DISPLAY = 30;
     private static final int MIN_GAMES_FOR_PLAYER = 10; // Minimum games for player to show on chart
@@ -115,12 +115,12 @@ public class PlayerSuccessHeatmapFragment extends Fragment {
             Color.rgb(255, 213, 79),  // Amber Light
     };
 
-    public PlayerSuccessHeatmapFragment() {
+    public PlayerSuccessChartFragment() {
         super(R.layout.fragment_player_success_heatmap);
     }
 
-    public static PlayerSuccessHeatmapFragment newInstance() {
-        return new PlayerSuccessHeatmapFragment();
+    public static PlayerSuccessChartFragment newInstance() {
+        return new PlayerSuccessChartFragment();
     }
 
     @Override
