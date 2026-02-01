@@ -729,7 +729,6 @@ public class MakeTeamsActivity extends AppCompatActivity {
 
     private void enterSendMode() {
         exitMoveMode();
-        teamStatsLayout.setVisibility(View.INVISIBLE);
 
         if (mSetResult) {
             // Hide weather when sharing screenshot

@@ -13,18 +13,6 @@
     android:paddingEnd="6dp"
     android:paddingBottom="5dp">
 
-    <!-- Player Grade Badge -->
-    <TextView
-        android:id="@+id/player_team_grade"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:layout_marginEnd="4dp"
-        android:background="@drawable/circle_grade_neutral"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textSize="10sp"
-        android:textStyle="bold" />
-
     <!-- Result Indicators -->
     <LinearLayout
         android:id="@+id/res_indicators"
@@ -72,6 +60,18 @@
             android:layout_gravity="center_vertical"
             android:visibility="gone" />
     </LinearLayout>
+
+    <!-- Player Grade Badge -->
+    <TextView
+        android:id="@+id/player_team_grade"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/circle_grade_neutral"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        android:textStyle="bold" />
 
     <!-- Injured Indicator -->
     <ImageView

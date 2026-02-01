@@ -33,9 +33,9 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
     private final boolean isRecentGamesVisible;
 
     public PlayerTeamGameAdapter(Context ctx, List<Player> players,
-                                 List<Player> coloredPlayers, Collection<Player> markedPlayers,
-                                 Collection<Player> mvpPlayers,
-                                 boolean showInternalData, boolean showRecentGames) {
+            List<Player> coloredPlayers, Collection<Player> markedPlayers,
+            Collection<Player> mvpPlayers,
+            boolean showInternalData, boolean showRecentGames) {
         super(ctx, -1, players);
         context = ctx;
         mPlayers = players;
@@ -93,7 +93,8 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
     }
 
     private void setInjuredIndicator(View rowView, Player player) {
-        rowView.findViewById(R.id.player_injured).setVisibility(isAttributesVisible && player.isInjured ? View.VISIBLE : View.GONE);
+        rowView.findViewById(R.id.player_injured)
+                .setVisibility(isAttributesVisible && player.isInjured ? View.VISIBLE : View.GONE);
     }
 
     private void setGrade(Player player, TextView grade) {
@@ -101,7 +102,7 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
             grade.setText(String.valueOf(player.mGrade));
             grade.setVisibility(View.VISIBLE);
         } else {
-            grade.setVisibility(View.GONE);
+            grade.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -123,7 +124,7 @@ public class PlayerTeamGameAdapter extends ArrayAdapter<Player> {
             for (int r = 0; r < player.results.size() && r < starView.size(); ++r) {
                 ResultEnum res = player.results.get(r).result;
                 boolean isMVP = player.results.get(r).isMVP;
-                
+
                 if (res == ResultEnum.Win) {
                     starView.get(r).setImageResource(isMVP ? R.drawable.mvp_star : R.drawable.circle_win);
                 } else if (res == ResultEnum.Lose) {

@@ -30,7 +30,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:padding="8dp"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
                 <!-- Screenshot Area Container (includes teams + weather for sharing) -->
                 <LinearLayout
@@ -48,7 +50,8 @@
                         android:clipChildren="false"
                         android:clipToPadding="false"
                         android:minHeight="300dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:padding="4dp">
 
                         <!-- Team 1 Card (Blue) -->
                         <androidx.cardview.widget.CardView

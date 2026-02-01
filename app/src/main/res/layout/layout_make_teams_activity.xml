@@ -30,7 +30,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:padding="8dp"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
                 <include
                     android:id="@+id/score_display_container"
@@ -54,7 +56,8 @@
                         android:layout_height="wrap_content"
                         android:clipChildren="false"
                         android:clipToPadding="false"
-                        android:minHeight="300dp">
+                        android:minHeight="300dp"
+                        android:padding="5dp">
 
                         <!-- Team 1 Card -->
                         <androidx.cardview.widget.CardView
