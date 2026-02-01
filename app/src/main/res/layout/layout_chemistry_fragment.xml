@@ -14,7 +14,7 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:padding="8dp"
-        android:background="@color/colorPrimary">
+        android:background="@drawable/tab_bar_with_top_border">
 
         <RadioGroup
             android:id="@+id/participation_chip_group_games"
