@@ -12,43 +12,65 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
+        android:gravity="center"
+        android:padding="8dp"
+        android:background="@color/colorPrimary">
 
-        <com.google.android.material.chip.ChipGroup
+        <RadioGroup
             android:id="@+id/participation_chip_group_games"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:chipSpacing="10dp"
-            app:selectionRequired="true"
-            app:singleSelection="true">
+            android:orientation="horizontal"
+            android:gravity="center">
 
-            <com.google.android.material.chip.Chip
+            <RadioButton
                 android:id="@+id/participation_chip_10_games"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/chart_pill_min_height"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
                 android:text="@string/part_last_10_games"
-                android:theme="@style/Theme.MaterialComponents.Light" />
+                android:textSize="13sp"
+                android:textColor="@color/charts_tab_text_color"
+                android:background="@drawable/charts_tab_pill_background"
+                android:layout_marginEnd="4dp" />
 
-            <com.google.android.material.chip.Chip
+            <RadioButton
                 android:id="@+id/participation_chip_50_games"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:checked="true"
+                android:layout_weight="1"
+                android:minHeight="@dimen/chart_pill_min_height"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
                 android:text="@string/part_last_50_games"
-                android:theme="@style/Theme.MaterialComponents.Light" />
+                android:textSize="13sp"
+                android:textColor="@color/charts_tab_text_color"
+                android:background="@drawable/charts_tab_pill_background"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:checked="true" />
 
-            <com.google.android.material.chip.Chip
+            <RadioButton
                 android:id="@+id/participation_chip_all_games"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/chart_pill_min_height"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
                 android:text="@string/part_all_games"
-                android:theme="@style/Theme.MaterialComponents.Light" />
+                android:textSize="13sp"
+                android:textColor="@color/charts_tab_text_color"
+                android:background="@drawable/charts_tab_pill_background"
+                android:layout_marginStart="4dp" />
 
-        </com.google.android.material.chip.ChipGroup>
+        </RadioGroup>
     </LinearLayout>
 
     <include

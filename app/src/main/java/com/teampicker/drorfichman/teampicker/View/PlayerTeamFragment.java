@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -20,8 +21,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Adapter.PlayerChemistryAdapter;
@@ -111,12 +110,12 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
     }
 
     private void setGamesCountSelection(View root) {
-        ((ChipGroup) root.findViewById(R.id.participation_chip_group_games)).setOnCheckedChangeListener(
-                (group, checkedChip) -> {
-                    if (checkedChip == R.id.participation_chip_10_games) {
+        ((RadioGroup) root.findViewById(R.id.participation_chip_group_games)).setOnCheckedChangeListener(
+                (group, checkedId) -> {
+                    if (checkedId == R.id.participation_chip_10_games) {
                         games = 10;
                         refreshPlayers();
-                    } else if (checkedChip == R.id.participation_chip_50_games) {
+                    } else if (checkedId == R.id.participation_chip_50_games) {
                         games = 50;
                         refreshPlayers();
                     } else {

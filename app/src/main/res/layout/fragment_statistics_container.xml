@@ -10,13 +10,13 @@
         android:id="@+id/statistics_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        app:tabIndicatorColor="@color/colorPrimary"
-        app:tabSelectedTextColor="@color/colorPrimary"
-        app:tabTextColor="@android:color/darker_gray"
-        app:tabTextAppearance="@style/AppTabTextAppearance"
+        android:background="@color/colorPrimary"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/colorAccent"
         app:tabMode="fixed"
-        app:tabGravity="fill" />
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabTextAppearance="@style/AppTabTextAppearance"
+        app:tabTextColor="@color/tab_text_unselected" />
 
     <!-- ViewPager for tab content -->
     <androidx.viewpager2.widget.ViewPager2

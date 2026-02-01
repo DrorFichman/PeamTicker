@@ -76,4 +76,16 @@
         <item name="chipStrokeWidth">1dp</item>
         <item name="checkedIconVisible">false</item>
     </style>
+
+    <!-- Tab/charts chip style: blue bar alignment, pill look, selected = accent stroke -->
+    <style name="ChartsChipStyle" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipBackgroundColor">@color/charts_chip_background_color</item>
+        <item name="android:textColor">@color/charts_tab_text_color</item>
+        <item name="android:textSize">13sp</item>
+        <item name="chipStrokeColor">@color/charts_chip_stroke_color</item>
+        <item name="chipStrokeWidth">2dp</item>
+        <item name="chipCornerRadius">20dp</item>
+        <item name="chipMinHeight">@dimen/chart_pill_min_height</item>
+        <item name="checkedIconVisible">false</item>
+    </style>
 </resources>

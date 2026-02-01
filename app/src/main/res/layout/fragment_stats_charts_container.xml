@@ -12,20 +12,22 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:padding="8dp"
-        android:background="#F5F5F5">
+        android:background="@color/colorPrimary">
 
         <RadioButton
             android:id="@+id/tab_seniority"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:minHeight="@dimen/chart_pill_min_height"
             android:button="@null"
             android:gravity="center"
             android:padding="10dp"
             android:text="@string/stats_charts_tab_seniority"
             android:textSize="13sp"
-            android:textColor="@color/insights_tab_text_color"
-            android:background="@drawable/insights_tab_selector"
+            android:textColor="@color/charts_tab_text_color"
+            android:background="@drawable/charts_tab_pill_background"
+            android:layout_marginEnd="4dp"
             android:checked="true" />
 
         <RadioButton
@@ -33,13 +35,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:minHeight="@dimen/chart_pill_min_height"
             android:button="@null"
             android:gravity="center"
             android:padding="10dp"
             android:text="@string/stats_charts_tab_success"
             android:textSize="13sp"
-            android:textColor="@color/insights_tab_text_color"
-            android:background="@drawable/insights_tab_selector"
+            android:textColor="@color/charts_tab_text_color"
+            android:background="@drawable/charts_tab_pill_background"
             android:layout_marginStart="4dp" />
     </RadioGroup>
 

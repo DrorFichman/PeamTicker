@@ -21,4 +21,7 @@
 
     <color name="moved_highlight">#2ECC71</color>
 
+    <!-- Tab bar unselected text (on colorPrimary background) -->
+    <color name="tab_text_unselected">#9E9E9E</color>
+
 </resources>
