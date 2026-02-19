@@ -59,6 +59,9 @@
     <string name="empty_injured_icon">Aucun joueur blessé</string>
     <string name="empty_injured_title">Aucun joueur blessé</string>
     <string name="empty_injured_message">Bonne nouvelle ! Aucun de vos joueurs n\'est actuellement marqué comme blessé.\n\nVous pouvez marquer un joueur comme blessé depuis son écran de détails.</string>
+    <string name="empty_games_icon">Aucun match</string>
+    <string name="empty_games_title">Aucun Match Pour l\'Instant</string>
+    <string name="empty_games_message">Jouez un match et entrez les résultats pour commencer à suivre l\'historique de votre équipe.</string>
 
     <!--    Buttons-->
     <string name="save">Enregistrer</string>

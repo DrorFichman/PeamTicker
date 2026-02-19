@@ -59,6 +59,9 @@
     <string name="empty_injured_icon">Нет травмированных игроков</string>
     <string name="empty_injured_title">Нет Травмированных Игроков</string>
     <string name="empty_injured_message">Хорошие новости! Никто из ваших игроков в настоящее время не отмечен как травмированный.\n\nВы можете отметить игрока как травмированного на экране его деталей.</string>
+    <string name="empty_games_icon">Нет игр</string>
+    <string name="empty_games_title">Пока Нет Игр</string>
+    <string name="empty_games_message">Сыграйте матч и введите результаты, чтобы начать отслеживать историю вашей команды.</string>
 
     <!--    Buttons-->
     <string name="save">Сохранить</string>

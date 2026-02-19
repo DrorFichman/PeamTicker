@@ -59,6 +59,9 @@
     <string name="empty_injured_icon">Sin jugadores lesionados</string>
     <string name="empty_injured_title">Sin Jugadores Lesionados</string>
     <string name="empty_injured_message">¡Buenas noticias! Ninguno de tus jugadores está marcado actualmente como lesionado.\n\nPuedes marcar a un jugador como lesionado desde su pantalla de detalles.</string>
+    <string name="empty_games_icon">Sin partidos</string>
+    <string name="empty_games_title">Aún No Hay Partidos</string>
+    <string name="empty_games_message">Juega un partido e ingresa los resultados para empezar a rastrear el historial de tu equipo.</string>
 
     <!--    Buttons-->
     <string name="save">Guardar</string>

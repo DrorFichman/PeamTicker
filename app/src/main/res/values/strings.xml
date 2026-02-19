@@ -58,6 +58,9 @@
     <string name="empty_injured_icon">No injured players</string>
     <string name="empty_injured_title">No Injured Players</string>
     <string name="empty_injured_message">Great news! None of your players are currently marked as injured.\n\nYou can mark a player as injured from their player details screen.</string>
+    <string name="empty_games_icon">No games</string>
+    <string name="empty_games_title">No Games Yet</string>
+    <string name="empty_games_message">Play a game and enter the results to start tracking your team\'s history.</string>
 
     <!--    Buttons-->
     <string name="save">Save</string>

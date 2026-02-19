@@ -59,6 +59,9 @@
     <string name="empty_injured_icon">אין שחקנים פצועים</string>
     <string name="empty_injured_title">אין שחקנים פצועים</string>
     <string name="empty_injured_message">חדשות טובות! אף אחד מהשחקנים שלך לא מסומן כרגע כפצוע.\n\nתוכל לסמן שחקן כפצוע ממסך הפרטים של השחקן.</string>
+    <string name="empty_games_icon">אין משחקים</string>
+    <string name="empty_games_title">עדיין אין משחקים</string>
+    <string name="empty_games_message">שחק משחק והזן את התוצאות כדי להתחיל לעקוב אחר ההיסטוריה של הקבוצה שלך.</string>
 
     <!--    Buttons-->
     <string name="save">שמור</string>

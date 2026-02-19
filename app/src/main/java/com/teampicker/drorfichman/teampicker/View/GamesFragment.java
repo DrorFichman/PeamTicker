@@ -37,6 +37,8 @@ public class GamesFragment extends Fragment {
     private boolean mEditable;
 
     private ExpandableListView gamesList;
+    private View gamesContent;
+    private View emptyGamesStateContainer;
 
     private GameResultBroadcast notificationHandler;
     private final Sorting sorting = new Sorting(null, null);
@@ -78,6 +80,8 @@ public class GamesFragment extends Fragment {
         setHasOptionsMenu(isAllGamesView());
 
         gamesList = root.findViewById(R.id.games_list);
+        gamesContent = root.findViewById(R.id.games_content);
+        emptyGamesStateContainer = root.findViewById(R.id.empty_games_state_container);
         newGameButton = root.findViewById(R.id.games_list_make_teams);
 
         setHeadlines(root);
@@ -176,6 +180,10 @@ public class GamesFragment extends Fragment {
         GameExpandableAdapter gamesAdapter = new GameExpandableAdapter(activity, games,
                 mPlayerName, mPlayerCollaborator, mEditable, this::refreshGames, gamesList);
         gamesList.setAdapter(gamesAdapter);
+
+        boolean isEmpty = games.isEmpty();
+        gamesContent.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        emptyGamesStateContainer.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
     }
 
     //region broadcasts

@@ -59,6 +59,9 @@
     <string name="empty_injured_icon">कोई घायल खिलाड़ी नहीं</string>
     <string name="empty_injured_title">कोई घायल खिलाड़ी नहीं</string>
     <string name="empty_injured_message">अच्छी खबर! आपके किसी भी खिलाड़ी को वर्तमान में घायल के रूप में चिह्नित नहीं किया गया है।\n\nआप किसी खिलाड़ी को उनकी विवरण स्क्रीन से घायल के रूप में चिह्नित कर सकते हैं।</string>
+    <string name="empty_games_icon">कोई खेल नहीं</string>
+    <string name="empty_games_title">अभी तक कोई खेल नहीं</string>
+    <string name="empty_games_message">एक खेल खेलें और अपनी टीम का इतिहास ट्रैक करने के लिए परिणाम दर्ज करें।</string>
 
     <!--    Buttons-->
     <string name="save">सहेजें</string>

@@ -9,6 +9,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
+        android:id="@+id/games_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -23,6 +24,46 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingBottom="100dp" />
+
+    </LinearLayout>
+
+    <!-- Empty State View -->
+    <LinearLayout
+        android:id="@+id/empty_games_state_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:alpha="0.4"
+            android:contentDescription="@string/empty_games_icon"
+            android:src="@drawable/games" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="@string/empty_games_title"
+            android:textColor="#333333"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/empty_games_message"
+            android:textColor="#666666"
+            android:textSize="15sp" />
 
     </LinearLayout>
 
