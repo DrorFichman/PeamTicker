@@ -80,6 +80,7 @@
     <string name="shuffle_stats">לפי סטטיסטיקה</string>
     <string name="clear_all_coming">נקה נוכחות</string>
     <string name="action_send_statistics">שלח סטטיסטיקה</string>
+    <string name="action_send">שלח</string>
     <string name="action_analysis">ניתוח</string>
     <string name="action_share">שתף</string>
     <string name="action_enter_results">הזן תוצאות</string>
@@ -165,6 +166,19 @@
     <string name="setting_summary_show_grades">הצג דירוגי שחקנים</string>
     <string name="setting_title_auto_sync_games">סנכרון אוטומטי</string>
     <string name="setting_summary_auto_sync_games">סנכרן אוטומטית משחקים חדשים לענן</string>
+    <string name="setting_title_team_count">מספר קבוצות</string>
+    <string name="setting_summary_team_count">בחר 2 או 3 קבוצות</string>
+    <string name="setting_title_auto_reset_coming">נקה שחקנים משתתפים</string>
+    <string name="setting_summary_auto_reset_coming">נקה אוטומטית שחקנים משתתפים לאחר שמירת תוצאות משחק</string>
+
+    <!--    3-Team Feature-->
+    <string name="dialog_team_count_title">כמה קבוצות?</string>
+    <string name="dialog_team_count_message">בחר כיצד לחלק את השחקנים</string>
+    <string name="dialog_option_2_teams">2 קבוצות</string>
+    <string name="dialog_option_3_teams">3 קבוצות</string>
+    <string name="hint_drag_drop_3teams">לחץ לחיצה ארוכה כדי לגרור שחקנים בין קבוצות</string>
+    <string name="make_3teams_title">חלוקת קבוצות (3 קבוצות)</string>
+    <string name="team_3_public_stats">סטטיסטיקות קבוצה 3</string>
 
     <!--    Messages-->
     <string name="parentheses">(%1$d)</string>
@@ -288,8 +302,40 @@
     <!--    Statistics Tab Charts-->
     <string name="stats_tab_stats">סטטיסטיקה</string>
     <string name="stats_tab_charts">גרפים</string>
+    <string name="stats_tab_chemistry">כימיה</string>
     <string name="stats_charts_tab_seniority">ניסיון</string>
     <string name="stats_charts_tab_success">הצלחה</string>
+    <string name="stats_charts_tab_grade_vs_winrate">כיול</string>
+
+    <!-- Chemistry container sub-tabs -->
+    <string name="chemistry_tab_pairs">זוגות</string>
+    <string name="chemistry_tab_triplets">שלשות</string>
+    <string name="chemistry_tab_form">מצב</string>
+    <string name="chemistry_toggle_all">כל הזמן</string>
+    <string name="chemistry_toggle_recent">אחרונים</string>
+
+    <!-- Triplets -->
+    <string name="pairs_title">זוגות חזקים</string>
+    <string name="pairs_description">שילובי 2 שחקנים ממוינים לפי ניצחונות ביחד.\nהקש על שורה כדי לראות את משחקיהם.</string>
+    <string name="pairs_no_data">אין מספיק נתונים. שחק משחקים נוספים כדי שזוגות יופיעו ביחד לפחות %1$d פעמים.</string>
+    <string name="pairs_col_pair">זוג</string>
+    <string name="pairs_col_games">משחקים</string>
+    <string name="pairs_col_winrate">אחוז ניצחונות</string>
+    <string name="triplets_title">שלשות חזקות</string>
+    <string name="triplets_description">שילובי 3 שחקנים ממוינים לפי אחוז ניצחונות ביחד.\nהקש על שורה כדי לראות את משחקיהם.</string>
+    <string name="triplets_no_data">אין מספיק נתונים. שחק משחקים נוספים כדי ששלשות יופיעו ביחד לפחות %1$d פעמים.</string>
+
+    <!-- Form grid -->
+    <string name="form_grid_title">מצב אחרון</string>
+    <string name="form_grid_description">%1$d המשחקים האחרונים לכל שחקן.\nהקש על שורה כדי לראות פרטי שחקן.</string>
+    <string name="form_grid_no_data">אין עדיין נתוני משחק.</string>
+    <string name="form_section_recent">הופעות אחרונות</string>
+    <string name="form_section_others">אחרים</string>
+
+    <!-- Grade vs Win Rate -->
+    <string name="grade_winrate_title">אחוז ניצחונות מול ניסיון</string>
+    <string name="grade_winrate_description">כל נקודה היא שחקן. משחקים ששוחקו / אחוז ניצחונות.\nהקש על נקודה כדי לראות פרטים.</string>
+    <string name="grade_winrate_no_data">אין מספיק נתונים. שחק לפחות %1$d משחקים כדי לראות כיול.</string>
 
     <!--    Player Experience Distribution Chart-->
     <string name="stats_seniority_chart_title">התפלגות ניסיון שחקנים</string>

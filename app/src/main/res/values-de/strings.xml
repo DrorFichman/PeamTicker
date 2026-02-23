@@ -80,6 +80,7 @@
     <string name="shuffle_stats">Nach Statistiken</string>
     <string name="clear_all_coming">Anwesenheit löschen</string>
     <string name="action_send_statistics">Statistiken senden</string>
+    <string name="action_send">Senden</string>
     <string name="action_analysis">Analyse</string>
     <string name="action_share">Teilen</string>
     <string name="action_enter_results">Ergebnisse eingeben</string>
@@ -166,6 +167,19 @@
     <string name="setting_summary_show_grades">Spielerbewertungen anzeigen</string>
     <string name="setting_title_auto_sync_games">Automatische Synchronisierung</string>
     <string name="setting_summary_auto_sync_games">Neue Spiele automatisch mit Cloud synchronisieren</string>
+    <string name="setting_title_team_count">Anzahl der Teams</string>
+    <string name="setting_summary_team_count">Wählen Sie 2 oder 3 Teams</string>
+    <string name="setting_title_auto_reset_coming">Anwesende Spieler löschen</string>
+    <string name="setting_summary_auto_reset_coming">Anwesende Spieler nach Speichern der Ergebnisse automatisch löschen</string>
+
+    <!--    3-Team Feature-->
+    <string name="dialog_team_count_title">Wie viele Teams?</string>
+    <string name="dialog_team_count_message">Wählen Sie, wie Sie Ihre Spieler aufteilen</string>
+    <string name="dialog_option_2_teams">2 Teams</string>
+    <string name="dialog_option_3_teams">3 Teams</string>
+    <string name="hint_drag_drop_3teams">Lange drücken, um Spieler zwischen Teams zu ziehen</string>
+    <string name="make_3teams_title">Teamaufteilung (3 Teams)</string>
+    <string name="team_3_public_stats">Team 3 Statistiken</string>
 
     <!--    Messages-->
     <string name="parentheses">(%1$d)</string>
@@ -289,8 +303,40 @@
     <!--    Statistics Tab Charts-->
     <string name="stats_tab_stats">Statistiken</string>
     <string name="stats_tab_charts">Diagramme</string>
+    <string name="stats_tab_chemistry">Chemie</string>
     <string name="stats_charts_tab_seniority">Erfahrung</string>
     <string name="stats_charts_tab_success">Erfolg</string>
+    <string name="stats_charts_tab_grade_vs_winrate">Kalibrierung</string>
+
+    <!-- Chemistry container sub-tabs -->
+    <string name="chemistry_tab_pairs">Paare</string>
+    <string name="chemistry_tab_triplets">Trios</string>
+    <string name="chemistry_tab_form">Form</string>
+    <string name="chemistry_toggle_all">Gesamte Zeit</string>
+    <string name="chemistry_toggle_recent">Aktuell</string>
+
+    <!-- Triplets -->
+    <string name="pairs_title">Starke Paare</string>
+    <string name="pairs_description">2-Spieler-Kombinationen sortiert nach Siegen zusammen.\nTippen Sie auf eine Zeile, um ihre Spiele zu sehen.</string>
+    <string name="pairs_no_data">Nicht genügend Daten. Spielen Sie mehr Spiele, damit Paare mindestens %1$d Mal zusammen erscheinen.</string>
+    <string name="pairs_col_pair">Paar</string>
+    <string name="pairs_col_games">Spiele</string>
+    <string name="pairs_col_winrate">Sieg %</string>
+    <string name="triplets_title">Starke Trios</string>
+    <string name="triplets_description">3-Spieler-Kombinationen sortiert nach Siegrate zusammen.\nTippen Sie auf eine Zeile, um ihre Spiele zu sehen.</string>
+    <string name="triplets_no_data">Nicht genügend Daten. Spielen Sie mehr Spiele, damit Trios mindestens %1$d Mal zusammen erscheinen.</string>
+
+    <!-- Form grid -->
+    <string name="form_grid_title">Aktuelle Form</string>
+    <string name="form_grid_description">Letzte %1$d Spiele pro Spieler.\nTippen Sie auf eine Zeile für Spielerdetails.</string>
+    <string name="form_grid_no_data">Noch keine Spieldaten.</string>
+    <string name="form_section_recent">Aktuelle Auftritte</string>
+    <string name="form_section_others">Andere</string>
+
+    <!-- Grade vs Win Rate -->
+    <string name="grade_winrate_title">Siegrate vs. Erfahrung</string>
+    <string name="grade_winrate_description">Jeder Punkt ist ein Spieler. Gespielte Spiele / Siegrate.\nTippen Sie auf einen Punkt für Details.</string>
+    <string name="grade_winrate_no_data">Nicht genügend Daten. Spielen Sie mindestens %1$d Spiele für Kalibrierung.</string>
 
     <!--    Player Experience Distribution Chart-->
     <string name="stats_seniority_chart_title">Spielererfahrungsverteilung</string>

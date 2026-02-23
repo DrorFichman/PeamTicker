@@ -80,6 +80,7 @@
     <string name="shuffle_stats">По Статистике</string>
     <string name="clear_all_coming">Очистить Посещаемость</string>
     <string name="action_send_statistics">Отправить Статистику</string>
+    <string name="action_send">Отправить</string>
     <string name="action_analysis">Анализ</string>
     <string name="action_share">Поделиться</string>
     <string name="action_enter_results">Ввести Результаты</string>
@@ -166,6 +167,19 @@
     <string name="setting_summary_show_grades">Показывать рейтинги игроков</string>
     <string name="setting_title_auto_sync_games">Автосинхронизация</string>
     <string name="setting_summary_auto_sync_games">Автоматически синхронизировать новые игры с облаком</string>
+    <string name="setting_title_team_count">Количество команд</string>
+    <string name="setting_summary_team_count">Выберите 2 или 3 команды</string>
+    <string name="setting_title_auto_reset_coming">Очистить присутствующих игроков</string>
+    <string name="setting_summary_auto_reset_coming">Автоматически очищать присутствующих игроков после сохранения результатов</string>
+
+    <!--    3-Team Feature-->
+    <string name="dialog_team_count_title">Сколько команд?</string>
+    <string name="dialog_team_count_message">Выберите, как разделить игроков</string>
+    <string name="dialog_option_2_teams">2 команды</string>
+    <string name="dialog_option_3_teams">3 команды</string>
+    <string name="hint_drag_drop_3teams">Долгое нажатие для перетаскивания игроков между командами</string>
+    <string name="make_3teams_title">Разделение команд (3 команды)</string>
+    <string name="team_3_public_stats">Статистика команды 3</string>
 
     <!--    Messages-->
     <string name="parentheses">(%1$d)</string>
@@ -289,8 +303,40 @@
     <!--    Statistics Tab Charts-->
     <string name="stats_tab_stats">Статистика</string>
     <string name="stats_tab_charts">Графики</string>
+    <string name="stats_tab_chemistry">Химия</string>
     <string name="stats_charts_tab_seniority">Опыт</string>
     <string name="stats_charts_tab_success">Успех</string>
+    <string name="stats_charts_tab_grade_vs_winrate">Калибровка</string>
+
+    <!-- Chemistry container sub-tabs -->
+    <string name="chemistry_tab_pairs">Пары</string>
+    <string name="chemistry_tab_triplets">Тройки</string>
+    <string name="chemistry_tab_form">Форма</string>
+    <string name="chemistry_toggle_all">Всё время</string>
+    <string name="chemistry_toggle_recent">Недавние</string>
+
+    <!-- Triplets -->
+    <string name="pairs_title">Сильные пары</string>
+    <string name="pairs_description">Комбинации из 2 игроков, отсортированные по победам вместе.\nНажмите на строку, чтобы увидеть их игры.</string>
+    <string name="pairs_no_data">Недостаточно данных. Сыграйте больше игр, чтобы пары появлялись вместе минимум %1$d раз.</string>
+    <string name="pairs_col_pair">Пара</string>
+    <string name="pairs_col_games">Игры</string>
+    <string name="pairs_col_winrate">% побед</string>
+    <string name="triplets_title">Сильные тройки</string>
+    <string name="triplets_description">Комбинации из 3 игроков, отсортированные по проценту побед вместе.\nНажмите на строку, чтобы увидеть их игры.</string>
+    <string name="triplets_no_data">Недостаточно данных. Сыграйте больше игр, чтобы тройки появлялись вместе минимум %1$d раз.</string>
+
+    <!-- Form grid -->
+    <string name="form_grid_title">Недавняя форма</string>
+    <string name="form_grid_description">Последние %1$d игр на игрока.\nНажмите на строку, чтобы увидеть детали игрока.</string>
+    <string name="form_grid_no_data">Пока нет данных об играх.</string>
+    <string name="form_section_recent">Недавние появления</string>
+    <string name="form_section_others">Другие</string>
+
+    <!-- Grade vs Win Rate -->
+    <string name="grade_winrate_title">Процент побед vs. Опыт</string>
+    <string name="grade_winrate_description">Каждая точка — игрок. Игры сыграны / процент побед.\nНажмите на точку для деталей.</string>
+    <string name="grade_winrate_no_data">Недостаточно данных. Сыграйте минимум %1$d игр для калибровки.</string>
 
     <!--    Player Experience Distribution Chart-->
     <string name="stats_seniority_chart_title">Распределение Опыта Игроков</string>

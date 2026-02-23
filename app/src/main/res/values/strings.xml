@@ -194,7 +194,7 @@
     <string name="player_analysis_collaborator">"(W:%1$02d%% G:%2$02d) [S:%3$s]"</string>
     <string name="player_analysis_selected">"(W:%1$02d%% G:%2$02d) [%3$s]"</string>
     <string name="player_analysis_selected_win_rate">"%1$02d%%"</string>
-    <string name="player_analysis_selected_games">"%1$02d</string>
+    <string name="player_analysis_selected_games">"%1$02d"</string>
     <string name="operation_move">"Long press players row to start drag and drop"</string>
     <string name="operation_divide_by_collaboration">* AI in progress :)</string>
     <string name="optimizing_teams">Optimizing Teams…</string>
