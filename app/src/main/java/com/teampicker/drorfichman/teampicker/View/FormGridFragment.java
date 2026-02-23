@@ -1,5 +1,7 @@
 package com.teampicker.drorfichman.teampicker.View;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.Player;
@@ -46,12 +49,34 @@ public class FormGridFragment extends Fragment {
     private TextView emptyMessage;
     private TextView description;
 
+    private BroadcastReceiver dataUpdateReceiver;
+
     public FormGridFragment() {
         super(R.layout.fragment_form_grid);
     }
 
     public static FormGridFragment newInstance() {
         return new FormGridFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        dataUpdateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                loadData();
+            }
+        };
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION, dataUpdateReceiver);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION, dataUpdateReceiver);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION, dataUpdateReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalNotifications.unregisterBroadcastReceiver(getContext(), dataUpdateReceiver);
     }
 
     @Nullable

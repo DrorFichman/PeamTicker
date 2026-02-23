@@ -109,7 +109,7 @@ public class StatsChartsContainerFragment extends Fragment {
                 case TAB_SUCCESS:
                     return PlayerSuccessChartFragment.newInstance();
                 case TAB_GRADE_VS_WINRATE:
-                    return GradeVsWinRateChartFragment.newInstance();
+                    return WinRateCalibrationChartFragment.newInstance();
                 default:
                     return PlayerExperienceChartFragment.newInstance();
             }

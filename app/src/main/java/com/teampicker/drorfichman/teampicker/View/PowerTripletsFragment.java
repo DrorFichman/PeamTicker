@@ -1,5 +1,7 @@
 package com.teampicker.drorfichman.teampicker.View;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.Controller.TeamAnalyze.TripletHelper;
 import com.teampicker.drorfichman.teampicker.R;
 
@@ -37,12 +40,34 @@ public class PowerTripletsFragment extends Fragment {
 
     private int gameCount = -1;
 
+    private BroadcastReceiver dataUpdateReceiver;
+
     public PowerTripletsFragment() {
         super(R.layout.fragment_power_triplets);
     }
 
     public static PowerTripletsFragment newInstance() {
         return new PowerTripletsFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        dataUpdateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                loadData();
+            }
+        };
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.GAME_UPDATE_ACTION, dataUpdateReceiver);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PULL_DATA_ACTION, dataUpdateReceiver);
+        LocalNotifications.registerBroadcastReceiver(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION, dataUpdateReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalNotifications.unregisterBroadcastReceiver(getContext(), dataUpdateReceiver);
     }
 
     @Nullable
