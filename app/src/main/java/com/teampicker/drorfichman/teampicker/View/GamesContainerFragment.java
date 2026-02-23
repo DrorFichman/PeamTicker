@@ -80,11 +80,11 @@ public class GamesContainerFragment extends Fragment {
         public Fragment createFragment(int position) {
             switch (position) {
                 case TAB_HISTORY:
-                    return GamesFragment.newInstance(null, null, true, null);
+                    return GamesFragment.newInstance(java.util.Collections.emptyList(), true, null);
                 case TAB_CHARTS:
                     return GamesChartsContainerFragment.newInstance();
                 default:
-                    return GamesFragment.newInstance(null, null, true, null);
+                    return GamesFragment.newInstance(java.util.Collections.emptyList(), true, null);
             }
         }
 

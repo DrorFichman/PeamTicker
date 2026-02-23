@@ -301,9 +301,42 @@
 
     <!--    Statistics Tab Charts-->
     <string name="stats_tab_stats">Stats</string>
-    <string name="stats_tab_charts">Charts</string>
+    <string name="stats_tab_charts">Competitiveness</string>
+    <string name="stats_tab_chemistry">Chemistry</string>
     <string name="stats_charts_tab_seniority">Experience</string>
     <string name="stats_charts_tab_success">Success</string>
+    <string name="stats_charts_tab_grade_vs_winrate">Calibration</string>
+
+    <!-- Chemistry container sub-tabs -->
+    <string name="chemistry_tab_pairs">Couples</string>
+    <string name="chemistry_tab_triplets">Triplets</string>
+    <string name="chemistry_tab_form">Form</string>
+
+    <string name="chemistry_toggle_all">All time</string>
+    <string name="chemistry_toggle_recent">Recent</string>
+
+    <!-- Triplets -->
+    <string name="pairs_title">Power Couples</string>
+    <string name="pairs_description">2-player combinations sorted by wins together.\nTap a row to see their games.</string>
+    <string name="pairs_no_data">Not enough data yet. Play more games so pairs appear together at least %1$d times.</string>
+    <string name="pairs_col_pair">Pair</string>
+    <string name="pairs_col_games">Games</string>
+    <string name="pairs_col_winrate">Win %</string>
+    <string name="triplets_title">Power Triplets</string>
+    <string name="triplets_description">3-player combinations sorted by win rate together.\nTap a row to see their games.</string>
+    <string name="triplets_no_data">Not enough data yet. Play more games so triplets appear together at least %1$d times.</string>
+
+    <!-- Form grid -->
+    <string name="form_grid_title">Recent Form</string>
+    <string name="form_grid_description">Last %1$d games per player.\nTap a row to see player details.</string>
+    <string name="form_grid_no_data">No game data yet.</string>
+    <string name="form_section_recent">Recent appearances</string>
+    <string name="form_section_others">Others</string>
+
+    <!-- Grade vs Win Rate -->
+    <string name="grade_winrate_title">Win Rate vs. Experience</string>
+    <string name="grade_winrate_description">Each dot is a player. Games played / win rate.\nTap a dot to see details.</string>
+    <string name="grade_winrate_no_data">Not enough data. Play at least %1$d games to see calibration.</string>
 
     <!--    Player Experience Distribution Chart-->
     <string name="stats_seniority_chart_title">Player Experience Distribution</string>

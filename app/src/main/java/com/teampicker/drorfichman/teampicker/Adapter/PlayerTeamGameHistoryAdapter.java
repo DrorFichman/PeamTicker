@@ -20,15 +20,13 @@ import java.util.List;
 public class PlayerTeamGameHistoryAdapter extends ArrayAdapter<Player> {
     private Context context;
     private List<Player> mPlayers;
-    private String mSelectedPlayer;
-    private String mCollaborator;
+    private List<String> mHighlightedNames;
 
-    public PlayerTeamGameHistoryAdapter(Context ctx, List<Player> players, String selectedPlayer, String mPlayerCollaborator) {
+    public PlayerTeamGameHistoryAdapter(Context ctx, List<Player> players, List<String> highlightedNames) {
         super(ctx, -1, players);
         context = ctx;
         mPlayers = players;
-        mSelectedPlayer = selectedPlayer;
-        mCollaborator = mPlayerCollaborator;
+        mHighlightedNames = highlightedNames != null ? highlightedNames : new java.util.ArrayList<>();
     }
 
     @Override
@@ -68,9 +66,10 @@ public class PlayerTeamGameHistoryAdapter extends ArrayAdapter<Player> {
     private void setName(Player player, TextView name) {
         name.setText(player.mName + (ResultEnum.Missed.getValue() == player.gameResult ? " **" : ""));
 
-        if (mSelectedPlayer != null)
-            name.setAlpha(player.mName.equals(mSelectedPlayer) || player.mName.equals(mCollaborator) ? 1F : 0.4F);
-        else
+        if (!mHighlightedNames.isEmpty()) {
+            name.setAlpha(mHighlightedNames.contains(player.mName) ? 1F : 0.4F);
+        } else {
             name.setAlpha(1F);
+        }
     }
 }

@@ -41,6 +41,10 @@ public class Game implements Serializable {
     @Exclude
     public boolean playerIsInjured;
 
+    /** True when all filtered players were on the same (non-bench) team in this game. */
+    @Exclude
+    public boolean playersAllOnSameTeam;
+
     public Game(int gameId, String date, int score1, int score2) {
         this.gameId = gameId;
         this.dateString = date;

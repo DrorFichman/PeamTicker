@@ -193,7 +193,7 @@ public class PlayerDetailsActivity extends AppCompatActivity {
             if (position == 0) {
                 return PlayerDetailsFragment.newInstance(p, createFromIdentifier, updateListener);
             } else if (position == 1) {
-                return GamesFragment.newInstance(p.mName, null, false, null);
+                return GamesFragment.newInstance(java.util.Collections.singletonList(p.mName), false, null);
             } else if (position == 2) {
                 return PlayerTeamFragment.newInstance(p, null, null);
             } else {

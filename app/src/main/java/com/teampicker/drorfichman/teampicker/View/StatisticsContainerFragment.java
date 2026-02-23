@@ -21,9 +21,10 @@ import com.teampicker.drorfichman.teampicker.R;
  */
 public class StatisticsContainerFragment extends Fragment {
 
-    private static final int NUM_TABS = 2;
+    private static final int NUM_TABS = 3;
     private static final int TAB_STATS = 0;
-    private static final int TAB_CHARTS = 1;
+    private static final int TAB_CHEMISTRY = 1;
+    private static final int TAB_CHARTS = 2;
 
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
@@ -62,6 +63,9 @@ public class StatisticsContainerFragment extends Fragment {
                 case TAB_STATS:
                     tab.setText(R.string.stats_tab_stats);
                     break;
+                case TAB_CHEMISTRY:
+                    tab.setText(R.string.stats_tab_chemistry);
+                    break;
                 case TAB_CHARTS:
                     tab.setText(R.string.stats_tab_charts);
                     break;
@@ -81,6 +85,8 @@ public class StatisticsContainerFragment extends Fragment {
             switch (position) {
                 case TAB_STATS:
                     return StatisticsFragment.newInstance();
+                case TAB_CHEMISTRY:
+                    return ChemistryContainerFragment.newInstance();
                 case TAB_CHARTS:
                     return StatsChartsContainerFragment.newInstance();
                 default:

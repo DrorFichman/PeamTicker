@@ -4,9 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Chart selector tabs -->
     <RadioGroup
-        android:id="@+id/stats_charts_tab_group"
+        android:id="@+id/chemistry_tab_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -15,7 +14,7 @@
         android:background="@drawable/tab_bar_with_top_border">
 
         <RadioButton
-            android:id="@+id/tab_seniority"
+            android:id="@+id/tab_chemistry_pairs"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -23,7 +22,7 @@
             android:button="@null"
             android:gravity="center"
             android:padding="10dp"
-            android:text="@string/stats_charts_tab_seniority"
+            android:text="@string/chemistry_tab_pairs"
             android:textSize="13sp"
             android:textColor="@color/charts_tab_text_color"
             android:background="@drawable/charts_tab_pill_background_ripple"
@@ -31,7 +30,7 @@
             android:checked="true" />
 
         <RadioButton
-            android:id="@+id/tab_success"
+            android:id="@+id/tab_chemistry_triplets"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -39,7 +38,7 @@
             android:button="@null"
             android:gravity="center"
             android:padding="10dp"
-            android:text="@string/stats_charts_tab_success"
+            android:text="@string/chemistry_tab_triplets"
             android:textSize="13sp"
             android:textColor="@color/charts_tab_text_color"
             android:background="@drawable/charts_tab_pill_background_ripple"
@@ -47,7 +46,7 @@
             android:layout_marginEnd="4dp" />
 
         <RadioButton
-            android:id="@+id/tab_grade_vs_winrate"
+            android:id="@+id/tab_chemistry_form"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -55,19 +54,18 @@
             android:button="@null"
             android:gravity="center"
             android:padding="10dp"
-            android:text="@string/stats_charts_tab_grade_vs_winrate"
+            android:text="@string/chemistry_tab_form"
             android:textSize="13sp"
             android:textColor="@color/charts_tab_text_color"
             android:background="@drawable/charts_tab_pill_background_ripple"
             android:layout_marginStart="4dp" />
+
     </RadioGroup>
 
-    <!-- ViewPager2 for charts -->
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/stats_charts_view_pager"
+        android:id="@+id/chemistry_view_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
 </LinearLayout>
-

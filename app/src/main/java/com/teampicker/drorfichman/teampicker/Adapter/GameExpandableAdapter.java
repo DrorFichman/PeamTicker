@@ -37,8 +37,7 @@ import java.util.List;
 public class GameExpandableAdapter extends BaseExpandableListAdapter {
     private final Context context;
     private final List<Game> mGames;
-    private final String mPlayerName;
-    private final String mPlayerCollaborator;
+    private final List<String> mPlayers;
     private final GameModified mGameModifiedHandler;
     private final boolean mEditable;
     private final ListView mList;
@@ -47,14 +46,13 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         void onGameModified();
     }
 
-    public GameExpandableAdapter(Context ctx, List<Game> games, String playerName, String collaborator,
+    public GameExpandableAdapter(Context ctx, List<Game> games, List<String> players,
                                  boolean editable, GameModified handler, ListView list) {
         super();
 
         context = ctx;
         mGames = games;
-        mPlayerName = playerName;
-        mPlayerCollaborator = collaborator;
+        mPlayers = players != null ? new ArrayList<>(players) : new ArrayList<>();
         mGameModifiedHandler = handler;
         mEditable = editable;
         mList = list;
@@ -112,7 +110,6 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         TextView playerGrade = view.findViewById(R.id.game_player_grade);
         ImageView playerMVP = view.findViewById(R.id.game_player_mvp);
         ImageView playerInjured = view.findViewById(R.id.game_player_injured);
-
         dateView.setText(DateHelper.getDisplayDate(context, g.dateString));
         setResults(g, resultSet1, resultSet2, resultDivider);
         setPlayerCount(g, playerCountView);
@@ -196,7 +193,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     private void setPlayerMVP(ImageView playerMVP, Game g) {
-        if (mPlayerCollaborator == null && g.playerIsMVP) { // player view and was MVP
+        if (mPlayers.size() <= 1 && g.playerIsMVP) { // single-player view and was MVP
             playerMVP.setVisibility(View.VISIBLE);
         } else {
             playerMVP.setVisibility(View.INVISIBLE);
@@ -204,7 +201,7 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     private void setPlayerInjured(ImageView playerInjured, Game g) {
-        if (mPlayerCollaborator == null && g.playerIsInjured) { // player view and was injured
+        if (mPlayers.size() <= 1 && g.playerIsInjured) { // single-player view and was injured
             playerInjured.setVisibility(View.VISIBLE);
         } else {
             playerInjured.setVisibility(View.GONE);
@@ -240,8 +237,8 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
             mTeam2.add(new Player("", 0));
         }
 
-        team1List.setAdapter(new PlayerTeamGameHistoryAdapter(context, mTeam1, mPlayerName, mPlayerCollaborator));
-        team2List.setAdapter(new PlayerTeamGameHistoryAdapter(context, mTeam2, mPlayerName, mPlayerCollaborator));
+        team1List.setAdapter(new PlayerTeamGameHistoryAdapter(context, mTeam1, mPlayers));
+        team2List.setAdapter(new PlayerTeamGameHistoryAdapter(context, mTeam2, mPlayers));
     }
 
     private void setChildDefaultColors(ListView team1List, ListView team2List) {

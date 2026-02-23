@@ -487,22 +487,22 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @NonNull
     public static ArrayList<Game> getGames(Context context) {
-        return GameDbHelper.getGames(getSqLiteDatabase(context), -1);
+        return GameDbHelper.getGames(getSqLiteDatabase(context), Collections.emptyList(), -1);
     }
 
     @NonNull
     public static ArrayList<Game> getGames(Context context, int limit) {
-        return GameDbHelper.getGames(getSqLiteDatabase(context), limit);
+        return GameDbHelper.getGames(getSqLiteDatabase(context), Collections.emptyList(), limit);
     }
 
     @NonNull
-    public static ArrayList<Game> getGames(Context context, String name) {
-        return GameDbHelper.getGames(getSqLiteDatabase(context), name);
+    public static ArrayList<Game> getGames(Context context, List<String> players) {
+        return GameDbHelper.getGames(getSqLiteDatabase(context), players, -1);
     }
 
     @NonNull
-    public static ArrayList<Game> getGames(Context context, String name, String another) {
-        return GameDbHelper.getGames(getSqLiteDatabase(context), name, another);
+    public static ArrayList<Game> getGames(Context context, List<String> players, int limit) {
+        return GameDbHelper.getGames(getSqLiteDatabase(context), players, limit);
     }
 
     /**

@@ -38,6 +38,7 @@ import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallbacks {
@@ -213,7 +214,7 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
     private final AdapterView.OnItemClickListener onPlayerClick = (parent, view, position, id) -> {
         Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.player_collaboration_clicked);
         String selected = ((PlayerChemistry) parent.getItemAtPosition(position)).mName;
-        Intent gameActivityIntent = GamesActivity.getGameActivityIntent(getContext(), pPlayer.mName, selected, false);
+        Intent gameActivityIntent = GamesActivity.getGameActivityIntent(getContext(), Arrays.asList(pPlayer.mName, selected), false);
         startActivity(gameActivityIntent);
     };
 
@@ -237,7 +238,7 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
     }
 
     private void setGameCountValues() {
-        int totalGames = DbHelper.getGames(getContext(), pPlayer.mName).size();
+        int totalGames = DbHelper.getGames(getContext(), java.util.Collections.singletonList(pPlayer.mName)).size();
         chip50Games.setVisibility(totalGames > 50 ? View.VISIBLE : View.GONE);
     }
 

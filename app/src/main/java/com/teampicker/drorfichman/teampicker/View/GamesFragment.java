@@ -27,12 +27,13 @@ import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GamesFragment extends Fragment {
 
     private int gamesCount = 50;
-    private String mPlayerName;
-    private String mPlayerCollaborator;
+    private List<String> mPlayers = new ArrayList<>();
     private gamesCountHandler mCountHandler;
     private boolean mEditable;
 
@@ -52,32 +53,27 @@ public class GamesFragment extends Fragment {
         super(R.layout.layout_games_fragment);
     }
 
-    public static GamesFragment newInstance(String playerName, String collaborator, boolean editable, gamesCountHandler handler) {
+    public static GamesFragment newInstance(List<String> players, boolean editable, gamesCountHandler handler) {
         GamesFragment gamesFragment = new GamesFragment();
-        gamesFragment.mPlayerName = playerName;
-        gamesFragment.mPlayerCollaborator = collaborator;
+        gamesFragment.mPlayers = players != null ? new ArrayList<>(players) : new ArrayList<>();
         gamesFragment.mCountHandler = handler;
         gamesFragment.mEditable = editable;
         return gamesFragment;
     }
 
     private boolean isAllGamesView() {
-        return (mPlayerName == null && mPlayerCollaborator == null);
+        return mPlayers.isEmpty();
     }
 
-    private boolean isPlayerView() {
-        return (mPlayerName != null && mPlayerCollaborator == null);
-    }
-
-    private boolean isPlayerCollaboratorView() {
-        return (mPlayerName != null && mPlayerCollaborator != null);
+    private boolean isSinglePlayerView() {
+        return mPlayers.size() == 1;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
-        setHasOptionsMenu(isAllGamesView());
+        setHasOptionsMenu(isAllGamesView()); // options menu (game count filter) only shown in all-games view
 
         gamesList = root.findViewById(R.id.games_list);
         gamesContent = root.findViewById(R.id.games_content);
@@ -108,7 +104,7 @@ public class GamesFragment extends Fragment {
     private void updateNewGameButtonVisibility() {
         // Only show "new game" button when viewing all games AND there's an active game with team divisions
         boolean hasActiveGame = DbHelper.hasActiveGame(getContext());
-        newGameButton.setVisibility(isAllGamesView() && hasActiveGame ? View.VISIBLE : View.GONE);
+        newGameButton.setVisibility(isAllGamesView() && hasActiveGame ? View.VISIBLE : View.GONE); // new game only in all-games view
     }
 
     private void setHeadlines(View root) {
@@ -165,12 +161,14 @@ public class GamesFragment extends Fragment {
         if (activity == null) return;
 
         ArrayList<Game> games;
-        if (isPlayerCollaboratorView()) { // games in which both played
-            games = DbHelper.getGames(activity, mPlayerName, mPlayerCollaborator);
-        } else if (isPlayerView()) { // games in which selected player played
-            games = DbHelper.getGames(activity, mPlayerName);
-        } else { // all games
+        if (isAllGamesView()) {
             games = DbHelper.getGames(activity, gamesCount);
+        } else {
+            games = DbHelper.getGames(activity, mPlayers);
+            // When filtering by 2+ players, show only games where they were on the same team
+            if (mPlayers.size() >= 2) {
+                games.removeIf(g -> !g.playersAllOnSameTeam);
+            }
         }
 
         if (mCountHandler != null) {
@@ -178,7 +176,7 @@ public class GamesFragment extends Fragment {
         }
 
         GameExpandableAdapter gamesAdapter = new GameExpandableAdapter(activity, games,
-                mPlayerName, mPlayerCollaborator, mEditable, this::refreshGames, gamesList);
+                mPlayers, mEditable, this::refreshGames, gamesList);
         gamesList.setAdapter(gamesAdapter);
 
         boolean isEmpty = games.isEmpty();

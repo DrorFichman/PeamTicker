@@ -3,6 +3,7 @@ package com.teampicker.drorfichman.teampicker.View;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.teampicker.drorfichman.teampicker.R;
 
@@ -10,20 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GamesActivity extends AppCompatActivity {
-    private static final String EXTRA_PLAYER_FILTER = "EXTRA_PLAYER_FILTER";
-    private static final String EXTRA_PLAYER_COLLABORATOR = "EXTRA_PLAYER_COLLABORATOR";
+    private static final String EXTRA_PLAYER_FILTERS = "EXTRA_PLAYER_FILTERS";
     private static final String EXTRA_EDITABLE = "EXTRA_EDITABLE";
 
-    private String mPlayerName;
-    private String mPlayerCollaborator;
+    private ArrayList<String> mPlayers = new ArrayList<>();
     private boolean mEditable;
 
     @NonNull
-    public static Intent getGameActivityIntent(Context context, String playerName, String collaborator, boolean editable) {
+    public static Intent getGameActivityIntent(Context context, List<String> players, boolean editable) {
         Intent intent = new Intent(context, GamesActivity.class);
-        intent.putExtra(EXTRA_PLAYER_FILTER, playerName);
-        intent.putExtra(EXTRA_PLAYER_COLLABORATOR, collaborator);
+        intent.putStringArrayListExtra(EXTRA_PLAYER_FILTERS, new ArrayList<>(players));
         intent.putExtra(EXTRA_EDITABLE, editable);
         return intent;
     }
@@ -37,7 +38,7 @@ public class GamesActivity extends AppCompatActivity {
 
         GamesFragment gamesFragment = getFragment();
         if (gamesFragment == null) {
-            gamesFragment = GamesFragment.newInstance(mPlayerName, mPlayerCollaborator, mEditable, this::onGamesCount);
+            gamesFragment = GamesFragment.newInstance(mPlayers, mEditable, this::onGamesCount);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.games_container, gamesFragment);
             transaction.commit();
@@ -50,15 +51,13 @@ public class GamesActivity extends AppCompatActivity {
 
     private void getPlayerIntent() {
         Intent intent = getIntent();
-        mPlayerName = intent.getStringExtra(EXTRA_PLAYER_FILTER);
-        mPlayerCollaborator = intent.getStringExtra(EXTRA_PLAYER_COLLABORATOR);
+        ArrayList<String> players = intent.getStringArrayListExtra(EXTRA_PLAYER_FILTERS);
+        if (players != null) mPlayers = players;
         mEditable = intent.getBooleanExtra(EXTRA_EDITABLE, true);
 
-        String addTitle = "";
-        if (mPlayerName != null) addTitle = " : " + mPlayerName;
-        if (mPlayerName != null && mPlayerCollaborator != null)
-            addTitle += " + " + mPlayerCollaborator;
-        setTitle(getTitle() + addTitle);
+        if (!mPlayers.isEmpty()) {
+            setTitle(getTitle() + " : " + TextUtils.join(" + ", mPlayers));
+        }
     }
 
     public void onGamesCount(int count) {

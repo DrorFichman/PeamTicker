@@ -20,9 +20,10 @@ import com.teampicker.drorfichman.teampicker.R;
  */
 public class StatsChartsContainerFragment extends Fragment {
 
-    private static final int NUM_CHARTS = 2;
+    private static final int NUM_CHARTS = 3;
     private static final int TAB_SENIORITY = 0;
     private static final int TAB_SUCCESS = 1;
+    private static final int TAB_GRADE_VS_WINRATE = 2;
 
     private ViewPager2 viewPager;
     private RadioGroup tabGroup;
@@ -73,6 +74,8 @@ public class StatsChartsContainerFragment extends Fragment {
                 viewPager.setCurrentItem(TAB_SENIORITY, true);
             } else if (checkedId == R.id.tab_success) {
                 viewPager.setCurrentItem(TAB_SUCCESS, true);
+            } else if (checkedId == R.id.tab_grade_vs_winrate) {
+                viewPager.setCurrentItem(TAB_GRADE_VS_WINRATE, true);
             }
         });
     }
@@ -84,6 +87,9 @@ public class StatsChartsContainerFragment extends Fragment {
                 break;
             case TAB_SUCCESS:
                 tabGroup.check(R.id.tab_success);
+                break;
+            case TAB_GRADE_VS_WINRATE:
+                tabGroup.check(R.id.tab_grade_vs_winrate);
                 break;
         }
     }
@@ -102,6 +108,8 @@ public class StatsChartsContainerFragment extends Fragment {
                     return PlayerExperienceChartFragment.newInstance();
                 case TAB_SUCCESS:
                     return PlayerSuccessChartFragment.newInstance();
+                case TAB_GRADE_VS_WINRATE:
+                    return GradeVsWinRateChartFragment.newInstance();
                 default:
                     return PlayerExperienceChartFragment.newInstance();
             }
