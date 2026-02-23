@@ -19,6 +19,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 
@@ -43,6 +44,24 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         Event.logEvent(FirebaseAnalytics.getInstance(context), EventType.player_clicked);
         Intent intent = new Intent(context, PlayerDetailsActivity.class);
         intent.putExtra(PlayerDetailsActivity.EXTRA_PLAYER, playerName);
+        return intent;
+    }
+
+    /** Opens the player's Games tab (tab 1). */
+    @NonNull
+    public static Intent getPlayerGamesIntent(Context context, String playerName) {
+        Intent intent = new Intent(context, PlayerDetailsActivity.class);
+        intent.putExtra(PlayerDetailsActivity.EXTRA_PLAYER, playerName);
+        intent.putExtra(PlayerDetailsActivity.EXTRA_START_TAB, 1);
+        return intent;
+    }
+
+    /** Opens the player's Insights tab, landing on the Win Rate chart (sub-tab 0). */
+    @NonNull
+    public static Intent getPlayerWinRateIntent(Context context, String playerName) {
+        Intent intent = new Intent(context, PlayerDetailsActivity.class);
+        intent.putExtra(PlayerDetailsActivity.EXTRA_PLAYER, playerName);
+        intent.putExtra(PlayerDetailsActivity.EXTRA_START_TAB, TAB_INSIGHTS);
         return intent;
     }
 
@@ -104,12 +123,21 @@ public class PlayerDetailsActivity extends AppCompatActivity {
 
     private void refreshData(String name) {
         if (!TextUtils.isEmpty(name)) {
-            pPlayer = DbHelper.getPlayer(this, name);
-            setTitle(pPlayer.mName);
+            DbAsync.run(
+                    () -> DbHelper.getPlayer(this, name),
+                    player -> {
+                        if (isFinishing()) return;
+                        pPlayer = player;
+                        setTitle(pPlayer.mName);
+                        setupPager();
+                    });
         } else {
             setTitle("New Player");
+            setupPager();
         }
+    }
 
+    private void setupPager() {
         mAdapter = new PlayerViewAdapter(getSupportFragmentManager(), pPlayer, createFromIdentifier, highlightPlayer, this::finish);
         mPager = findViewById(R.id.player_pager);
         mPager.setAdapter(mAdapter);
@@ -122,7 +150,6 @@ public class PlayerDetailsActivity extends AppCompatActivity {
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
 
             @Override
@@ -139,7 +166,6 @@ public class PlayerDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
             }
         });
     }

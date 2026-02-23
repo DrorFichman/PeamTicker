@@ -33,12 +33,14 @@ import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 import com.teampicker.drorfichman.teampicker.R;
 import com.teampicker.drorfichman.teampicker.tools.ColorHelper;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallbacks {
@@ -218,36 +220,51 @@ public class PlayerTeamFragment extends Fragment implements Sorting.sortingCallb
         startActivity(gameActivityIntent);
     };
 
+    /** Bundles the three DB results needed by refreshPlayers into a single background fetch. */
+    private static class PlayerTeamData {
+        final HashMap<String, PlayerChemistry> chemistry;
+        final Player playerWithStats;
+        final int totalGames;
+
+        PlayerTeamData(HashMap<String, PlayerChemistry> chemistry, Player playerWithStats, int totalGames) {
+            this.chemistry = chemistry;
+            this.playerWithStats = playerWithStats;
+            this.totalGames = totalGames;
+        }
+    }
+
     private void refreshPlayers() {
         Context context = getContext();
         if (context == null || pPlayer == null) return;
 
-        HashMap<String, PlayerChemistry> result = DbHelper.getPlayersParticipationStatistics(context, pPlayer.mName,
-                new BuilderPlayerCollaborationStatistics().setGames(games));
-        players.clear();
-        players.addAll(result.values());
+        final String playerName = pPlayer.mName;
+        final int gamesFilter = games;
 
-        setTitle(context);
+        DbAsync.run(
+                () -> {
+                    HashMap<String, PlayerChemistry> chemistry = DbHelper.getPlayersParticipationStatistics(
+                            context, playerName, new BuilderPlayerCollaborationStatistics().setGames(gamesFilter));
+                    Player playerWithStats = DbHelper.getPlayer(context, playerName, gamesFilter);
+                    int totalGames = DbHelper.getGames(context, Collections.singletonList(playerName)).size();
+                    return new PlayerTeamData(chemistry, playerWithStats, totalGames);
+                },
+                data -> {
+                    if (!isAdded()) return;
+                    players.clear();
+                    players.addAll(data.chemistry.values());
 
-        sorting.sort(players);
+                    if (data.playerWithStats != null) {
+                        name.setText(getString(R.string.player_participation_statistics,
+                                data.playerWithStats.mName,
+                                data.playerWithStats.statistics.gamesCount,
+                                data.playerWithStats.statistics.getWinRate()));
+                    }
 
-        playersAdapter = new PlayerChemistryAdapter(context, players, blue, orange);
-        playersList.setAdapter(playersAdapter);
-
-        setGameCountValues();
-    }
-
-    private void setGameCountValues() {
-        int totalGames = DbHelper.getGames(getContext(), java.util.Collections.singletonList(pPlayer.mName)).size();
-        chip50Games.setVisibility(totalGames > 50 ? View.VISIBLE : View.GONE);
-    }
-
-    private void setTitle(Context context) {
-        Player player = DbHelper.getPlayer(context, pPlayer.mName, games);
-        name.setText(getString(R.string.player_participation_statistics,
-                player.mName,
-                player.statistics.gamesCount,
-                player.statistics.getWinRate()));
+                    sorting.sort(players);
+                    playersAdapter = new PlayerChemistryAdapter(context, players, blue, orange);
+                    playersList.setAdapter(playersAdapter);
+                    chip50Games.setVisibility(data.totalGames > 50 ? View.VISIBLE : View.GONE);
+                });
     }
 
     //region sort

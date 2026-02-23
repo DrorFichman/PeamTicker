@@ -23,6 +23,7 @@ import com.teampicker.drorfichman.teampicker.Data.PlayerGameStat;
 import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
 import com.teampicker.drorfichman.teampicker.Data.TeamEnum;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -74,59 +75,63 @@ public class FormGridFragment extends Fragment {
     }
 
     private void loadData() {
-        if (getContext() == null) return;
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
 
-        ArrayList<Player> players = DbHelper.getPlayers(getContext(), 0, false); // non-archived only
-        if (players == null || players.isEmpty()) {
-            showEmpty(getString(R.string.form_grid_no_data));
-            return;
-        }
+        DbAsync.run(
+                () -> buildFormItems(ctx),
+                items -> {
+                    if (!isAdded()) return;
+                    if (items == null) {
+                        showEmpty(getString(R.string.form_grid_no_data));
+                    } else {
+                        showList(items);
+                    }
+                });
+    }
+
+    /** Runs on background thread — pure data work, no UI access. */
+    private List<ListItem> buildFormItems(android.content.Context ctx) {
+        ArrayList<Player> players = DbHelper.getPlayers(ctx, 0, false); // non-archived only
+        if (players == null || players.isEmpty()) return null;
 
         // Determine which players appeared in the last RECENT_GAMES_WINDOW games
         Set<String> recentPlayerNames = new HashSet<>();
-        ArrayList<Game> recentGames = DbHelper.getGames(getContext(), RECENT_GAMES_WINDOW);
+        ArrayList<Game> recentGames = DbHelper.getGames(ctx, RECENT_GAMES_WINDOW);
         for (Game game : recentGames) {
-            for (Player p : DbHelper.getGameTeam(getContext(), game.gameId, TeamEnum.Team1, 0))
+            for (Player p : DbHelper.getGameTeam(ctx, game.gameId, TeamEnum.Team1, 0))
                 recentPlayerNames.add(p.mName);
-            for (Player p : DbHelper.getGameTeam(getContext(), game.gameId, TeamEnum.Team2, 0))
+            for (Player p : DbHelper.getGameTeam(ctx, game.gameId, TeamEnum.Team2, 0))
                 recentPlayerNames.add(p.mName);
         }
 
         List<FormRow> recentRows = new ArrayList<>();
         List<FormRow> otherRows = new ArrayList<>();
-
         for (Player p : players) {
-            ArrayList<PlayerGameStat> results = DbHelper.getPlayerLastGames(getContext(), p, FORM_GAMES_COUNT);
+            ArrayList<PlayerGameStat> results = DbHelper.getPlayerLastGames(ctx, p, FORM_GAMES_COUNT);
             if (results.isEmpty()) continue;
             FormRow row = new FormRow(p, results);
-            if (recentPlayerNames.contains(p.mName)) {
-                recentRows.add(row);
-            } else {
-                otherRows.add(row);
-            }
+            if (recentPlayerNames.contains(p.mName)) recentRows.add(row);
+            else otherRows.add(row);
         }
 
-        if (recentRows.isEmpty() && otherRows.isEmpty()) {
-            showEmpty(getString(R.string.form_grid_no_data));
-            return;
-        }
+        if (recentRows.isEmpty() && otherRows.isEmpty()) return null;
 
         // Sort each section by success (wins - losses) descending
         recentRows.sort((a, b) -> Integer.compare(b.success, a.success));
         otherRows.sort((a, b) -> Integer.compare(b.success, a.success));
 
-        // Build flat list with section headers
+        // Build flat list with section headers (ctx.getString is safe off main thread)
         List<ListItem> items = new ArrayList<>();
         if (!recentRows.isEmpty()) {
-            items.add(ListItem.header(getString(R.string.form_section_recent)));
+            items.add(ListItem.header(ctx.getString(R.string.form_section_recent)));
             for (FormRow r : recentRows) items.add(ListItem.row(r));
         }
         if (!otherRows.isEmpty()) {
-            items.add(ListItem.header(getString(R.string.form_section_others)));
+            items.add(ListItem.header(ctx.getString(R.string.form_section_others)));
             for (FormRow r : otherRows) items.add(ListItem.row(r));
         }
-
-        showList(items);
+        return items;
     }
 
     private void showEmpty(String message) {
@@ -242,7 +247,7 @@ public class FormGridFragment extends Fragment {
 
                 vh.itemView.setOnClickListener(v -> {
                     if (getContext() == null) return;
-                    Intent intent = PlayerDetailsActivity.getEditPlayerIntent(getContext(), row.player.mName);
+                    Intent intent = PlayerDetailsActivity.getPlayerGamesIntent(getContext(), row.player.mName);
                     startActivity(intent);
                 });
             }

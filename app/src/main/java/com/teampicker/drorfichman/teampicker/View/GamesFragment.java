@@ -25,6 +25,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,9 +103,15 @@ public class GamesFragment extends Fragment {
     }
 
     private void updateNewGameButtonVisibility() {
+        Context ctx = getContext();
+        if (ctx == null) return;
         // Only show "new game" button when viewing all games AND there's an active game with team divisions
-        boolean hasActiveGame = DbHelper.hasActiveGame(getContext());
-        newGameButton.setVisibility(isAllGamesView() && hasActiveGame ? View.VISIBLE : View.GONE); // new game only in all-games view
+        DbAsync.run(
+                () -> DbHelper.hasActiveGame(ctx),
+                hasActive -> {
+                    if (!isAdded()) return;
+                    newGameButton.setVisibility(isAllGamesView() && hasActive ? View.VISIBLE : View.GONE);
+                });
     }
 
     private void setHeadlines(View root) {
@@ -157,31 +164,35 @@ public class GamesFragment extends Fragment {
     }
 
     public void refreshGames() {
-        Context activity = getContext();
-        if (activity == null) return;
+        Context ctx = getContext();
+        if (ctx == null) return;
 
-        ArrayList<Game> games;
-        if (isAllGamesView()) {
-            games = DbHelper.getGames(activity, gamesCount);
-        } else {
-            games = DbHelper.getGames(activity, mPlayers);
-            // When filtering by 2+ players, show only games where they were on the same team
-            if (mPlayers.size() >= 2) {
-                games.removeIf(g -> !g.playersAllOnSameTeam);
-            }
-        }
+        DbAsync.run(
+                () -> {
+                    ArrayList<Game> games;
+                    if (isAllGamesView()) {
+                        games = DbHelper.getGames(ctx, gamesCount);
+                    } else {
+                        games = DbHelper.getGames(ctx, mPlayers);
+                        // When filtering by 2+ players, show only games where they were on the same team
+                        if (mPlayers.size() >= 2) {
+                            games.removeIf(g -> !g.playersAllOnSameTeam);
+                        }
+                    }
+                    return games;
+                },
+                games -> {
+                    if (!isAdded()) return;
+                    if (mCountHandler != null) mCountHandler.onGamesCount(games.size());
 
-        if (mCountHandler != null) {
-            mCountHandler.onGamesCount(games.size());
-        }
+                    GameExpandableAdapter gamesAdapter = new GameExpandableAdapter(ctx, games,
+                            mPlayers, mEditable, this::refreshGames, gamesList);
+                    gamesList.setAdapter(gamesAdapter);
 
-        GameExpandableAdapter gamesAdapter = new GameExpandableAdapter(activity, games,
-                mPlayers, mEditable, this::refreshGames, gamesList);
-        gamesList.setAdapter(gamesAdapter);
-
-        boolean isEmpty = games.isEmpty();
-        gamesContent.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-        emptyGamesStateContainer.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+                    boolean isEmpty = games.isEmpty();
+                    gamesContent.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+                    emptyGamesStateContainer.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+                });
     }
 
     //region broadcasts

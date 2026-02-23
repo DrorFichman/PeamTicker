@@ -32,6 +32,7 @@ import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -178,71 +179,66 @@ public class PlayerTeamCollaborationChartFragment extends Fragment {
         return root;
     }
 
+    private static class TeamCollabChartData {
+        final Player playerWithStats;
+        final HashMap<String, PlayerChemistry> collaborations;
+
+        TeamCollabChartData(Player playerWithStats, HashMap<String, PlayerChemistry> collaborations) {
+            this.playerWithStats = playerWithStats;
+            this.collaborations = collaborations;
+        }
+    }
+
     private void loadDataAndSetupChart() {
         if (player == null || getContext() == null) {
             showEmptyState("No player data available");
             return;
         }
+        android.content.Context ctx = getContext();
+        String playerName = player.mName;
+        int games = recentGames;
 
-        // Load player with statistics to get overall success rate (using recentGames)
-        Player playerWithStats = DbHelper.getPlayer(getContext(), player.mName, recentGames);
-        if (playerWithStats != null && playerWithStats.statistics != null) {
-            playerOverallSuccess = playerWithStats.statistics.successRate;
-        }
+        DbAsync.run(
+                () -> new TeamCollabChartData(
+                        DbHelper.getPlayer(ctx, playerName, games),
+                        DbHelper.getPlayersParticipationStatistics(ctx, playerName,
+                                new BuilderPlayerCollaborationStatistics().setGames(games))),
+                data -> {
+                    if (!isAdded()) return;
 
-        // Set title with number of games
-        chartTitle.setText(getString(R.string.team_collaboration_chart_title_with_games, player.mName, recentGames));
+                    if (data.playerWithStats != null && data.playerWithStats.statistics != null) {
+                        playerOverallSuccess = data.playerWithStats.statistics.successRate;
+                    }
 
-        // Get collaboration statistics for recent games (same as used for team division)
-        HashMap<String, PlayerChemistry> collaborations = DbHelper.getPlayersParticipationStatistics(
-                getContext(), player.mName,
-                new BuilderPlayerCollaborationStatistics().setGames(recentGames));
+                    chartTitle.setText(getString(R.string.team_collaboration_chart_title_with_games,
+                            player.mName, recentGames));
 
-        if (collaborations.isEmpty()) {
-            showEmptyState("No collaboration data available");
-            return;
-        }
+                    if (data.collaborations.isEmpty()) {
+                        showEmptyState("No collaboration data available");
+                        return;
+                    }
 
-        // Build entries list - only include players from current teams
-        allEntries = new ArrayList<>();
-        
-        for (PlayerChemistry pc : collaborations.values()) {
-            // Skip the player themselves
-            if (pc.mName.equals(player.mName)) {
-                continue;
-            }
-            
-            boolean isTeammate = playerTeamNames.contains(pc.mName);
-            boolean isOpponent = opposingTeamNames.contains(pc.mName);
-            
-            if (isTeammate) {
-                // For teammates: use "with" statistics
-                if (pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD) {
-                    allEntries.add(new TeamCollaborationEntry(
-                            pc.mName,
-                            pc.statisticsWith.gamesCount,
-                            pc.statisticsWith.successRate,
-                            true));
-                }
-            } else if (isOpponent) {
-                // For opponents: use "against" statistics
-                if (pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
-                    allEntries.add(new TeamCollaborationEntry(
-                            pc.mName,
-                            pc.statisticsVs.gamesCount,
-                            pc.statisticsVs.successRate,
-                            false));
-                }
-            }
-        }
+                    allEntries = new ArrayList<>();
+                    for (PlayerChemistry pc : data.collaborations.values()) {
+                        if (pc.mName.equals(player.mName)) continue;
+                        boolean isTeammate = playerTeamNames.contains(pc.mName);
+                        boolean isOpponent = opposingTeamNames.contains(pc.mName);
+                        if (isTeammate && pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD) {
+                            allEntries.add(new TeamCollaborationEntry(pc.mName,
+                                    pc.statisticsWith.gamesCount, pc.statisticsWith.successRate, true));
+                        } else if (isOpponent && pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
+                            allEntries.add(new TeamCollaborationEntry(pc.mName,
+                                    pc.statisticsVs.gamesCount, pc.statisticsVs.successRate, false));
+                        }
+                    }
 
-        if (allEntries.isEmpty()) {
-            showEmptyState(getString(R.string.team_collaboration_no_data, MIN_GAMES_THRESHOLD));
-            return;
-        }
-
-        setupChart();
-        updateChart();
+                    if (allEntries.isEmpty()) {
+                        showEmptyState(getString(R.string.team_collaboration_no_data, MIN_GAMES_THRESHOLD));
+                        return;
+                    }
+                    setupChart();
+                    updateChart();
+                });
     }
 
     private void showEmptyState(String message) {

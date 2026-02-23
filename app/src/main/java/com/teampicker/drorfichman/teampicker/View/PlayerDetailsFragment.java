@@ -25,6 +25,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotificat
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 
 import java.util.Calendar;
@@ -120,23 +121,74 @@ public class PlayerDetailsFragment extends Fragment {
         int newGrade = verifyGrade();
         if (newGrade < 0) return;
 
-        if (!setNameAndGrade(newName, newGrade)) return;
-
-        if (!setBirthday()) return;
-
-        setAttributes();
-
         hideKeyboard();
 
-        LocalNotifications.sendNotification(getContext(), LocalNotifications.PLAYER_UPDATE_ACTION);
+        // Capture birthday tag before going off-thread
+        String birthdayTag = vBirth.getTag() != null ? (String) vBirth.getTag() : null;
 
-        Toast.makeText(getContext(), getString(R.string.toast_success_player_saved), Toast.LENGTH_SHORT).show();
-        if (updateListener != null) {
-            updateListener.onUpdate(player.mName);
-        } else if (getActivity() != null) {
-            // Fallback for process death scenario - just close the activity
-            getActivity().finish();
-        }
+        // Capture attribute state
+        boolean gk = isGK.isChecked(), defender = isDefender.isChecked(),
+                playmaker = isPlaymaker.isChecked(), unbreakable = isUnbreakable.isChecked(),
+                extra = isExtra.isChecked(), injured = isInjured.isChecked();
+
+        android.content.Context ctx = getContext();
+        DbAsync.run(
+                () -> {
+                    // setNameAndGrade
+                    if (player != null) {
+                        if (!player.mName.equals(newName)) {
+                            if (!DbHelper.updatePlayerName(ctx, player, newName)) return false;
+                        }
+                        DbHelper.updatePlayerGrade(ctx, player.mName, newGrade);
+                    } else {
+                        Player p = new Player(newName, newGrade);
+                        if (!DbHelper.insertPlayer(ctx, p)) return false;
+                        player = p;
+                        if (createFromIdentifier != null) {
+                            DbHelper.setPlayerIdentifier(ctx, newName, createFromIdentifier);
+                        }
+                    }
+
+                    // setBirthday
+                    if (birthdayTag != null) {
+                        int newYear = Integer.parseInt(birthdayTag.split("/")[2]);
+                        int newMonth = Integer.parseInt(birthdayTag.split("/")[1]);
+                        int newDay = Integer.parseInt(birthdayTag.split("/")[0]);
+                        if (newYear < 1900 || newYear > java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)) {
+                            return false;
+                        }
+                        DbHelper.updatePlayerBirth(ctx, player.mName, newYear, newMonth, newDay);
+                    }
+
+                    // setAttributes
+                    player.isGK = gk; player.isDefender = defender; player.isPlaymaker = playmaker;
+                    player.isUnbreakable = unbreakable; player.isExtra = extra; player.isInjured = injured;
+                    DbHelper.updatePlayerAttributes(ctx, player);
+                    return true;
+                },
+                success -> {
+                    if (!isAdded()) return;
+                    if (!success) {
+                        if (birthdayTag != null) {
+                            int year = Integer.parseInt(birthdayTag.split("/")[2]);
+                            if (year < 1900 || year > java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)) {
+                                Toast.makeText(ctx, getString(R.string.toast_validation_year_range),
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                        Toast.makeText(ctx, getString(R.string.toast_validation_player_name_in_use),
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    LocalNotifications.sendNotification(ctx, LocalNotifications.PLAYER_UPDATE_ACTION);
+                    Toast.makeText(ctx, getString(R.string.toast_success_player_saved), Toast.LENGTH_SHORT).show();
+                    if (updateListener != null) {
+                        updateListener.onUpdate(player.mName);
+                    } else if (getActivity() != null) {
+                        getActivity().finish();
+                    }
+                });
     };
 
     private String verifyName() {
@@ -164,57 +216,6 @@ public class PlayerDetailsFragment extends Fragment {
         return newGrade;
     }
 
-    private boolean setNameAndGrade(String name, int grade) {
-        if (player != null) {
-            if (!player.mName.equals(name)) {
-                if (!DbHelper.updatePlayerName(getContext(), player, name)) {
-                    Toast.makeText(getContext(), getString(R.string.toast_validation_player_name_in_use), Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-            }
-            DbHelper.updatePlayerGrade(getContext(), player.mName, grade);
-        } else {
-            Player p = new Player(name, grade);
-            if (!DbHelper.insertPlayer(getContext(), p)) {
-                Toast.makeText(getContext(), getString(R.string.toast_validation_player_name_in_use), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            player = p;
-            if (createFromIdentifier != null) {
-                DbHelper.setPlayerIdentifier(getContext(), name, createFromIdentifier);
-            }
-        }
-
-        return true;
-    }
-
-    private boolean setBirthday() {
-        if (vBirth.getTag() != null) { // update birth
-            String date = (String) vBirth.getTag();
-            int newYear = Integer.parseInt(date.split("/")[2]);
-            int newMonth = Integer.parseInt(date.split("/")[1]);
-            int newDay = Integer.parseInt(date.split("/")[0]);
-
-            if (newYear < 1900 || newYear > Calendar.getInstance().get(Calendar.YEAR)) {
-                Toast.makeText(getContext(), getString(R.string.toast_validation_year_range), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-
-            Log.i("AGE", "Year " + newYear + " month " + newMonth);
-            DbHelper.updatePlayerBirth(getContext(), player.mName, newYear, newMonth, newDay);
-        }
-        return true;
-    }
-
-    private void setAttributes() {
-        player.isGK = isGK.isChecked();
-        player.isDefender = isDefender.isChecked();
-        player.isPlaymaker = isPlaymaker.isChecked();
-        player.isUnbreakable = isUnbreakable.isChecked();
-        player.isExtra = isExtra.isChecked();
-        player.isInjured = isInjured.isChecked();
-        DbHelper.updatePlayerAttributes(getContext(), player);
-    }
 
     //region init
     private void initPlayerAttributesView() {

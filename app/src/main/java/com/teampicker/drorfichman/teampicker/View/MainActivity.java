@@ -43,6 +43,7 @@ import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.analytics.UserProperty;
 import com.teampicker.drorfichman.teampicker.tools.analytics.UserPropertyType;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.SharedContactHandler;
 import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
@@ -89,17 +90,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setUserProperties() {
-        UserProperty.log(FirebaseAnalytics.getInstance(this),
-                UserPropertyType.games_count,
-                String.valueOf(DbHelper.getGames(this).size()));
-
-        UserProperty.log(FirebaseAnalytics.getInstance(this),
-                UserPropertyType.players_count,
-                String.valueOf(DbHelper.getPlayers(this).size()));
-
-        UserProperty.log(FirebaseAnalytics.getInstance(this),
-                UserPropertyType.tutorial_dismissed,
-                String.valueOf(TutorialManager.isSkipAllTutorials(this)));
+        boolean tutorialDismissed = TutorialManager.isSkipAllTutorials(this);
+        DbAsync.run(
+                () -> new int[]{DbHelper.getGames(this).size(), DbHelper.getPlayers(this).size()},
+                counts -> {
+                    if (isFinishing()) return;
+                    UserProperty.log(FirebaseAnalytics.getInstance(this),
+                            UserPropertyType.games_count, String.valueOf(counts[0]));
+                    UserProperty.log(FirebaseAnalytics.getInstance(this),
+                            UserPropertyType.players_count, String.valueOf(counts[1]));
+                    UserProperty.log(FirebaseAnalytics.getInstance(this),
+                            UserPropertyType.tutorial_dismissed, String.valueOf(tutorialDismissed));
+                });
     }
 
     private void setTabs() {
@@ -262,7 +264,7 @@ public class MainActivity extends AppCompatActivity
         TextView badgeCount = actionView.findViewById(R.id.sync_badge_count);
         ImageView syncedIcon = actionView.findViewById(R.id.sync_badge_synced);
 
-        // Only show sync status for logged in users
+        // Only show sync status for logged-in users
         if (AuthHelper.getUser() == null) {
             badgeCount.setVisibility(View.GONE);
             syncedIcon.setVisibility(View.GONE);
@@ -270,22 +272,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         int lastSyncedGameId = PreferenceHelper.getLastSyncedGameId(this);
-        int unsyncedCount = DbHelper.countUnsyncedGames(this, lastSyncedGameId);
-
-        if (unsyncedCount > 0) {
-            // Show unsynced count badge
-            badgeCount.setText(String.valueOf(unsyncedCount));
-            badgeCount.setVisibility(View.VISIBLE);
-            syncedIcon.setVisibility(View.GONE);
-        } else if (lastSyncedGameId > 0) {
-            // Show synced indicator (only if user has synced at least once)
-            badgeCount.setVisibility(View.GONE);
-            syncedIcon.setVisibility(View.VISIBLE);
-        } else {
-            // User hasn't synced yet, don't show anything
-            badgeCount.setVisibility(View.GONE);
-            syncedIcon.setVisibility(View.GONE);
-        }
+        DbAsync.run(
+                () -> DbHelper.countUnsyncedGames(this, lastSyncedGameId),
+                unsyncedCount -> {
+                    if (isFinishing()) return;
+                    if (unsyncedCount > 0) {
+                        badgeCount.setText(String.valueOf(unsyncedCount));
+                        badgeCount.setVisibility(View.VISIBLE);
+                        syncedIcon.setVisibility(View.GONE);
+                    } else if (lastSyncedGameId > 0) {
+                        badgeCount.setVisibility(View.GONE);
+                        syncedIcon.setVisibility(View.VISIBLE);
+                    } else {
+                        badgeCount.setVisibility(View.GONE);
+                        syncedIcon.setVisibility(View.GONE);
+                    }
+                });
     }
 
     @Override

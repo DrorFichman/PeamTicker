@@ -33,6 +33,7 @@ import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.PlayerChemistry;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,61 +161,61 @@ public class PlayerCollaborationChartFragment extends Fragment {
         startActivity(intent);
     }
 
+    private static class CollabChartData {
+        final Player playerWithStats;
+        final HashMap<String, PlayerChemistry> collaborations;
+
+        CollabChartData(Player playerWithStats, HashMap<String, PlayerChemistry> collaborations) {
+            this.playerWithStats = playerWithStats;
+            this.collaborations = collaborations;
+        }
+    }
+
     private void loadDataAndSetupChart() {
         if (player == null || getContext() == null) {
             showEmptyState();
             return;
         }
+        android.content.Context ctx = getContext();
+        String playerName = player.mName;
 
-        // Load player with statistics to get overall success rate
-        Player playerWithStats = DbHelper.getPlayer(getContext(), player.mName, -1);
-        if (playerWithStats != null && playerWithStats.statistics != null) {
-            playerOverallSuccess = playerWithStats.statistics.successRate;
-        }
+        DbAsync.run(
+                () -> new CollabChartData(
+                        DbHelper.getPlayer(ctx, playerName, -1),
+                        DbHelper.getPlayersParticipationStatistics(ctx, playerName,
+                                new BuilderPlayerCollaborationStatistics().setGames(-1))),
+                data -> {
+                    if (!isAdded()) return;
 
-        // Get collaboration statistics for all games
-        HashMap<String, PlayerChemistry> collaborations = DbHelper.getPlayersParticipationStatistics(
-                getContext(), player.mName,
-                new BuilderPlayerCollaborationStatistics().setGames(-1));
+                    if (data.playerWithStats != null && data.playerWithStats.statistics != null) {
+                        playerOverallSuccess = data.playerWithStats.statistics.successRate;
+                    }
 
-        if (collaborations.isEmpty()) {
-            showEmptyState();
-            return;
-        }
+                    if (data.collaborations.isEmpty()) {
+                        showEmptyState();
+                        return;
+                    }
 
-        // Build entries list - include both "with" and "against" stats
-        allEntries = new ArrayList<>();
-        
-        for (PlayerChemistry pc : collaborations.values()) {
-            // Add "with" entry if enough games
-            if (pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD) {
-                allEntries.add(new CollaborationEntry(
-                        pc.mName,
-                        pc.statisticsWith.gamesCount,
-                        pc.statisticsWith.successRate,
-                        true));
-            }
-            
-            // Add "against" entry if enough games
-            if (pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
-                allEntries.add(new CollaborationEntry(
-                        pc.mName,
-                        pc.statisticsVs.gamesCount,
-                        pc.statisticsVs.successRate,
-                        false));
-            }
-        }
+                    allEntries = new ArrayList<>();
+                    for (PlayerChemistry pc : data.collaborations.values()) {
+                        if (pc.statisticsWith.gamesCount >= MIN_GAMES_THRESHOLD) {
+                            allEntries.add(new CollaborationEntry(pc.mName,
+                                    pc.statisticsWith.gamesCount, pc.statisticsWith.successRate, true));
+                        }
+                        if (pc.statisticsVs.gamesCount >= MIN_GAMES_THRESHOLD) {
+                            allEntries.add(new CollaborationEntry(pc.mName,
+                                    pc.statisticsVs.gamesCount, pc.statisticsVs.successRate, false));
+                        }
+                    }
 
-        if (allEntries.isEmpty()) {
-            showEmptyState();
-            return;
-        }
-
-        setupChart();
-        updateChart();
-        
-        // Auto-highlight initial player if specified
-        highlightInitialPlayer();
+                    if (allEntries.isEmpty()) {
+                        showEmptyState();
+                        return;
+                    }
+                    setupChart();
+                    updateChart();
+                    highlightInitialPlayer();
+                });
     }
     
     private void highlightInitialPlayer() {

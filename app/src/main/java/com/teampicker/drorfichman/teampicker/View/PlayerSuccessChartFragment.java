@@ -39,6 +39,7 @@ import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.PlayerGame;
 import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -227,35 +228,38 @@ public class PlayerSuccessChartFragment extends Fragment {
     }
 
     private void loadDataAndSetupChart() {
-        if (getContext() == null) {
+        android.content.Context ctx = getContext();
+        if (ctx == null) {
             showEmptyState();
             return;
         }
 
-        games = DbHelper.getGames(getContext());
-        allPlayerGames = DbHelper.getPlayersGames(getContext());
+        DbAsync.run(
+                () -> new ArrayList[]{DbHelper.getGames(ctx), DbHelper.getPlayersGames(ctx)},
+                raw -> {
+                    if (!isAdded()) return;
+                    @SuppressWarnings("unchecked")
+                    ArrayList<Game> loadedGames = (ArrayList<Game>) raw[0];
+                    @SuppressWarnings("unchecked")
+                    ArrayList<PlayerGame> loadedPlayerGames = (ArrayList<PlayerGame>) raw[1];
 
-        if (games == null || games.size() < MIN_GAMES_FOR_DISPLAY) {
-            showEmptyState();
-            return;
-        }
-
-        // Games are sorted DESC (newest first), we need oldest first for chronological chart
-        Collections.reverse(games);
-
-        // Create date formatter for info panel
-        dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-
-        // Calculate player success data
-        calculatePlayerSuccessData();
-
-        if (topPlayerNames == null || topPlayerNames.isEmpty()) {
-            showEmptyState();
-            return;
-        }
-
-        setupChart();
-        updateChart();
+                    if (loadedGames == null || loadedGames.size() < MIN_GAMES_FOR_DISPLAY) {
+                        showEmptyState();
+                        return;
+                    }
+                    games = loadedGames;
+                    allPlayerGames = loadedPlayerGames;
+                    // Games are sorted DESC (newest first); need oldest first for chronological chart
+                    Collections.reverse(games);
+                    dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+                    calculatePlayerSuccessData();
+                    if (topPlayerNames == null || topPlayerNames.isEmpty()) {
+                        showEmptyState();
+                        return;
+                    }
+                    setupChart();
+                    updateChart();
+                });
     }
 
     private void showEmptyState() {

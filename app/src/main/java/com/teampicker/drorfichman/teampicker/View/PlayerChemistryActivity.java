@@ -7,13 +7,13 @@ import android.os.Bundle;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 public class PlayerChemistryActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYER = "EXTRA_PLAYER";
@@ -72,37 +72,41 @@ public class PlayerChemistryActivity extends AppCompatActivity {
         setContentView(R.layout.layout_chemistry_activity);
 
         Intent intent = getIntent();
-        if (intent.hasExtra(EXTRA_PLAYER)) {
-            pPlayer = DbHelper.getPlayer(this, intent.getStringExtra(EXTRA_PLAYER));
-            orange = (ArrayList<Player>) intent.getSerializableExtra(EXTRA_ORANGE_PLAYERS);
-            blue = (ArrayList<Player>) intent.getSerializableExtra(EXTRA_BLUE_PLAYERS);
-            showChart = intent.getBooleanExtra(EXTRA_SHOW_CHART, false);
-            recentGames = intent.getIntExtra(EXTRA_RECENT_GAMES, 50);
-        }
-
-        // Handle case where player couldn't be loaded (e.g., after process death with invalid data)
-        if (pPlayer == null) {
+        if (!intent.hasExtra(EXTRA_PLAYER)) {
             finish();
             return;
         }
 
-        Fragment existingFragment = getSupportFragmentManager().findFragmentById(R.id.collaboration_container);
+        String playerName = intent.getStringExtra(EXTRA_PLAYER);
+        orange = (ArrayList<Player>) intent.getSerializableExtra(EXTRA_ORANGE_PLAYERS);
+        blue = (ArrayList<Player>) intent.getSerializableExtra(EXTRA_BLUE_PLAYERS);
+        showChart = intent.getBooleanExtra(EXTRA_SHOW_CHART, false);
+        recentGames = intent.getIntExtra(EXTRA_RECENT_GAMES, 50);
 
-        if (existingFragment == null) {
-            Fragment fragment;
-            if (showChart) {
-                // Show team collaboration chart
-                // blue contains the player's team, orange contains the opposing team
-                fragment = PlayerTeamCollaborationChartFragment.newInstance(
-                        DbHelper.getPlayer(this, pPlayer.mName), blue, orange, recentGames);
-            } else {
-                // Show chemistry list fragment
-                fragment = PlayerTeamFragment.newInstance(
-                        DbHelper.getPlayer(this, pPlayer.mName), blue, orange);
-            }
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.collaboration_container, fragment);
-            transaction.commit();
-        }
+        DbAsync.run(
+                () -> DbHelper.getPlayer(this, playerName),
+                player -> {
+                    if (isFinishing()) return;
+                    pPlayer = player;
+                    if (pPlayer == null) {
+                        finish();
+                        return;
+                    }
+
+                    Fragment existingFragment = getSupportFragmentManager()
+                            .findFragmentById(R.id.collaboration_container);
+                    if (existingFragment != null) return;
+
+                    Fragment fragment;
+                    if (showChart) {
+                        fragment = PlayerTeamCollaborationChartFragment.newInstance(
+                                pPlayer, blue, orange, recentGames);
+                    } else {
+                        fragment = PlayerTeamFragment.newInstance(pPlayer, blue, orange);
+                    }
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.collaboration_container, fragment)
+                            .commit();
+                });
     }
 }

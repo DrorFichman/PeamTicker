@@ -31,6 +31,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 
 import java.util.ArrayList;
@@ -130,28 +131,49 @@ public class StatisticsFragment extends Fragment {
         playersList.setOnItemLongClickListener((adapterView, view, i, l) -> false);
     }
 
-    public void refreshPlayers(boolean showInternalData) {
-        players = DbHelper.getPlayersStatistics(getContext(), games);
+    /** Bundles player stats and game count into a single background fetch. */
+    private static class StatisticsData {
+        final ArrayList<Player> players;
+        final int totalGames;
+        final int gamesCountFilter;
 
-        sorting.sort(players);
-
-        playersAdapter = new PlayerStatisticsAdapter(getContext(), players, getGamesCountFilter(), showInternalData);
-        playersList.setAdapter(playersAdapter);
-
-        // Re-apply filter if active
-        if (currentFilterValue != null && !currentFilterValue.isEmpty()) {
-            playersAdapter.setFilter(currentFilterValue);
+        StatisticsData(ArrayList<Player> players, int totalGames, int gamesCountFilter) {
+            this.players = players;
+            this.totalGames = totalGames;
+            this.gamesCountFilter = gamesCountFilter;
         }
-
-        setGameCountValues();
     }
 
-    private void setGameCountValues() {
-        int gamesCount = getGamesCountFilter();
-        int totalGames = DbHelper.getGames(getContext()).size();
-        gameCountSelection.setVisibility(totalGames > 10 ? View.VISIBLE : View.GONE);
-        chip50Games.setVisibility(totalGames >= 50 ? View.VISIBLE : View.GONE);
-        statsTotals.setText(getString(R.string.stats_with_count, players.size(), gamesCount));
+    public void refreshPlayers(boolean showInternalData) {
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+
+        final int gamesFilter = games;
+
+        DbAsync.run(
+                () -> {
+                    ArrayList<Player> fetchedPlayers = DbHelper.getPlayersStatistics(ctx, gamesFilter);
+                    int totalGames = DbHelper.getGames(ctx).size();
+                    int gamesCountFilter = gamesFilter > 0 ? Math.min(gamesFilter, totalGames) : totalGames;
+                    return new StatisticsData(fetchedPlayers, totalGames, gamesCountFilter);
+                },
+                data -> {
+                    if (!isAdded()) return;
+                    players = data.players;
+                    sorting.sort(players);
+
+                    playersAdapter = new PlayerStatisticsAdapter(ctx, players, data.gamesCountFilter, showInternalData);
+                    playersList.setAdapter(playersAdapter);
+
+                    // Re-apply filter if active
+                    if (currentFilterValue != null && !currentFilterValue.isEmpty()) {
+                        playersAdapter.setFilter(currentFilterValue);
+                    }
+
+                    gameCountSelection.setVisibility(data.totalGames > 10 ? View.VISIBLE : View.GONE);
+                    chip50Games.setVisibility(data.totalGames >= 50 ? View.VISIBLE : View.GONE);
+                    statsTotals.setText(getString(R.string.stats_with_count, players.size(), data.gamesCountFilter));
+                });
     }
 
     private boolean handleBackPress() {
@@ -179,14 +201,6 @@ public class StatisticsFragment extends Fragment {
         });
         if (playersAdapter != null)
             playersAdapter.setFilter(null);
-    }
-
-    private int getGamesCountFilter() {
-        int gameCount = DbHelper.getGames(getContext()).size();
-        if (games > 0)
-            return Math.min(games, gameCount);
-        else
-            return gameCount;
     }
 
     private void setHeadlines(View root) {

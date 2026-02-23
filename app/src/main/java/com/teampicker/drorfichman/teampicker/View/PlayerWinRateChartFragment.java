@@ -30,6 +30,7 @@ import com.teampicker.drorfichman.teampicker.Data.PlayerGameStat;
 import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
 import com.teampicker.drorfichman.teampicker.Data.StreakInfo;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -100,35 +101,77 @@ public class PlayerWinRateChartFragment extends Fragment {
         selectedDate = root.findViewById(R.id.insights_selected_date);
         selectedValue = root.findViewById(R.id.insights_selected_value);
 
-        loadDataAndSetupChart();
-        updateLongestUnbeatenRun();
-        updateOverallWinRateCard();
+        loadAllData();
 
         return root;
     }
 
-    private void loadDataAndSetupChart() {
+    /** Bundles all three DB calls into a single background fetch to avoid blocking the main thread. */
+    private static class ChartData {
+        final ArrayList<PlayerGameStat> gameHistory;
+        final StreakInfo streakInfo;
+        final Player playerWithStats;
+
+        ChartData(ArrayList<PlayerGameStat> gameHistory, StreakInfo streakInfo, Player playerWithStats) {
+            this.gameHistory = gameHistory;
+            this.streakInfo = streakInfo;
+            this.playerWithStats = playerWithStats;
+        }
+    }
+
+    private void loadAllData() {
         if (player == null || getContext() == null) {
             showEmptyState();
             return;
         }
 
-        // Fetch all game history for the player (up to 1000 games)
-        gameHistory = DbHelper.getPlayerLastGames(getContext(), player, 1000);
-        
-        if (gameHistory == null || gameHistory.size() < MIN_GAMES_FOR_DISPLAY) {
+        android.content.Context ctx = getContext();
+        final String playerName = player.mName;
+
+        DbAsync.run(
+                () -> {
+                    ArrayList<PlayerGameStat> history = DbHelper.getPlayerLastGames(ctx, player, 1000);
+                    StreakInfo streak = DbHelper.getLongestUnbeatenRun(ctx, playerName);
+                    Player playerWithStats = DbHelper.getPlayer(ctx, playerName, -1);
+                    return new ChartData(history, streak, playerWithStats);
+                },
+                data -> {
+                    if (!isAdded()) return;
+                    applyChartData(data);
+                });
+    }
+
+    private void applyChartData(ChartData data) {
+        // --- Game history / chart ---
+        if (data.gameHistory == null || data.gameHistory.size() < MIN_GAMES_FOR_DISPLAY) {
             showEmptyState();
-            return;
+        } else {
+            gameHistory = data.gameHistory;
+            // Games are sorted DESC (newest first); need oldest first for chronological chart
+            Collections.reverse(gameHistory);
+            dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+            setupChart();
+            updateChart();
         }
 
-        // Games are sorted DESC (newest first), we need oldest first for chronological chart
-        Collections.reverse(gameHistory);
-        
-        // Create date formatter for info panel
-        dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-        
-        setupChart();
-        updateChart();
+        // --- Longest unbeaten run card ---
+        currentStreak = data.streakInfo;
+        if (currentStreak != null && currentStreak.length > 0) {
+            unbeatenRunValue.setText(String.format("%d games (%d days)", currentStreak.length, currentStreak.days));
+            unbeatenRunCard.setVisibility(View.VISIBLE);
+            unbeatenRunCard.setOnClickListener(v -> toggleStreakHighlight());
+        } else {
+            unbeatenRunCard.setVisibility(View.GONE);
+        }
+
+        // --- Overall win rate card ---
+        Player p = data.playerWithStats;
+        if (p != null && p.statistics != null && p.statistics.gamesCount > 0) {
+            overallWinRateValue.setText(getString(R.string.win_rate_value, p.statistics.getWinRate()));
+            overallWinRateCard.setVisibility(View.VISIBLE);
+        } else {
+            overallWinRateCard.setVisibility(View.GONE);
+        }
     }
 
     private void showEmptyState() {
@@ -368,34 +411,6 @@ public class PlayerWinRateChartFragment extends Fragment {
         return dataSet;
     }
 
-    private void updateLongestUnbeatenRun() {
-        if (player != null && getContext() != null) {
-            currentStreak = DbHelper.getLongestUnbeatenRun(getContext(), player.mName);
-            if (currentStreak.length > 0) {
-                unbeatenRunValue.setText(String.format("%d games (%d days)", currentStreak.length, currentStreak.days));
-                unbeatenRunCard.setVisibility(View.VISIBLE);
-                
-                // Add click listener to highlight the streak period on the chart
-                unbeatenRunCard.setOnClickListener(v -> toggleStreakHighlight());
-            } else {
-                unbeatenRunCard.setVisibility(View.GONE);
-            }
-        }
-    }
-
-    private void updateOverallWinRateCard() {
-        if (player != null && getContext() != null) {
-            Player playerWithStats = DbHelper.getPlayer(getContext(), player.mName, -1);
-            if (playerWithStats != null && playerWithStats.statistics != null && playerWithStats.statistics.gamesCount > 0) {
-                overallWinRateValue.setText(getString(R.string.win_rate_value,
-                        playerWithStats.statistics.getWinRate()));
-                overallWinRateCard.setVisibility(View.VISIBLE);
-            } else {
-                overallWinRateCard.setVisibility(View.GONE);
-            }
-        }
-    }
-    
     private void toggleStreakHighlight() {
         if (gameHistory == null || gameHistory.isEmpty() || currentStreak == null || currentStreak.length == 0) {
             return;

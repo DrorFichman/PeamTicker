@@ -31,6 +31,7 @@ import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.Data.TeamData;
 import com.teampicker.drorfichman.teampicker.Data.WeatherData;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.ScreenshotHelper;
 import com.teampicker.drorfichman.teampicker.tools.WeatherService;
@@ -172,25 +173,22 @@ public class Make3TeamsActivity extends AppCompatActivity {
         }
     }
 
-    private ArrayList<Player> getPlayers() {
-        return DbHelper.getComingPlayers(this, RECENT_GAMES);
-    }
-
     //region initial teams
     private void initialTeams() {
         divideComingPlayers(selectedDivision);
     }
 
     protected void divideComingPlayers(TeamDivision3Teams.DivisionStrategy3Teams selectedDivision) {
-        ArrayList<Player> comingPlayers = getPlayers();
-        
-        int totalPlayers = comingPlayers.size();
-        Log.d("teams", "Total " + totalPlayers + " players for 3 teams");
-
-        TeamDivision3Teams.dividePlayers(this, comingPlayers, players1, players2, players3, selectedDivision, null);
-
-        exitMoveMode();
-        refreshPlayers();
+        DbAsync.run(
+                () -> DbHelper.getComingPlayers(this, RECENT_GAMES),
+                comingPlayers -> {
+                    if (isFinishing()) return;
+                    Log.d("teams", "Total " + comingPlayers.size() + " players for 3 teams");
+                    TeamDivision3Teams.dividePlayers(this, comingPlayers, players1, players2,
+                            players3, selectedDivision, null);
+                    exitMoveMode();
+                    refreshPlayers();
+                });
     }
 
     private void setDefaultShuffleStrategy() {

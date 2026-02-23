@@ -32,6 +32,7 @@ import com.teampicker.drorfichman.teampicker.Data.PlayerGameStat;
 import com.teampicker.drorfichman.teampicker.Data.ResultEnum;
 import com.teampicker.drorfichman.teampicker.Data.StreakInfo;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import com.github.mikephil.charting.components.LimitLine;
 
@@ -116,42 +117,86 @@ public class PlayerParticipationChartFragment extends Fragment {
         selectedPeriod = root.findViewById(R.id.participation_selected_period);
         selectedStats = root.findViewById(R.id.participation_selected_stats);
 
-        loadDataAndSetupChart();
-        updateConsecutiveAttendance();
-        updateTotalGamesCard();
+        loadAllData();
 
         return root;
     }
 
-    private void loadDataAndSetupChart() {
+    private static class ParticipationData {
+        final ArrayList<PlayerGameStat> gameHistory;
+        final ArrayList<Game> allGames;
+        final StreakInfo streakInfo;
+        final Player playerWithStats;
+
+        ParticipationData(ArrayList<PlayerGameStat> gameHistory, ArrayList<Game> allGames,
+                          StreakInfo streakInfo, Player playerWithStats) {
+            this.gameHistory = gameHistory;
+            this.allGames = allGames;
+            this.streakInfo = streakInfo;
+            this.playerWithStats = playerWithStats;
+        }
+    }
+
+    private void loadAllData() {
         if (player == null || getContext() == null) {
             showEmptyState();
             return;
         }
+        android.content.Context ctx = getContext();
+        Player p = player;
 
-        // Fetch player's game history
-        gameHistory = DbHelper.getPlayerLastGames(getContext(), player, 1000);
-
-        if (gameHistory == null || gameHistory.size() < MIN_GAMES_FOR_DISPLAY) {
-            showEmptyState();
-            return;
-        }
-
-        // Fetch all games to calculate total games per quarter
-        allGames = DbHelper.getGames(getContext());
-
-        if (allGames == null || allGames.isEmpty()) {
-            showEmptyState();
-            return;
-        }
-
-        // Games are sorted DESC (newest first), we need oldest first for chronological chart
-        Collections.reverse(gameHistory);
-        Collections.reverse(allGames);
-
-        setupChart();
-        updateChart();
+        DbAsync.run(
+                () -> new ParticipationData(
+                        DbHelper.getPlayerLastGames(ctx, p, 1000),
+                        DbHelper.getGames(ctx),
+                        DbHelper.getConsecutiveAttendance(ctx, p.mName),
+                        DbHelper.getPlayer(ctx, p.mName, -1)),
+                data -> {
+                    if (!isAdded()) return;
+                    applyData(data);
+                });
     }
+
+    private void applyData(ParticipationData data) {
+        // Chart data
+        if (data.gameHistory == null || data.gameHistory.size() < MIN_GAMES_FOR_DISPLAY
+                || data.allGames == null || data.allGames.isEmpty()) {
+            showEmptyState();
+        } else {
+            gameHistory = data.gameHistory;
+            allGames = data.allGames;
+            // Games are sorted DESC (newest first); need oldest first for chronological chart
+            Collections.reverse(gameHistory);
+            Collections.reverse(allGames);
+            setupChart();
+            updateChart();
+        }
+
+        // Consecutive attendance card
+        currentStreak = data.streakInfo;
+        if (currentStreak != null && currentStreak.length > 0) {
+            consecutiveAttendanceValue.setText(String.format("%d games (%d days period)",
+                    currentStreak.length, currentStreak.days));
+            consecutiveAttendanceCard.setVisibility(View.VISIBLE);
+            consecutiveAttendanceCard.setOnClickListener(v -> toggleStreakHighlight());
+        } else {
+            consecutiveAttendanceCard.setVisibility(View.GONE);
+        }
+
+        // Total games card
+        if (data.playerWithStats != null && data.playerWithStats.statistics != null
+                && data.playerWithStats.statistics.gamesCount > 0) {
+            totalGamesValue.setText(getString(R.string.total_games_count,
+                    data.playerWithStats.statistics.gamesCount));
+            totalGamesCard.setVisibility(View.VISIBLE);
+        } else {
+            totalGamesCard.setVisibility(View.GONE);
+        }
+    }
+
+    // kept for legacy call-sites but now a no-op (logic merged into loadAllData)
+    private void loadDataAndSetupChart() { }
+
 
     private void showEmptyState() {
         chart.setVisibility(View.GONE);
@@ -464,33 +509,6 @@ public class PlayerParticipationChartFragment extends Fragment {
         return "Q" + quarter + " " + String.format(Locale.getDefault(), "%02d", year);
     }
 
-    private void updateConsecutiveAttendance() {
-        if (player != null && getContext() != null) {
-            currentStreak = DbHelper.getConsecutiveAttendance(getContext(), player.mName);
-            if (currentStreak.length > 0) {
-                consecutiveAttendanceValue.setText(String.format("%d games (%d days period)", currentStreak.length, currentStreak.days));
-                consecutiveAttendanceCard.setVisibility(View.VISIBLE);
-                
-                // Add click listener to highlight the streak period on the chart
-                consecutiveAttendanceCard.setOnClickListener(v -> toggleStreakHighlight());
-            } else {
-                consecutiveAttendanceCard.setVisibility(View.GONE);
-            }
-        }
-    }
-
-    private void updateTotalGamesCard() {
-        if (player != null && getContext() != null) {
-            Player playerWithStats = DbHelper.getPlayer(getContext(), player.mName, -1);
-            if (playerWithStats != null && playerWithStats.statistics != null && playerWithStats.statistics.gamesCount > 0) {
-                totalGamesValue.setText(getString(R.string.total_games_count,
-                        playerWithStats.statistics.gamesCount));
-                totalGamesCard.setVisibility(View.VISIBLE);
-            } else {
-                totalGamesCard.setVisibility(View.GONE);
-            }
-        }
-    }
     
     private void toggleStreakHighlight() {
         if (quarterDataList == null || quarterDataList.isEmpty() || currentStreak == null || currentStreak.length == 0) {

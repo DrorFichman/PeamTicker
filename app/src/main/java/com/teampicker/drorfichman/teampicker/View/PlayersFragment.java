@@ -47,6 +47,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Sort.Sorting;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 import com.teampicker.drorfichman.teampicker.tools.PreferenceHelper;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
@@ -362,9 +363,13 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void clearAttendance() {
-        DbHelper.clearComingPlayers(getContext());
-        refreshPlayers();
-        Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.clear_attendance);
+        DbAsync.runWrite(
+                () -> DbHelper.clearComingPlayers(getContext()),
+                () -> {
+                    if (!isAdded()) return;
+                    refreshPlayers();
+                    Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.clear_attendance);
+                });
     }
 
     private void onPlayerComingChanged(boolean coming) {
@@ -375,13 +380,22 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void onPlayerGradeChanged(Player player, int newGrade) {
-        DbHelper.updatePlayerGrade(getContext(), player.mName, newGrade);
+        DbAsync.runWrite(
+                () -> DbHelper.updatePlayerGrade(getContext(), player.mName, newGrade),
+                null);
         Log.i("Grade", "Player grade changed: " + player.mName + " -> " + newGrade);
     }
 
     private void setComingPlayersCount() {
-        ((Button) rootView.findViewById(R.id.main_make_teams))
-                .setText(getString(R.string.main_make_teams, DbHelper.getComingPlayersCount(getContext())));
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+        DbAsync.run(
+                () -> DbHelper.getComingPlayersCount(ctx),
+                count -> {
+                    if (!isAdded()) return;
+                    ((Button) rootView.findViewById(R.id.main_make_teams))
+                            .setText(getString(R.string.main_make_teams, count));
+                });
     }
 
     private void setActionButtons() {
@@ -410,21 +424,26 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void cancelPastedPlayersMode() {
-        // Delete all auto-created players (undo)
-        for (String playerName : mAutoCreatedPlayers) {
-            DbHelper.deletePlayer(getContext(), playerName);
-        }
-        // Uncheck attendance for pasted players that weren't auto-created
-        if (mPastedPlayers != null) {
-            ArrayList<Player> existingPasted = DbHelper.getPlayersByIdentifier(getContext(),
-                    new ArrayList<>(mPastedPlayers));
-            for (Player p : existingPasted) {
-                if (!mAutoCreatedPlayers.contains(p.mName)) {
-                    DbHelper.updatePlayerComing(getContext(), p.mName, false);
-                }
-            }
-        }
-        exitPastedPlayersMode();
+        android.content.Context ctx = getContext();
+        if (ctx == null) { exitPastedPlayersMode(); return; }
+        Set<String> autoCreated = new HashSet<>(mAutoCreatedPlayers);
+        ArrayList<String> pastedList = mPastedPlayers != null ? new ArrayList<>(mPastedPlayers) : null;
+
+        DbAsync.runWrite(
+                () -> {
+                    for (String playerName : autoCreated) {
+                        DbHelper.deletePlayer(ctx, playerName);
+                    }
+                    if (pastedList != null) {
+                        ArrayList<Player> existingPasted = DbHelper.getPlayersByIdentifier(ctx, pastedList);
+                        for (Player p : existingPasted) {
+                            if (!autoCreated.contains(p.mName)) {
+                                DbHelper.updatePlayerComing(ctx, p.mName, false);
+                            }
+                        }
+                    }
+                },
+                () -> { if (isAdded()) exitPastedPlayersMode(); });
     }
 
     private void updatePastedModeUI() {
@@ -526,21 +545,23 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
             return;
         }
 
-        ArrayList<Player> players;
-        if (showInjuredPlayers) {
-            players = DbHelper.getInjuredPlayers(getContext(), RECENT_GAMES_COUNT);
-        } else {
-            players = DbHelper.getPlayers(getContext(), RECENT_GAMES_COUNT, showArchivedPlayers);
-        }
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+        boolean injured = showInjuredPlayers;
+        boolean archived = showArchivedPlayers;
 
-        setPlayersList(players, null);
-
-        sorting.sort(players);
-
-        // Re-apply filter if active
-        if (!TextUtils.isEmpty(currentFilterValue)) {
-            playersAdapter.setFilter(currentFilterValue);
-        }
+        DbAsync.run(
+                () -> injured
+                        ? DbHelper.getInjuredPlayers(ctx, RECENT_GAMES_COUNT)
+                        : DbHelper.getPlayers(ctx, RECENT_GAMES_COUNT, archived),
+                players -> {
+                    if (!isAdded()) return;
+                    setPlayersList(players, null);
+                    sorting.sort(players);
+                    if (!TextUtils.isEmpty(currentFilterValue)) {
+                        playersAdapter.setFilter(currentFilterValue);
+                    }
+                });
     }
 
     private void switchArchivedPlayersView() {
@@ -548,18 +569,27 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         if (showArchivedPlayers) {
             showPastedPlayers = false;
             showInjuredPlayers = false;
-            ArrayList<Player> players = DbHelper.getPlayers(getContext(), 0, showArchivedPlayers);
-            if (players.isEmpty()) {
-                Toast.makeText(getContext(), getString(R.string.toast_instruction_no_archived_players),
-                        Toast.LENGTH_SHORT).show();
-                showArchivedPlayers = false;
-            }
+            android.content.Context ctx = getContext();
+            if (ctx == null) return;
+            DbAsync.run(
+                    () -> DbHelper.getPlayers(ctx, 0, true),
+                    players -> {
+                        if (!isAdded()) return;
+                        if (players.isEmpty()) {
+                            Toast.makeText(getContext(),
+                                    getString(R.string.toast_instruction_no_archived_players),
+                                    Toast.LENGTH_SHORT).show();
+                            showArchivedPlayers = false;
+                        }
+                        backPress.setEnabled(showArchivedPlayers);
+                        refreshPlayers();
+                        Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.players_archive);
+                    });
+        } else {
+            backPress.setEnabled(false);
+            refreshPlayers();
+            Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.players_archive);
         }
-
-        backPress.setEnabled(showArchivedPlayers);
-        refreshPlayers();
-
-        Event.logEvent(FirebaseAnalytics.getInstance(requireContext()), EventType.players_archive);
     }
 
     private void switchInjuredPlayersView() {
@@ -622,12 +652,14 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                             (dialog, which) -> {
                                 switch (which) {
                                     case 0: // Unarchive
-                                        DbHelper.archivePlayer(getContext(), player.mName, false);
-                                        refreshPlayers();
+                                        DbAsync.runWrite(
+                                                () -> DbHelper.archivePlayer(getContext(), player.mName, false),
+                                                () -> { if (isAdded()) refreshPlayers(); });
                                         break;
                                     case 1: // Remove
-                                        DbHelper.deletePlayer(getContext(), player.mName);
-                                        refreshPlayers();
+                                        DbAsync.runWrite(
+                                                () -> DbHelper.deletePlayer(getContext(), player.mName),
+                                                () -> { if (isAdded()) refreshPlayers(); });
                                         break;
                                     case 2: // Cancel
                                         break;
@@ -640,8 +672,9 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
                             (dialog, which) -> {
                                 switch (which) {
                                     case 0: // Archive
-                                        DbHelper.archivePlayer(getContext(), player.mName, true);
-                                        refreshPlayers();
+                                        DbAsync.runWrite(
+                                                () -> DbHelper.archivePlayer(getContext(), player.mName, true),
+                                                () -> { if (isAdded()) refreshPlayers(); });
                                         break;
                                     case 2: // Cancel
                                         break;
@@ -694,78 +727,92 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         }
     }
 
+    private static class PasteDisplayData {
+        final ArrayList<Player> knownPasted;
+        final String[] allPlayerNames;
+        final ArrayList<String> archivedPlayers;
+        final Set<String> autoCreated;
+
+        PasteDisplayData(ArrayList<Player> knownPasted, String[] allPlayerNames,
+                         ArrayList<String> archivedPlayers, Set<String> autoCreated) {
+            this.knownPasted = knownPasted;
+            this.allPlayerNames = allPlayerNames;
+            this.archivedPlayers = archivedPlayers;
+            this.autoCreated = autoCreated;
+        }
+    }
+
     private void displayPastedIdentifiers(Set<String> pasted) {
-        Set<String> unknownPastedSet = new HashSet<>(pasted);
-        ArrayList<String> pastedArray = new ArrayList<>(unknownPastedSet);
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+        ArrayList<String> pastedArray = new ArrayList<>(pasted);
+        Set<String> prevAutoCreated = new HashSet<>(mAutoCreatedPlayers);
 
-        ArrayList<Player> knownPasted = DbHelper.getPlayersByIdentifier(getContext(), pastedArray);
-        for (Player known : knownPasted) {
-            unknownPastedSet.remove(known.msgDisplayName);
-        }
+        DbAsync.run(
+                () -> {
+                    Set<String> unknownSet = new HashSet<>(pasted);
+                    ArrayList<Player> known = DbHelper.getPlayersByIdentifier(ctx, pastedArray);
+                    for (Player k : known) unknownSet.remove(k.msgDisplayName);
 
-        // Auto-create missing players with default 80 grade
-        ArrayList<String> archivedPlayers = new ArrayList<>();
-        for (String identifier : unknownPastedSet) {
-            // Use the identifier as the player name (contact name)
-            String playerName = identifier;
-            // Only create if not already in auto-created set
-            if (!mAutoCreatedPlayers.contains(playerName)) {
-                // Check if player already exists (possibly archived)
-                Player existingPlayer = DbHelper.getPlayer(getContext(), playerName);
-                if (existingPlayer != null) {
-                    if (existingPlayer.archived) {
-                        archivedPlayers.add(playerName);
-                        Log.i("Identify", "Player " + playerName + " exists in archive, skipping creation");
+                    ArrayList<String> archived = new ArrayList<>();
+                    Set<String> newAutoCreated = new HashSet<>(prevAutoCreated);
+                    for (String identifier : unknownSet) {
+                        if (newAutoCreated.contains(identifier)) continue;
+                        Player existing = DbHelper.getPlayer(ctx, identifier);
+                        if (existing != null) {
+                            if (existing.archived) {
+                                archived.add(identifier);
+                                Log.i("Identify", "Player " + identifier + " exists in archive, skipping");
+                            }
+                            continue;
+                        }
+                        Player newPlayer = new Player(identifier, 80);
+                        newPlayer.msgDisplayName = identifier;
+                        if (DbHelper.insertPlayer(ctx, newPlayer)) {
+                            DbHelper.setPlayerIdentifier(ctx, identifier, identifier);
+                            newAutoCreated.add(identifier);
+                            Log.i("Identify", "Auto-created player: " + identifier);
+                        }
                     }
-                    // Player exists (archived or not), skip creation
-                    continue;
-                }
 
-                Player newPlayer = new Player(playerName, 80);
-                newPlayer.msgDisplayName = identifier;
-                if (DbHelper.insertPlayer(getContext(), newPlayer)) {
-                    DbHelper.setPlayerIdentifier(getContext(), playerName, identifier);
-                    mAutoCreatedPlayers.add(playerName);
-                    Log.i("Identify", "Auto-created player: " + playerName + " with grade 80");
-                }
-            }
-        }
+                    // Re-fetch and mark all pasted as coming
+                    ArrayList<Player> finalKnown = DbHelper.getPlayersByIdentifier(ctx, pastedArray);
+                    for (Player player : finalKnown) {
+                        if (!player.isComing) {
+                            DbHelper.updatePlayerComing(ctx, player.mName, true);
+                            player.isComing = true;
+                        }
+                    }
+                    String[] allNames = DbHelper.getPlayersNames(ctx);
+                    return new PasteDisplayData(finalKnown, allNames, archived, newAutoCreated);
+                },
+                data -> {
+                    if (!isAdded()) return;
+                    mAutoCreatedPlayers.clear();
+                    mAutoCreatedPlayers.addAll(data.autoCreated);
 
-        // Show message for archived players that couldn't be auto-created
-        if (!archivedPlayers.isEmpty()) {
-            String message = archivedPlayers.size() == 1
-                    ? "Player \"" + archivedPlayers.get(0) + "\" exists in archive. Unarchive to use."
-                    : archivedPlayers.size() + " players exist in archive: " + TextUtils.join(", ", archivedPlayers);
-            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-        }
+                    if (!data.archivedPlayers.isEmpty()) {
+                        String message = data.archivedPlayers.size() == 1
+                                ? "Player \"" + data.archivedPlayers.get(0) + "\" exists in archive. Unarchive to use."
+                                : data.archivedPlayers.size() + " players exist in archive: "
+                                        + TextUtils.join(", ", data.archivedPlayers);
+                        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                    }
 
-        // Re-fetch all known pasted players (including newly created ones)
-        knownPasted = DbHelper.getPlayersByIdentifier(getContext(), pastedArray);
+                    showPastedPlayers = true;
+                    mPastedPlayers = pasted;
+                    backPress.setEnabled(true);
+                    updatePastedModeUI();
 
-        // Mark all pasted players as coming by default
-        for (Player player : knownPasted) {
-            if (!player.isComing) {
-                DbHelper.updatePlayerComing(getContext(), player.mName, true);
-                player.isComing = true;
-            }
-        }
-
-        showPastedPlayers = true;
-        mPastedPlayers = pasted;
-        backPress.setEnabled(true);
-        updatePastedModeUI();
-
-        String[] allPlayerNames = DbHelper.getPlayersNames(getContext());
-        AdapterView.OnItemClickListener handler = (parent, view, position, id) -> {
-            Player p = (Player) view.getTag();
-            Log.i("Identify", "Clicked on " + p.mName + " = " + p.msgDisplayName);
-            setComingPlayerIdentity(p.mName, p.msgDisplayName, pasted, allPlayerNames);
-        };
-
-        // Filter the players list only to the pasted players identifiers
-        setPlayersList(knownPasted, handler);
-        setHeadlines(false);
-        setComingPlayersCount();
+                    AdapterView.OnItemClickListener handler = (parent, view, position, id) -> {
+                        Player p = (Player) view.getTag();
+                        Log.i("Identify", "Clicked on " + p.mName + " = " + p.msgDisplayName);
+                        setComingPlayerIdentity(p.mName, p.msgDisplayName, pasted, data.allPlayerNames);
+                    };
+                    setPlayersList(data.knownPasted, handler);
+                    setHeadlines(false);
+                    setComingPlayersCount();
+                });
     }
 
     private void setComingPlayerIdentity(String currPlayer, String identity, Set<String> comingSet,
@@ -800,38 +847,52 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
         builder.setPositiveButton("OK", (dialog, which) -> {
             String newPlayer = input.getText().toString();
             if (!TextUtils.isEmpty(newPlayer) && !TextUtils.isEmpty(currPlayer) &&
-                    newPlayer.equals(currPlayer)) { // current name for identifier hasn't changed
+                    newPlayer.equals(currPlayer)) {
                 Log.i("Identifier", "Curr name " + currPlayer + " not modified for " + identity);
                 return;
             }
+            android.content.Context ctx = getContext();
+            if (ctx == null) return;
             if (TextUtils.isEmpty(newPlayer)) {
-                if (!TextUtils.isEmpty(currPlayer)) { // empty name, for current player == clearing
+                if (!TextUtils.isEmpty(currPlayer)) {
                     Log.i("Identifier", "Count 0 - Clearing " + currPlayer);
-                    DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
-                    Toast.makeText(getContext(), getString(R.string.toast_instruction_identifier_cleared, currPlayer),
-                            Toast.LENGTH_LONG).show();
-                    displayPastedIdentifiers(comingSet);
-                } else { // empty name set
+                    DbAsync.runWrite(
+                            () -> DbHelper.clearPlayerIdentifier(ctx, currPlayer),
+                            () -> {
+                                if (!isAdded()) return;
+                                Toast.makeText(ctx,
+                                        getString(R.string.toast_instruction_identifier_cleared, currPlayer),
+                                        Toast.LENGTH_LONG).show();
+                                displayPastedIdentifiers(comingSet);
+                            });
+                } else {
                     Log.i("Identifier", "No name set for identifier " + identity);
                 }
                 return;
             }
 
             Log.i("Identifier", "Identify " + newPlayer + " as " + identity);
-            int count = DbHelper.setPlayerIdentifier(getContext(), newPlayer, identity);
-            if (count == 1) { // new player found and updated with the identifier
-                Log.i("Identifier", "Count + " + count + " remove identifier from " + currPlayer);
-                Toast.makeText(getContext(), getString(R.string.toast_instruction_identifier_set, newPlayer, identity),
-                        Toast.LENGTH_SHORT).show();
-                if (currPlayer != null) { // clear previous name from the identifier
-                    DbHelper.clearPlayerIdentifier(getContext(), currPlayer);
-                }
-                displayPastedIdentifiers(comingSet);
-            } else { // new player name not found
-                Log.i("Identifier", "Count 0 - " + newPlayer + " not found");
-                Toast.makeText(getContext(), getString(R.string.toast_instruction_player_not_found, newPlayer),
-                        Toast.LENGTH_SHORT).show();
-            }
+            DbAsync.run(
+                    () -> DbHelper.setPlayerIdentifier(ctx, newPlayer, identity),
+                    count -> {
+                        if (!isAdded()) return;
+                        if (count == 1) {
+                            Log.i("Identifier", "Count + " + count + " remove identifier from " + currPlayer);
+                            Toast.makeText(ctx,
+                                    getString(R.string.toast_instruction_identifier_set, newPlayer, identity),
+                                    Toast.LENGTH_SHORT).show();
+                            if (currPlayer != null) {
+                                DbAsync.runWrite(
+                                        () -> DbHelper.clearPlayerIdentifier(ctx, currPlayer), null);
+                            }
+                            displayPastedIdentifiers(comingSet);
+                        } else {
+                            Log.i("Identifier", "Count 0 - " + newPlayer + " not found");
+                            Toast.makeText(ctx,
+                                    getString(R.string.toast_instruction_player_not_found, newPlayer),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
@@ -845,17 +906,20 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
 
     // region import contacts
     private void launchContactPicker() {
-        // Check if there are players before import (for dialog decision)
-        ArrayList<Player> existingPlayers = DbHelper.getPlayers(getContext(), 0, false);
-        hadPlayersBeforeImport = existingPlayers != null && !existingPlayers.isEmpty();
-
-        // Check if we have permission
-        if (requireContext().checkSelfPermission(
-                android.Manifest.permission.READ_CONTACTS) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            showContactSelectionDialog();
-        } else {
-            contactPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS);
-        }
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+        DbAsync.run(
+                () -> DbHelper.getPlayers(ctx, 0, false),
+                existingPlayers -> {
+                    if (!isAdded()) return;
+                    hadPlayersBeforeImport = existingPlayers != null && !existingPlayers.isEmpty();
+                    if (requireContext().checkSelfPermission(android.Manifest.permission.READ_CONTACTS)
+                            == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                        showContactSelectionDialog();
+                    } else {
+                        contactPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS);
+                    }
+                });
     }
 
     private void showContactSelectionDialog() {
@@ -866,51 +930,50 @@ public class PlayersFragment extends Fragment implements Sorting.sortingCallback
     }
 
     private void processImportedContacts(ArrayList<String> contactNames) {
-        ArrayList<String> importedPlayers = new ArrayList<>();
-        ArrayList<String> skippedPlayers = new ArrayList<>();
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
 
-        for (String displayName : contactNames) {
-            if (TextUtils.isEmpty(displayName)) {
-                continue;
-            }
-
-            // Check if player already exists
-            Player existingPlayer = DbHelper.getPlayer(getContext(), displayName);
-            if (existingPlayer != null) {
-                skippedPlayers.add(displayName);
-                // Mark existing player as coming
-                if (!existingPlayer.isComing) {
-                    DbHelper.updatePlayerComing(getContext(), displayName, true);
-                }
-                continue;
-            }
-
-            // Create new player with default grade 80
-            Player newPlayer = new Player(displayName, 80);
-            newPlayer.msgDisplayName = displayName;
-            newPlayer.isComing = true;
-
-            if (DbHelper.insertPlayer(getContext(), newPlayer)) {
-                DbHelper.setPlayerIdentifier(getContext(), displayName, displayName);
-                DbHelper.updatePlayerComing(getContext(), displayName, true);
-                importedPlayers.add(displayName);
-                Log.i("ImportContacts", "Created player: " + displayName);
-            }
-        }
-
-        // Refresh the players list
-        refreshPlayers();
-
-        // Show appropriate feedback
-        if (!importedPlayers.isEmpty()) {
-            showImportResult(importedPlayers, skippedPlayers);
-        } else if (!skippedPlayers.isEmpty()) {
-            Toast.makeText(getContext(),
-                    skippedPlayers.size() == 1
-                            ? "Player already exists: " + skippedPlayers.get(0)
-                            : skippedPlayers.size() + " players already exist",
-                    Toast.LENGTH_SHORT).show();
-        }
+        DbAsync.run(
+                () -> {
+                    ArrayList<String> imported = new ArrayList<>();
+                    ArrayList<String> skipped = new ArrayList<>();
+                    for (String displayName : contactNames) {
+                        if (TextUtils.isEmpty(displayName)) continue;
+                        Player existing = DbHelper.getPlayer(ctx, displayName);
+                        if (existing != null) {
+                            skipped.add(displayName);
+                            if (!existing.isComing) DbHelper.updatePlayerComing(ctx, displayName, true);
+                            continue;
+                        }
+                        Player newPlayer = new Player(displayName, 80);
+                        newPlayer.msgDisplayName = displayName;
+                        newPlayer.isComing = true;
+                        if (DbHelper.insertPlayer(ctx, newPlayer)) {
+                            DbHelper.setPlayerIdentifier(ctx, displayName, displayName);
+                            DbHelper.updatePlayerComing(ctx, displayName, true);
+                            imported.add(displayName);
+                            Log.i("ImportContacts", "Created player: " + displayName);
+                        }
+                    }
+                    return new ArrayList[]{imported, skipped};
+                },
+                results -> {
+                    if (!isAdded()) return;
+                    @SuppressWarnings("unchecked")
+                    ArrayList<String> importedPlayers = (ArrayList<String>) results[0];
+                    @SuppressWarnings("unchecked")
+                    ArrayList<String> skippedPlayers = (ArrayList<String>) results[1];
+                    refreshPlayers();
+                    if (!importedPlayers.isEmpty()) {
+                        showImportResult(importedPlayers, skippedPlayers);
+                    } else if (!skippedPlayers.isEmpty()) {
+                        Toast.makeText(getContext(),
+                                skippedPlayers.size() == 1
+                                        ? "Player already exists: " + skippedPlayers.get(0)
+                                        : skippedPlayers.size() + " players already exist",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void showImportResult(ArrayList<String> importedPlayers, ArrayList<String> skippedPlayers) {

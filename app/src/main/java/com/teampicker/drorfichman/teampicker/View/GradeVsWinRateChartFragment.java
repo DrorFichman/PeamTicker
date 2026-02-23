@@ -27,9 +27,9 @@ import com.github.mikephil.charting.utils.EntryXComparator;
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Player;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,6 +43,15 @@ public class GradeVsWinRateChartFragment extends Fragment {
 
     private static final int MIN_GAMES = 5;
 
+    private static final float MARKER_SIZE    = 50f;
+    private static final float HIGHLIGHT_SIZE = 100f;
+
+    // Match PlayerTeamCollaborationChartFragment's color scheme
+    private static final int COLOR_WIN      = Color.argb(200, 76, 175, 80);  // green  — win rate ≥ 50%
+    private static final int COLOR_LOSE     = Color.argb(200, 244, 67, 54);  // red    — win rate < 50%
+    private static final int COLOR_WIN_HL   = Color.argb(80,  76, 175, 80);  // semi-transparent green ring
+    private static final int COLOR_LOSE_HL  = Color.argb(80,  244, 67, 54);  // semi-transparent red ring
+
     private ScatterChart chart;
     private TextView emptyMessage;
     private LinearLayout infoPanel;
@@ -53,6 +62,9 @@ public class GradeVsWinRateChartFragment extends Fragment {
     /** Stores player data parallel to chart entries for tap lookup. */
     private final List<Player> chartPlayers = new ArrayList<>();
     private int selectedPlayerIndex = -1;
+
+    /** Persistent empty dataset used as a highlight ring — updated on tap without full rebuild. */
+    private ScatterDataSet highlightDataSet;
 
     public GradeVsWinRateChartFragment() {
         super(R.layout.fragment_grade_vs_winrate_chart);
@@ -83,23 +95,30 @@ public class GradeVsWinRateChartFragment extends Fragment {
     }
 
     private void loadData() {
-        if (getContext() == null) return;
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
 
-        ArrayList<Player> allPlayers = DbHelper.getPlayersStatistics(getContext(), -1);
-
-        chartPlayers.clear();
-        for (Player p : allPlayers) {
-            if (p.statistics != null && p.statistics.getWinsAndLosesCount() >= MIN_GAMES) {
-                chartPlayers.add(p);
-            }
-        }
-
-        if (chartPlayers.isEmpty()) {
-            showEmpty(getString(R.string.grade_winrate_no_data, MIN_GAMES));
-            return;
-        }
-
-        showChart();
+        DbAsync.run(
+                () -> {
+                    ArrayList<Player> allPlayers = DbHelper.getPlayersStatistics(ctx, -1);
+                    List<Player> filtered = new ArrayList<>();
+                    for (Player p : allPlayers) {
+                        if (p.statistics != null && p.statistics.getWinsAndLosesCount() >= MIN_GAMES) {
+                            filtered.add(p);
+                        }
+                    }
+                    return filtered;
+                },
+                filtered -> {
+                    if (!isAdded()) return;
+                    chartPlayers.clear();
+                    chartPlayers.addAll(filtered);
+                    if (chartPlayers.isEmpty()) {
+                        showEmpty(getString(R.string.grade_winrate_no_data, MIN_GAMES));
+                    } else {
+                        showChart();
+                    }
+                });
     }
 
     private void showEmpty(String message) {
@@ -112,7 +131,7 @@ public class GradeVsWinRateChartFragment extends Fragment {
         emptyMessage.setVisibility(View.GONE);
         chart.setVisibility(View.VISIBLE);
         setupChart();
-        populateChart();
+        rebuildDatasets();
     }
 
     private void setupChart() {
@@ -156,67 +175,8 @@ public class GradeVsWinRateChartFragment extends Fragment {
 
         chart.getAxisRight().setEnabled(false);
 
-        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-            @Override
-            public void onValueSelected(Entry e, Highlight h) {
-                Object data = e.getData();
-                if (data instanceof Integer) {
-                    int idx = (Integer) data;
-                    if (idx >= 0 && idx < chartPlayers.size()) {
-                        selectedPlayerIndex = idx;
-                        showInfoPanel(chartPlayers.get(idx));
-                    }
-                }
-            }
-
-            @Override
-            public void onNothingSelected() {
-                selectedPlayerIndex = -1;
-                infoPanel.setVisibility(View.INVISIBLE);
-            }
-        });
-    }
-
-    private void populateChart() {
-        ArrayList<Entry> playerEntries = new ArrayList<>();
-        for (int i = 0; i < chartPlayers.size(); i++) {
-            Player p = chartPlayers.get(i);
-            float gamesPlayed = p.statistics.getWinsAndLosesCount();
-            float winRate = p.statistics.getWinRate();
-            Entry entry = new Entry(gamesPlayed, winRate);
-            entry.setData(Integer.valueOf(i));
-            playerEntries.add(entry);
-        }
-
-        playerEntries.sort(new EntryXComparator());
-
-        ScatterDataSet playerSet = new ScatterDataSet(playerEntries, "Players");
-        playerSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
-        playerSet.setScatterShapeSize(40f);
-        playerSet.setColor(Color.argb(200, 33, 150, 243)); // blue
-        playerSet.setDrawValues(true);
-        playerSet.setValueTextSize(9f);
-        playerSet.setValueTextColor(Color.DKGRAY);
-        playerSet.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getPointLabel(Entry entry) {
-                Object data = entry.getData();
-                if (data instanceof Integer) {
-                    int idx = (Integer) data;
-                    if (idx >= 0 && idx < chartPlayers.size()) {
-                        return chartPlayers.get(idx).mName;
-                    }
-                }
-                return "";
-            }
-        });
-        playerSet.setDrawHighlightIndicators(false);
-
-        ScatterData data = new ScatterData(playerSet);
-        chart.setData(data);
-
         LimitLine avgLine = new LimitLine(50f, "50%");
-        avgLine.setLineColor(Color.parseColor("#9C27B0")); // purple
+        avgLine.setLineColor(Color.parseColor("#9C27B0"));
         avgLine.setLineWidth(1.5f);
         avgLine.enableDashedLine(10f, 5f, 0f);
         avgLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
@@ -225,19 +185,131 @@ public class GradeVsWinRateChartFragment extends Fragment {
         chart.getAxisLeft().addLimitLine(avgLine);
 
         chart.setExtraOffsets(10, 20, 20, 10);
+
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                Object data = e.getData();
+                if (data instanceof Integer) {
+                    int idx = (Integer) data;
+                    if (idx >= 0 && idx < chartPlayers.size()) {
+                        if (selectedPlayerIndex == idx) {
+                            clearHighlight();
+                        } else {
+                            selectedPlayerIndex = idx;
+                            showInfoPanel(chartPlayers.get(idx));
+                            updateHighlightRing(chartPlayers.get(idx), e.getX(), e.getY());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected() {
+                clearHighlight();
+            }
+        });
+    }
+
+    /**
+     * Builds the initial chart datasets (green/red dots + empty highlight ring).
+     * Called once when data is ready; tap events update only the highlight ring.
+     */
+    private void rebuildDatasets() {
+        ArrayList<Entry> winEntries  = new ArrayList<>();
+        ArrayList<Entry> loseEntries = new ArrayList<>();
+
+        for (int i = 0; i < chartPlayers.size(); i++) {
+            Player p = chartPlayers.get(i);
+            Entry entry = new Entry(p.statistics.getWinsAndLosesCount(), p.statistics.getWinRate());
+            entry.setData(i);
+            if (p.statistics.getWinRate() >= 50) {
+                winEntries.add(entry);
+            } else {
+                loseEntries.add(entry);
+            }
+        }
+
+        winEntries.sort(new EntryXComparator());
+        loseEntries.sort(new EntryXComparator());
+
+        ValueFormatter nameFormatter = new ValueFormatter() {
+            @Override
+            public String getPointLabel(Entry entry) {
+                Object d = entry.getData();
+                if (d instanceof Integer) {
+                    int idx = (Integer) d;
+                    if (idx >= 0 && idx < chartPlayers.size()) {
+                        return chartPlayers.get(idx).mName;
+                    }
+                }
+                return "";
+            }
+        };
+
+        ScatterDataSet winSet = makeDotsDataSet(winEntries, COLOR_WIN, nameFormatter);
+        ScatterDataSet loseSet = makeDotsDataSet(loseEntries, COLOR_LOSE, nameFormatter);
+
+        // Empty highlight ring — populated by updateHighlightRing() on tap
+        highlightDataSet = new ScatterDataSet(new ArrayList<>(), "");
+        highlightDataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+        highlightDataSet.setScatterShapeSize(HIGHLIGHT_SIZE);
+        highlightDataSet.setColor(COLOR_WIN_HL);
+        highlightDataSet.setDrawValues(false);
+        highlightDataSet.setDrawHighlightIndicators(false);
+        highlightDataSet.setHighlightEnabled(false); // don't let the ring itself be "selected"
+
+        chart.setData(new ScatterData(highlightDataSet, winSet, loseSet));
         chart.invalidate();
+    }
+
+    private ScatterDataSet makeDotsDataSet(ArrayList<Entry> entries, int color, ValueFormatter formatter) {
+        ScatterDataSet set = new ScatterDataSet(entries, "");
+        set.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+        set.setScatterShapeSize(MARKER_SIZE);
+        set.setColor(color);
+        set.setDrawHighlightIndicators(false);
+        set.setDrawValues(true);
+        set.setValueTextSize(10f);
+        set.setValueTextColor(Color.DKGRAY);
+        set.setValueFormatter(formatter);
+        return set;
+    }
+
+    /** Places the highlight ring at the tapped player's position with a matching hue. */
+    private void updateHighlightRing(Player p, float x, float y) {
+        if (highlightDataSet == null || chart.getData() == null) return;
+        highlightDataSet.clear();
+        highlightDataSet.addEntry(new Entry(x, y));
+        highlightDataSet.setColor(p.statistics.getWinRate() >= 50 ? COLOR_WIN_HL : COLOR_LOSE_HL);
+        chart.getData().notifyDataChanged();
+        chart.notifyDataSetChanged();
+        chart.invalidate();
+    }
+
+    /** Clears the highlight ring and hides the info panel. */
+    private void clearHighlight() {
+        selectedPlayerIndex = -1;
+        infoPanel.setVisibility(View.INVISIBLE);
+        chart.highlightValue(null);
+        if (highlightDataSet != null && chart.getData() != null) {
+            highlightDataSet.clear();
+            chart.getData().notifyDataChanged();
+            chart.notifyDataSetChanged();
+            chart.invalidate();
+        }
     }
 
     private void showInfoPanel(Player p) {
         infoPanel.setVisibility(View.VISIBLE);
         selectedName.setText(p.mName);
-        selectedGames.setText(String.format(Locale.getDefault(), "%d games", p.statistics.getWinsAndLosesCount()));
-        selectedWinRate.setText(String.format(Locale.getDefault(), "%d%% WR", p.statistics.getWinRate()));
+        selectedGames.setText(String.format(Locale.getDefault(), "%dg", p.statistics.getWinsAndLosesCount()));
+        selectedWinRate.setText(String.format(Locale.getDefault(), "%d%%", p.statistics.getWinRate()));
     }
 
     private void openSelectedPlayerDetails() {
         if (selectedPlayerIndex < 0 || selectedPlayerIndex >= chartPlayers.size() || getContext() == null) return;
-        Intent intent = PlayerDetailsActivity.getEditPlayerIntent(getContext(), chartPlayers.get(selectedPlayerIndex).mName);
+        Intent intent = PlayerDetailsActivity.getPlayerWinRateIntent(getContext(), chartPlayers.get(selectedPlayerIndex).mName);
         startActivity(intent);
     }
 }

@@ -31,6 +31,7 @@ import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.Data.PlayerGame;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -125,39 +126,42 @@ public class PlayerExperienceChartFragment extends Fragment {
     }
 
     private void loadDataAndSetupChart() {
-        if (getContext() == null) {
+        android.content.Context ctx = getContext();
+        if (ctx == null) {
             showEmptyState();
             return;
         }
 
-        games = DbHelper.getGames(getContext());
-        allPlayerGames = DbHelper.getPlayersGames(getContext());
+        DbAsync.run(
+                () -> new ArrayList[]{DbHelper.getGames(ctx), DbHelper.getPlayersGames(ctx)},
+                raw -> {
+                    if (!isAdded()) return;
+                    @SuppressWarnings("unchecked")
+                    ArrayList<Game> loadedGames = (ArrayList<Game>) raw[0];
+                    @SuppressWarnings("unchecked")
+                    ArrayList<PlayerGame> loadedPlayerGames = (ArrayList<PlayerGame>) raw[1];
 
-        if (games == null || games.size() < MIN_GAMES_FOR_DISPLAY) {
-            showEmptyState();
-            return;
-        }
+                    if (loadedGames == null || loadedGames.size() < MIN_GAMES_FOR_DISPLAY) {
+                        showEmptyState();
+                        return;
+                    }
+                    games = loadedGames;
+                    allPlayerGames = loadedPlayerGames;
 
-        // Games are sorted DESC (newest first), we need oldest first for chronological chart
-        Collections.reverse(games);
+                    // Games are sorted DESC (newest first); need oldest first for chronological chart
+                    Collections.reverse(games);
+                    computeEventualTotalGames();
+                    calculateExperienceDistribution();
 
-        // First pass: compute eventual total games for each player
-        computeEventualTotalGames();
-
-        // Second pass: calculate experience distribution for each game
-        calculateExperienceDistribution();
-
-        if (gameExperienceData == null || gameExperienceData.size() < WINDOW_SIZE + 10) {
-            showEmptyState();
-            return;
-        }
-
-        // Create date formatter for info panel
-        dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-
-        setupChart();
-        updateChart();
-        updateSummaryCard();
+                    if (gameExperienceData == null || gameExperienceData.size() < WINDOW_SIZE + 10) {
+                        showEmptyState();
+                        return;
+                    }
+                    dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+                    setupChart();
+                    updateChart();
+                    updateSummaryCard();
+                });
     }
 
     private void showEmptyState() {

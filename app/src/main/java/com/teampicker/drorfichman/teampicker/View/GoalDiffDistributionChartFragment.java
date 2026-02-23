@@ -26,6 +26,7 @@ import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotificat
 import com.teampicker.drorfichman.teampicker.Data.DbHelper;
 import com.teampicker.drorfichman.teampicker.Data.Game;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,21 +89,25 @@ public class GoalDiffDistributionChartFragment extends Fragment {
     }
 
     private void loadDataAndSetupChart() {
-        if (getContext() == null) {
+        android.content.Context ctx = getContext();
+        if (ctx == null) {
             showEmptyState();
             return;
         }
 
-        games = DbHelper.getGames(getContext());
-
-        if (games == null || games.size() < MIN_GAMES_FOR_DISPLAY) {
-            showEmptyState();
-            return;
-        }
-
-        setupChart();
-        updateChart();
-        updateSummaryCard();
+        DbAsync.run(
+                () -> DbHelper.getGames(ctx),
+                loadedGames -> {
+                    if (!isAdded()) return;
+                    if (loadedGames == null || loadedGames.size() < MIN_GAMES_FOR_DISPLAY) {
+                        showEmptyState();
+                        return;
+                    }
+                    games = loadedGames;
+                    setupChart();
+                    updateChart();
+                    updateSummaryCard();
+                });
     }
 
     private void showEmptyState() {
