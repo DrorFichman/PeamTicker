@@ -5,6 +5,76 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <!-- Action buttons placed at the top so they are always visible when expanded,
+         regardless of how tall the team lists grow at large font/display sizes. -->
+    <LinearLayout
+        android:id="@+id/edit_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="6dp"
+        android:theme="@style/Theme.MaterialComponents.Light">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/game_copy_game"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:minWidth="0dp"
+            android:minHeight="48dp"
+            android:paddingVertical="4dp"
+            android:text="@string/copy"
+            android:textSize="10sp"
+            app:icon="@android:drawable/ic_menu_upload"
+            app:iconGravity="top"
+            app:iconSize="18dp"
+            app:iconPadding="2dp"
+            app:rippleColor="#1A1976D2" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/game_edit_game"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:minWidth="0dp"
+            android:minHeight="48dp"
+            android:paddingVertical="4dp"
+            android:text="@string/edit"
+            android:textSize="10sp"
+            app:icon="@android:drawable/ic_menu_edit"
+            app:iconGravity="top"
+            app:iconSize="18dp"
+            app:iconPadding="2dp"
+            app:rippleColor="#1A4CAF50" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/game_delete_game"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:minWidth="0dp"
+            android:minHeight="48dp"
+            android:paddingVertical="4dp"
+            android:text="@string/delete"
+            android:textColor="#D32F2F"
+            android:textSize="10sp"
+            app:icon="@android:drawable/ic_menu_delete"
+            app:iconGravity="top"
+            app:iconSize="18dp"
+            app:iconPadding="2dp"
+            app:iconTint="#D32F2F"
+            app:rippleColor="#1AD32F2F" />
+
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,72 +97,6 @@
             android:layout_weight="1"
             android:divider="@null"
             android:padding="5dp" />
-    </LinearLayout>
-
-    <!-- Modern Action Buttons -->
-    <LinearLayout
-        android:id="@+id/edit_actions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="6dp"
-        android:theme="@style/Theme.MaterialComponents.Light">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/game_copy_game"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:minHeight="48dp"
-            android:paddingVertical="4dp"
-            android:text="@string/copy"
-            android:textSize="10sp"
-            app:icon="@android:drawable/ic_menu_upload"
-            app:iconGravity="top"
-            app:iconSize="18dp"
-            app:iconPadding="2dp"
-            app:rippleColor="#1A1976D2" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/game_edit_game"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="4dp"
-            android:minHeight="48dp"
-            android:paddingVertical="4dp"
-            android:text="@string/edit"
-            android:textSize="10sp"
-            app:icon="@android:drawable/ic_menu_edit"
-            app:iconGravity="top"
-            app:iconSize="18dp"
-            app:iconPadding="2dp"
-            app:rippleColor="#1A4CAF50" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/game_delete_game"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:minHeight="48dp"
-            android:paddingVertical="4dp"
-            android:text="@string/delete"
-            android:textColor="#D32F2F"
-            android:textSize="10sp"
-            app:icon="@android:drawable/ic_menu_delete"
-            app:iconGravity="top"
-            app:iconSize="18dp"
-            app:iconPadding="2dp"
-            app:iconTint="#D32F2F"
-            app:rippleColor="#1AD32F2F" />
-
     </LinearLayout>
 
 </LinearLayout>

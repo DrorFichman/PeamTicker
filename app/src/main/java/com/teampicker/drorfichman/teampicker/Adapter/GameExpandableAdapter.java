@@ -1,6 +1,5 @@
 package com.teampicker.drorfichman.teampicker.Adapter;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -93,11 +92,10 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    @SuppressLint("InflateParams")
     @Override
     public View getGroupView(int position, boolean expanded, View view, ViewGroup parent) {
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.game_item, null);
+            view = LayoutInflater.from(context).inflate(R.layout.game_item, parent, false);
         }
 
         final Game g = getGroup(position);
@@ -131,11 +129,10 @@ public class GameExpandableAdapter extends BaseExpandableListAdapter {
         playerCountView.setText(context.getString(R.string.games_player_count, team1.size() + team2.size()));
     }
 
-    @SuppressLint("InflateParams")
     @Override
     public View getChildView(int position, int chilePosition, boolean expanded, View view, ViewGroup parent) {
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.game_details_child_item, null);
+            view = LayoutInflater.from(context).inflate(R.layout.game_details_child_item, parent, false);
         }
 
         final Game g = getGroup(position);
