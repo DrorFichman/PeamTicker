@@ -63,6 +63,17 @@
             app:title="@string/setting_title_auto_sync_games" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:key="admin_category"
+        android:title="@string/admin_category">
+
+        <Preference
+            android:key="admin_generate_test_data"
+            android:icon="@drawable/nav_setting"
+            android:summary="@string/admin_generate_test_data_summary"
+            android:title="@string/admin_generate_test_data" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Tutorials">
 
         <SwitchPreferenceCompat

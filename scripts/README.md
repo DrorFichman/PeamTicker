@@ -83,6 +83,39 @@ Last game ID:       247
 ════════════════════════════════════════════════════════════════════
 ```
 
+## check-tie-result-bug.js
+
+**Read-only** audit for the historical tie bug: when a game is a draw (`team1Score` = `team2Score`), `PlayerGame` rows for Team1/Team2 should not still show `result` = Lose. The app migration fixes local SQLite; this script measures how much bad data exists **in the Realtime Database** per user.
+
+### Usage
+
+```bash
+cd scripts
+npm install   # once
+
+# All users (skips known non-user roots like `configurations`)
+node check-tie-result-bug.js
+
+# One Firebase Auth UID
+node check-tie-result-bug.js --user <userId>
+
+# Or npm
+npm run check-tie-bug
+npm run check-tie-bug -- --user <userId>
+```
+
+### What it reports
+
+| Column | Meaning |
+|--------|---------|
+| **Ties** | Games where both sides have the same score (tie games). |
+| **BugRows** | `playersGames` rows on those games where `team` is Team1/Team2 and `result` is Lose (`-1` or `"Lose"`). |
+| **Plrs** | Distinct player names with at least one such row. |
+| **Max bug date** | Latest `games.dateString` among games that have at least one buggy row (helps see how recent bad data is). |
+| **Evident?** | `YES` if BugRows > 0 for that user. |
+
+No writes are performed. Use the same `serviceAccountKey.json` setup as `user-stats.js`.
+
 ## copy-games.js
 
 Copy games from one user to another. **INSERT ONLY** - never overwrites existing data.

@@ -2,20 +2,29 @@ package com.teampicker.drorfichman.teampicker.View;
 
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.EditTextPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teampicker.drorfichman.teampicker.Controller.Broadcast.LocalNotifications;
 import com.teampicker.drorfichman.teampicker.R;
+import com.teampicker.drorfichman.teampicker.tools.DbAsync;
 import com.teampicker.drorfichman.teampicker.tools.SettingsHelper;
+import com.teampicker.drorfichman.teampicker.tools.TestDataGenerator;
 import com.teampicker.drorfichman.teampicker.tools.analytics.Event;
 import com.teampicker.drorfichman.teampicker.tools.analytics.EventType;
 import com.teampicker.drorfichman.teampicker.tools.analytics.ParameterType;
+import com.teampicker.drorfichman.teampicker.tools.cloud.FirebaseHelper;
 import com.teampicker.drorfichman.teampicker.tools.tutorials.TutorialManager;
-
-import androidx.preference.EditTextPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
@@ -31,6 +40,76 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setColorScheme();
         setTeamsCount();
         setAutoResetComingPlayers();
+        setAdminGenerateTestData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        FirebaseHelper.executePostConfiguration(requireContext(), false, this::updateAdminVisibility);
+    }
+
+    private void updateAdminVisibility() {
+        if (getActivity() == null) return;
+        PreferenceCategory adminCategory = findPreference("admin_category");
+        if (adminCategory != null) {
+            adminCategory.setVisible(FirebaseHelper.isAdmin());
+        }
+    }
+
+    private void setAdminGenerateTestData() {
+        Preference genPref = findPreference("admin_generate_test_data");
+        if (genPref == null) return;
+        genPref.setOnPreferenceClickListener(preference -> {
+            showGenerateTestDataDialog();
+            return true;
+        });
+    }
+
+    private void showGenerateTestDataDialog() {
+        View view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_generate_test_data, null);
+        EditText playersEdit = view.findViewById(R.id.players_count);
+        EditText gamesEdit = view.findViewById(R.id.games_count);
+        playersEdit.setText(String.valueOf(30));
+        gamesEdit.setText(String.valueOf(50));
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.dialog_generate_test_data_title)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    int players = parsePositiveInt(playersEdit.getText(), 30);
+                    int games = parsePositiveInt(gamesEdit.getText(), 50);
+                    runGenerateTestData(players, games);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private int parsePositiveInt(CharSequence s, int defaultVal) {
+        if (TextUtils.isEmpty(s)) return defaultVal;
+        try {
+            int v = Integer.parseInt(s.toString().trim());
+            return v > 0 ? v : defaultVal;
+        } catch (NumberFormatException e) {
+            return defaultVal;
+        }
+    }
+
+    private void runGenerateTestData(int playerCount, int gameCount) {
+        DbAsync.run(
+                () -> {
+                    TestDataGenerator gen = new TestDataGenerator();
+                    return gen.generateAll(requireContext(), playerCount, gameCount);
+                },
+                result -> {
+                    if (getActivity() == null) return;
+                    if (result != null) {
+                        LocalNotifications.sendNotification(requireContext(), LocalNotifications.PULL_DATA_ACTION);
+                        Toast.makeText(requireContext(), R.string.toast_test_data_generated, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(requireContext(), R.string.toast_test_data_failed, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void setTeamsCount() {

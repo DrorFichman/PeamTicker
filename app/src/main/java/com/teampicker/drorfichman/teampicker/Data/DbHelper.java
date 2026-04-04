@@ -27,7 +27,7 @@ import java.util.List;
 public class DbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 10;
     public static final String DATABASE_NAME = "Players.db";
 
     private static SQLiteDatabase writableDatabase;
@@ -112,8 +112,53 @@ public class DbHelper extends SQLiteOpenHelper {
 
         migrateEmptyResultRecords(db);
 
+        if (oldVersion < 10) {
+            migrateTieGamePlayerResultsFromHistoricalBug(db);
+        }
+
         // TODO sanitize player names for firebase, not mandatory - sanitized when
         // synced to cloud
+    }
+
+    /**
+     * Fixes player_game rows where a drawn game (equal scores in {@code game}) was
+     * incorrectly stored as {@link ResultEnum#Lose} for both teams (bug: {@code getResultForTeam}
+     * did not handle {@link TeamEnum#Tie} as winning side). Only updates rows that still
+     * have {@code result = LOSE} for team1/team2 on tied games — idempotent for already-fixed data.
+     */
+    private void migrateTieGamePlayerResultsFromHistoricalBug(SQLiteDatabase db) {
+        try {
+            db.beginTransaction();
+            ContentValues cv = new ContentValues();
+            cv.put(PlayerContract.PlayerGameEntry.PLAYER_RESULT, PlayerGamesDbHelper.TIE);
+            cv.put(PlayerContract.PlayerGameEntry.DID_WIN, 0);
+
+            String gameSubquery = "SELECT " + PlayerContract.GameEntry.GAME + " FROM "
+                    + PlayerContract.GameEntry.TABLE_NAME + " WHERE "
+                    + PlayerContract.GameEntry.TEAM1_SCORE + " = " + PlayerContract.GameEntry.TEAM2_SCORE;
+
+            String where = PlayerContract.PlayerGameEntry.GAME + " IN (" + gameSubquery + ") AND "
+                    + PlayerContract.PlayerGameEntry.TEAM + " IN (0, 1) AND "
+                    + PlayerContract.PlayerGameEntry.PLAYER_RESULT + " = ?";
+
+            int updated = db.update(
+                    PlayerContract.PlayerGameEntry.TABLE_NAME,
+                    cv,
+                    where,
+                    new String[] { String.valueOf(PlayerGamesDbHelper.LOSE) });
+
+            db.setTransactionSuccessful();
+            if (updated > 0) {
+                Log.i("Migrate", "Tie-result migration: corrected " + updated + " player_game row(s)");
+                Event.logEvent(FirebaseAnalytics.getInstance(appContext), EventType.db_migrate_tie_result_fix);
+            } else {
+                Log.d("Migrate", "Tie-result migration: no rows to correct");
+            }
+        } catch (Exception e) {
+            Log.e("Migrate", "Tie-result migration failed: " + e.getMessage(), e);
+        } finally {
+            db.endTransaction();
+        }
     }
 
     /*
@@ -576,15 +621,20 @@ public class DbHelper extends SQLiteOpenHelper {
 
     /**
      * Determine the result for a team based on the winning team.
+     * When scores tie, {@code winningTeam} is {@link TeamEnum#Tie}; both field teams must get {@link ResultEnum#Tie},
+     * not Lose (Team1/Team2 never equal {@code TeamEnum.Tie}).
      */
     private static ResultEnum getResultForTeam(TeamEnum team, TeamEnum winningTeam) {
         if (winningTeam == null || winningTeam == TeamEnum.Bench) {
             return ResultEnum.Tie;
-        } else if (team == winningTeam) {
-            return ResultEnum.Win;
-        } else {
-            return ResultEnum.Lose;
         }
+        if (winningTeam == TeamEnum.Tie) {
+            return ResultEnum.Tie;
+        }
+        if (team == winningTeam) {
+            return ResultEnum.Win;
+        }
+        return ResultEnum.Lose;
     }
 
     public static void updateGameDate(Context context, Game game, String gameDate) {
@@ -655,10 +705,6 @@ public class DbHelper extends SQLiteOpenHelper {
 
     /**
      * Count games that have not been synced to cloud yet.
-     * 
-     * @param context          Context
-     * @param lastSyncedGameId the last game ID that was synced
-     * @return count of games with ID > lastSyncedGameId
      */
     public static int countUnsyncedGames(Context context, int lastSyncedGameId) {
         return GameDbHelper.countGamesSince(getSqLiteDatabase(context), lastSyncedGameId);

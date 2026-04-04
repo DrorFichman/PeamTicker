@@ -46,6 +46,7 @@ import com.teampicker.drorfichman.teampicker.tools.cloud.queries.GetUsers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class FirebaseHelper implements CloudSync {
@@ -175,10 +176,10 @@ public class FirebaseHelper implements CloudSync {
     }
 
     private void checkSync(Context ctx, SyncProgress progress) {
-        // Hide progress while showing dialog
         progress.showSyncProgress(null, 0);
         DialogHelper.showApprovalDialog(ctx,
-                "Sync players and games to the cloud?", "",
+                ctx.getString(R.string.dialog_sync_cloud_title),
+                ctx.getString(R.string.dialog_sync_cloud_message),
                 (dialog, positive) -> {
                     progress.showSyncProgress("Syncing players...", 25);
                     syncData(ctx, progress);
@@ -206,21 +207,11 @@ public class FirebaseHelper implements CloudSync {
      */
     private void syncData(Context ctx, SyncProgress progress) {
         progress.showSyncProgress("Preparing data...", 10);
-        
-        // Prepare all data for upload
+
         StagingData stagingData = new StagingData();
-        
-        // Get current max game ID before syncing
+
         stagingData.maxGameId = DbHelper.getMaxGame(ctx);
-        
-        // Prepare players data
-        ArrayList<Player> players = DbHelper.getPlayers(ctx);
-        for (Player p : players) {
-            stagingData.playersMap.put(sanitizeKey(p.name()), p);
-        }
-        Log.i("syncData", "Prepared " + players.size() + " players for sync");
-        
-        // Prepare games data
+
         ArrayList<Game> games = DbHelper.getGames(ctx);
         for (Game g : games) {
             ArrayList<Player> team1 = DbHelper.getGameTeam(ctx, g.gameId, TeamEnum.Team1, 0);
@@ -228,13 +219,13 @@ public class FirebaseHelper implements CloudSync {
             g.setTeams(team1, team2);
             stagingData.gamesMap.put(String.valueOf(g.gameId), g);
         }
-        Log.i("syncData", "Prepared " + games.size() + " games for sync");
-        
-        // Prepare player games data
+        Log.i("syncData", "Prepared " + stagingData.gamesMap.size() + " games for sync");
+
         ArrayList<PlayerGame> playerGames = DbHelper.getPlayersGames(ctx);
+        java.util.HashSet<String> playerNamesInPlayerGames = new HashSet<>();
         for (PlayerGame pg : playerGames) {
+            playerNamesInPlayerGames.add(sanitizeKey(pg.playerName));
             String playerKey = sanitizeKey(pg.playerName);
-            // Build nested structure: playersGames/{playerName}/{gameId}
             @SuppressWarnings("unchecked")
             Map<String, Object> playerGamesForPlayer = (Map<String, Object>) stagingData.playersGamesMap.get(playerKey);
             if (playerGamesForPlayer == null) {
@@ -243,8 +234,17 @@ public class FirebaseHelper implements CloudSync {
             }
             playerGamesForPlayer.put(String.valueOf(pg.gameId), pg);
         }
-        Log.i("syncData", "Prepared " + playerGames.size() + " player games for sync");
-        
+        Log.i("syncData", "Staged player games under " + stagingData.playersGamesMap.size() + " players (from "
+                + playerGames.size() + " total rows)");
+
+        ArrayList<Player> players = DbHelper.getPlayers(ctx);
+        for (Player p : players) {
+            String key = sanitizeKey(p.name());
+            if (!playerNamesInPlayerGames.contains(key)) continue;
+            stagingData.playersMap.put(key, p);
+        }
+        Log.i("syncData", "Prepared " + stagingData.playersMap.size() + " players for sync");
+
         // Step 1: Clear any leftover staging data first
         progress.showSyncProgress("Clearing staging...", 20);
         clearStagingData(() -> {
@@ -384,10 +384,9 @@ public class FirebaseHelper implements CloudSync {
                 progress.showSyncProgress(null, 0);
                 Toast.makeText(ctx, ctx.getString(R.string.toast_error_cloud_finalize_sync_failed, error.getMessage()), Toast.LENGTH_LONG).show();
             } else {
-                // Save the last synced game ID after successful sync
                 PreferenceHelper.setLastSyncedGameId(ctx, stagingData.maxGameId);
                 Log.i("swapStagingToProduction", "Atomic swap completed, saved last synced game ID: " + stagingData.maxGameId);
-                
+
                 progress.showSyncProgress(null, 100);
                 Toast.makeText(ctx, ctx.getString(R.string.toast_success_sync_completed), Toast.LENGTH_LONG).show();
             }
@@ -724,11 +723,11 @@ public class FirebaseHelper implements CloudSync {
                     
                     // All data fetched successfully - now insert atomically
                     try {
-                        DbHelper.replaceDataInTransaction(ctx, 
-                                cloudData.players, 
-                                cloudData.games, 
+                        DbHelper.replaceDataInTransaction(ctx,
+                                cloudData.players,
+                                cloudData.games,
                                 cloudData.playerGames);
-                        
+
                         // After successful transaction, update last synced game ID
                         int maxGameId = DbHelper.getMaxGame(ctx);
                         PreferenceHelper.setLastSyncedGameId(ctx, maxGameId);

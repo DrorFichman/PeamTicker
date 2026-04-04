@@ -15,6 +15,7 @@ public enum EventType {
     sign_in, sign_out, // Done
     tutorial_dismissed, // Done
     db_migrate_empty_result, // Done
+    db_migrate_tie_result_fix, // Done
     in_app_review_requested, // Done
     in_app_review_shown, // Done
     in_app_review_completed, // Done

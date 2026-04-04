@@ -4,7 +4,8 @@
   "description": "Admin scripts for TeamPicker Firebase operations",
   "scripts": {
     "copy-games": "node copy-games.js",
-    "user-stats": "node user-stats.js"
+    "user-stats": "node user-stats.js",
+    "check-tie-bug": "node check-tie-result-bug.js"
   },
   "dependencies": {
     "firebase-admin": "^12.0.0"

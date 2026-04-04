@@ -171,6 +171,17 @@
     <string name="setting_title_auto_reset_coming">Clear coming players</string>
     <string name="setting_summary_auto_reset_coming">Automatically clear attending players after saving game results</string>
 
+    <!--    Admin-->
+    <string name="admin_category">Admin</string>
+    <string name="admin_generate_test_data">Generate Test Data</string>
+    <string name="admin_generate_test_data_summary">Create sample players and games for chart testing</string>
+    <string name="dialog_generate_test_data_title">Generate Test Data</string>
+    <string name="dialog_players_label">Players</string>
+    <string name="dialog_games_label">Games</string>
+    <string name="toast_test_data_failed">Failed to generate test data</string>
+    <string name="dialog_sync_cloud_title">Sync players and games to the cloud?</string>
+    <string name="dialog_sync_cloud_message"></string>
+
     <!--    3-Team Feature-->
     <string name="dialog_team_count_title">How many teams?</string>
     <string name="dialog_team_count_message">Choose how to divide your players</string>
@@ -390,6 +401,7 @@
     <string name="toast_success_pull_completed">Pull completed from %1$s</string>
     <string name="toast_success_player_saved">Player saved</string>
     <string name="toast_success_tutorial_reset">Tutorial reset</string>
+    <string name="toast_test_data_generated">Test data generated</string>
     <string name="toast_success_weather_updated">Weather settings updated</string>
 
     <!--    Toast Messages - Validation-->
